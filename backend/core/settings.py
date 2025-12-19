@@ -92,6 +92,8 @@ SITE_ID = 1 # django.contrib.sites 필수 설정
 REST_AUTH = {
     'USE_JWT': False, # 기본 Token 기반 인증 사용 시 False
     'SESSION_LOGIN': True,
+    'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
+    'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
 }
 
 ROOT_URLCONF = 'core.urls'
@@ -173,6 +175,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # allauth 설정 (이메일 인증 등 서비스 정책에 맞게 조절 가능)
-ACCOUNT_AUTHENTICATION_METHOD = 'username' # 또는 'email'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'none' # 테스트 시 'none', 운영 시 'mandatory'
+ACCOUNT_AUTHENTICATION_METHOD = 'email' # 이메일로 인증
+ACCOUNT_EMAIL_REQUIRED = True           # 이메일 필드 필수
+ACCOUNT_USERNAME_REQUIRED = False       # username 필드 필수 아님
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None # username 필드를 사용하지 않음
+ACCOUNT_EMAIL_VERIFICATION = 'none'     # 테스트 시 'none', 운영 시 'mandatory'

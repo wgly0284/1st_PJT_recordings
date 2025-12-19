@@ -1,7 +1,9 @@
 
 import { createApp } from 'vue'
+import { createPinia } from 'pinia' // Pinia import
 import App from './App.vue'
 import router from './router'
+import { useAuthStore } from './stores/auth' // Auth store import
 
 // Tailwind CDN (전역 설정)
 const tailwindScript = document.createElement('script')
@@ -49,5 +51,14 @@ lucideScript.src = 'https://unpkg.com/lucide@latest'
 document.head.appendChild(lucideScript)
 
 const app = createApp(App)
-app.use(router)
+const pinia = createPinia() // Pinia 인스턴스 생성
+
+app.use(pinia) // 앱에 Pinia 등록
+
+// Pinia 스토어가 라우터 인스턴스를 사용할 수 있도록 설정
+// app.use(router)보다 먼저 실행되어야 함
+const authStore = useAuthStore()
+authStore.setRouter(router)
+
+app.use(router) // 앱에 라우터 등록
 app.mount('#app')

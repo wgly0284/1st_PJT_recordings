@@ -2,6 +2,10 @@ from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from allauth.account import app_settings as allauth_settings # allauth 설정 가져오기
 from .models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 # dj-rest-auth의 기본 회원가입 시리얼라이저를 상속받아 커스텀 필드 처리 로직 추가
 class CustomRegisterSerializer(RegisterSerializer):
@@ -52,3 +56,12 @@ class CustomUserDetailsSerializer(serializers.ModelSerializer):
         )
         # API를 통해 직접 수정할 수 없는 읽기 전용 필드
         read_only_fields = ('pk', 'email')
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id', 'email', 'nickname', 'profile_image_url', 
+            'bread_preferences', 'follows', 'followers'
+        ]

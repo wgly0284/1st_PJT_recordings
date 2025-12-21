@@ -16,7 +16,7 @@ class User(AbstractUser):
     # email을 주요 식별자로 사용하고, 고유하게 설정
     email = models.EmailField(unique=True)
 
-    profile_image_url = models.URLField(blank=True)
+    profile_image_url = models.CharField(max_length=500, blank=True)
     
     # 빵 취향 저장을 위한 필드
     bread_preferences = models.CharField(max_length=255, blank=True)
@@ -36,3 +36,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+    
+    
+    

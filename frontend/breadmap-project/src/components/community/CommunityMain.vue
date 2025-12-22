@@ -38,30 +38,44 @@
             selectedPost ? 'lg:col-span-1' : 'lg:col-span-3',
           ]"
         >
-          <!-- 카테고리 탭 -->
-          <div
-            class="flex flex-wrap lg:flex-nowrap justify-center lg:justify-start gap-3"
-          >
-            <button
-              v-for="cat in categories"
-              :key="cat.value"
-              @click="
-                () => {
-                  selectedCategory = cat.value
-                  selectedPost = null
-                  isCommentsOpen = false
-                }
-              "
-              :class="[
-                'px-5 py-2 text-sm font-bold rounded-full border-2 transition-all duration-200 flex items-center gap-2',
-                selectedCategory === cat.value
-                  ? 'bg-teal-900 text-white border-teal-900'
-                  : 'bg-white text-teal-900 border-teal-900/50 hover:border-teal-900 hover:bg-teal-50',
-              ]"
+          <!-- 카테고리 탭 & 액션 버튼 -->
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div
+              class="flex flex-wrap lg:flex-nowrap justify-center lg:justify-start gap-3"
             >
-              <span class="w-2 h-2 rounded-full bg-current"></span>
-              {{ cat.label }}
-            </button>
+              <button
+                v-for="cat in categories"
+                :key="cat.value"
+                @click="
+                  () => {
+                    selectedCategory = cat.value
+                    selectedPost = null
+                    isCommentsOpen = false
+                  }
+                "
+                :class="[
+                  'px-5 py-2 text-sm font-bold rounded-full border-2 transition-all duration-200 flex items-center gap-2',
+                  selectedCategory === cat.value
+                    ? 'bg-teal-900 text-white border-teal-900'
+                    : 'bg-white text-teal-900 border-teal-900/50 hover:border-teal-900 hover:bg-teal-50',
+                ]"
+              >
+                <span class="w-2 h-2 rounded-full bg-current"></span>
+                {{ cat.label }}
+              </button>
+            </div>
+            
+            <!-- 액션 버튼 영역 -->
+            <div class="flex items-center gap-3">
+              <button @click="fetchPosts" title="새로고침" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.899 2.186l-1.414 1.414A5.002 5.002 0 005.999 7.99V11a1 1 0 11-2 0V3a1 1 0 011-1zm12 3.899A7.003 7.003 0 018.101 16.89l1.414-1.414A5.002 5.002 0 0014.001 12.01V9a1 1 0 112 0v6a1 1 0 01-1 1h-5a1 1 0 110-2h2.01a5.002 5.002 0 00-3.9-3.9l1.414-1.414A7.003 7.003 0 0116 5.899z" clip-rule="evenodd" />
+                </svg>
+              </button>
+              <button @click="handleWritePost" class="px-5 py-2 text-sm font-bold rounded-full bg-orange-500 text-white hover:bg-orange-600 transition-colors">
+                글 작성
+              </button>
+            </div>
           </div>
 
           <!-- 글 목록 -->
@@ -302,6 +316,66 @@ const posts = ref([
     date: '2025.12.17',
   },
 ])
+
+const handleWritePost = () => {
+  alert('글 작성 기능은 현재 준비 중입니다. 백엔드 API 구현이 필요합니다.');
+};
+
+const fetchPosts = () => {
+  // 나중에는 실제 API를 호출해야 합니다.
+  // 지금은 목업 데이터를 다시 할당하여 새로고침을 흉내냅니다.
+  posts.value = [
+    {
+      id: 1,
+      category: '빵 주저리',
+      type: 'chatter',
+      title: '소금빵만 5군데 털어본 후기',
+      content:
+        '성수, 연남, 망원까지 돌면서 먹어본 소금빵 비교. 가격, 크기, 소금 함량까지 꼼꼼하게 비교해봤어요.',
+      likes: Math.floor(Math.random() * 100),
+      comments: Math.floor(Math.random() * 30),
+      views: (Math.random() * 3).toFixed(1),
+      date: '2025.12.20',
+    },
+    {
+      id: 2,
+      category: '빵집 추천',
+      type: 'recommend',
+      title: '서울 밤에 가기 좋은 베이글 맛집',
+      content:
+        '야근 끝나고도 열려있는 베이글 빵집 모음. 늦은 밤 크리미하고 쫀득한 베이글이 땡길 때 딱 좋은 곳들입니다.',
+      likes: Math.floor(Math.random() * 100),
+      comments: Math.floor(Math.random() * 30),
+      views: (Math.random() * 3).toFixed(1),
+      date: '2025.12.19',
+    },
+    {
+      id: 3,
+      category: '빵 꿀팁',
+      type: 'tip',
+      title: '크루아상 바삭하게 보관하는 법',
+      content:
+        '에어프라이어로 3분만에 갓 구운 느낌 살리기. 냉동 보관부터 해동까지 완벽한 크루아상 관리법 공유합니다.',
+      likes: Math.floor(Math.random() * 100),
+      comments: Math.floor(Math.random() * 30),
+      views: (Math.random() * 3).toFixed(1),
+      date: '2025.12.18',
+    },
+    {
+      id: 4,
+      category: '빵집 추천',
+      type: 'recommend',
+      title: '제주도 사워도우 투어 루트',
+      content:
+        '차 없이도 돌아다닐 수 있는 빵지 순례 코스. 제주공항 근처부터 성산까지 버스 타고 즐기는 사워도우 여행.',
+      likes: Math.floor(Math.random() * 100),
+      comments: Math.floor(Math.random() * 30),
+      views: (Math.random() * 3).toFixed(1),
+      date: '2025.12.17',
+    },
+  ];
+  console.log('Posts refreshed (mock data)');
+};
 
 const filteredPosts = computed(() => {
   if (selectedCategory.value === 'hot') return posts.value

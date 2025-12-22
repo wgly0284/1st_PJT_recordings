@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Store
 from .serializers import StoreListSerializer, StoreSerializer, MapStoreSerializer
+from .utils import generate_store_summary
+from django.shortcuts import get_object_or_404
 
 # 지도용 API (가볍게 전체 마커용으로 사용한다면 유지, 아니면 StoreListView 하나로 통합 가능)
 class MapStoreListView(generics.ListAPIView):
@@ -29,7 +31,7 @@ class StoreListView(generics.ListAPIView):
     # address: 주소
     # category: 카테고리
     # representative_tags: 태그 (만약 모델에 있다면)
-    search_fields = ['name', 'address', 'category', 'representative_tags']
+    search_fields = ['name', 'address', 'category', 'representative_tags', 'products__name']
 
 class StoreDetailView(generics.RetrieveAPIView):
     """
@@ -69,3 +71,21 @@ class UserBookmarkListView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.request.user.bookmarked_stores.all()
+    
+class StoreAISummaryView(APIView):
+    """
+    특정 가게(pk)의 리뷰들을 모아 AI 요약을 반환합니다.
+    GET /stores/<pk>/ai-summary/
+    """
+    def get(self, request, pk):
+        store = get_object_or_404(Store, pk=pk)
+        
+        # 가게에 달린 리뷰 내용만 리스트로 추출
+        # (related_name='reviews'가 모델에 설정되어 있어야 함)
+        reviews = store.reviews.all().values_list('content', flat=True)
+        reviews_list = list(reviews)
+        
+        # AI 요약 함수 실행
+        ai_result = generate_store_summary(store.name, reviews_list)
+        
+        return Response(ai_result, status=status.HTTP_200_OK)

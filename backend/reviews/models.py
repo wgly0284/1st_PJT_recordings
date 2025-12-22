@@ -8,7 +8,14 @@ class Review(models.Model):
     content = models.TextField()
     rating = models.IntegerField() # 1~5점과 같은 정수형 평점
     photo_urls = models.TextField(blank=True) # 여러 이미지 URL 저장
+    
+    # 기존 일반 태그 (예: #데이트 #분위기좋은)
     tags = models.CharField(max_length=200, blank=True)
+    
+    # ✅ [추가] 빵 맛/식감 태그 (Idea 3: 취향 분석용)
+    # 예: "달달함,바삭함,촉촉함" (콤마로 구분하여 저장)
+    taste_tags = models.CharField(max_length=200, blank=True, null=True) 
+    
     created_at = models.DateTimeField(auto_now_add=True)
     
     # '리뷰 좋아요' 관계

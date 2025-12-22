@@ -1,3 +1,4 @@
+from django.core.files.storage import default_storage
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -79,6 +80,30 @@ class ReviewCreateView(generics.CreateAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
 
+    def create(self, request, *args, **kwargs):
+        mutable_data = request.data.copy()
+        
+        # 1. 이미지 처리
+        image_file = request.FILES.get('image')
+        if image_file:
+            filename = default_storage.save(f'review_photos/{image_file.name}', image_file)
+            image_url = default_storage.url(filename)
+            mutable_data['photo_urls'] = image_url
+            
+        # 2. 제목(title)과 내용(content) 합치기
+        title = mutable_data.get('title')
+        content = mutable_data.get('content', '')
+        if title:
+            # 마크다운 형식으로 제목을 내용 상단에 추가
+            mutable_data['content'] = f"**{title}**\n\n{content}"
+
+        # 3. CreateAPIView의 기본 create 로직 다시 호출
+        serializer = self.get_serializer(data=mutable_data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
     def perform_create(self, serializer):
-        # 필요에 따라 store_id 등 추가 필드를 함께 저장
+        # 리뷰를 작성할 때, 요청을 보낸 사용자를 user 필드에 자동으로 할당
         serializer.save(user=self.request.user)

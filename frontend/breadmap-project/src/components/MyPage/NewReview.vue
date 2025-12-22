@@ -1,3 +1,55 @@
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const category = ref('')
+const title = ref('')
+const content = ref('')
+const imageFile = ref(null)
+const isSubmitting = ref(false)
+
+const handleImageChange = (e) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  imageFile.value = file
+}
+
+const handleSubmit = async () => {
+  if (!category.value || !title.value || !content.value) {
+    alert('카테고리, 제목, 내용을 모두 입력해주세요.')
+    return
+  }
+  
+  // TODO: 백엔드에 커뮤니티 게시글 생성 API가 준비되면 아래 로직을 구현해야 합니다.
+  alert('커뮤니티 글 작성 기능은 현재 준비 중입니다. 백엔드 API 구현이 필요합니다.');
+  
+  // 아래는 실제 구현 시 사용될 예시 코드입니다.
+  /*
+  const formData = new FormData()
+  formData.append('category', category.value)
+  formData.append('title', title.value)
+  formData.append('content', content.value)
+  if (imageFile.value) {
+    formData.append('image', imageFile.value)
+  }
+
+  try {
+    isSubmitting.value = true
+    // const res = await apiClient.post('/community/posts/', formData)
+    // alert('게시글이 등록되었습니다!')
+    // router.push({ name: 'community' }) 
+  } catch (e) {
+    console.error('게시글 등록 실패:', e)
+    alert('게시글 등록 중 오류가 발생했습니다.')
+  } finally {
+    isSubmitting.value = false
+  }
+  */
+}
+</script>
+
 <template>
   <div class="min-h-screen bg-gray-50/50 pt-32 pb-32">
     <div class="max-w-4xl mx-auto px-6 space-y-8">
@@ -6,17 +58,17 @@
         <h1
           class="text-4xl md:text-5xl font-playfair font-bold bg-gradient-to-r from-teal-900 to-teal-700 bg-clip-text text-transparent mb-2"
         >
-          WRITE REVIEW
+          WRITE POST
         </h1>
         <p class="text-xl text-gray-600">
-          빵집 방문 후기를 남겨 빵지순례 지도를 함께 채워보세요.
+          빵에 대한 당신의 이야기를 자유롭게 공유해주세요.
         </p>
       </div>
 
       <!-- 작성 카드 -->
       <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 md:p-8">
         <h2 class="text-sm font-bold text-gray-500 tracking-widest mb-4">
-          REVIEW FORM
+          NEW POST FORM
         </h2>
 
         <div class="space-y-5">
@@ -51,7 +103,7 @@
             <textarea
               v-model="content"
               class="mt-1 w-full border rounded-lg px-3 py-2 text-sm min-h-[160px] bg-white focus:outline-none focus:ring-2 focus:ring-teal-800 focus:border-teal-800"
-              placeholder="리뷰 내용을 자세히 입력해주세요. 맛, 분위기, 재방문 의사 등을 자유롭게 적어주세요."
+              placeholder="자유롭게 당신의 이야기를 적어주세요."
             ></textarea>
           </label>
 
@@ -72,7 +124,7 @@
 
         <div class="mt-8 flex flex-col sm:flex-row justify-between gap-3">
           <router-link
-            :to="{ name: 'myreview' }"
+            :to="{ name: 'community' }"
             class="inline-flex items-center justify-center px-6 py-3 border border-gray-200 text-sm font-semibold rounded-full text-gray-600 hover:bg-gray-50"
           >
             취소하고 돌아가기
@@ -91,59 +143,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import apiClient from '@/api/axios'
-
-const router = useRouter()
-
-const category = ref('')
-const title = ref('')
-const content = ref('')
-const imageFile = ref(null)
-const isSubmitting = ref(false)
-
-const handleImageChange = (e) => {
-  const file = e.target.files?.[0]
-  if (!file) return
-  imageFile.value = file
-}
-
-const handleSubmit = async () => {
-  if (!category.value || !title.value || !content.value) {
-    alert('카테고리, 제목, 내용을 모두 입력해주세요.')
-    return
-  }
-
-  const formData = new FormData()
-  formData.append('category', category.value)
-  formData.append('title', title.value)
-  formData.append('content', content.value)
-  if (imageFile.value) {
-    formData.append('image', imageFile.value)
-  }
-
-  try {
-    isSubmitting.value = true
-
-    // 백엔드에서 만든 생성용 엔드포인트에 맞춰 호출
-    const res = await apiClient.post('/reviews/create/', formData)
-    const created = res.data   // { id: ... } 형태라고 가정[web:198]
-
-    alert('리뷰가 등록되었습니다!')
-
-    // 방금 생성한 리뷰를 선택한 상태로 myreview 페이지로 이동
-    router.push({
-      name: 'myreview',
-      query: { selectedId: created.id },
-    })  // script setup 에서는 useRouter() + router.push 사용[web:199][web:202]
-  } catch (e) {
-    console.error('리뷰 등록 실패:', e.response?.status, e.response?.data)
-    alert('리뷰 등록 중 오류가 발생했습니다.')
-  } finally {
-    isSubmitting.value = false
-  }
-}
-</script>

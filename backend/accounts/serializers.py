@@ -53,9 +53,14 @@ class CustomUserDetailsSerializer(serializers.ModelSerializer):
             'nickname',
             'profile_image_url',
             'bread_preferences',
+            # [추가] 캐릭터 성장 관련 필드
+            'level',
+            'exp',
+            'character_type',
         )
         # API를 통해 직접 수정할 수 없는 읽기 전용 필드
-        read_only_fields = ('pk', 'email')
+        # 레벨과 경험치는 서버 로직에 의해서만 변경되어야 하므로 read_only에 추가
+        read_only_fields = ('pk', 'email', 'level', 'exp', 'character_type')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -63,5 +68,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'email', 'nickname', 'profile_image_url', 
-            'bread_preferences', 'follows', 'followers'
+            'bread_preferences', 'follows', 'followers',
+            # [추가] 캐릭터 성장 관련 필드
+            'level', 'exp', 'character_type'
         ]

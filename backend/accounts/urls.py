@@ -7,6 +7,9 @@ urlpatterns = [
     # dj-rest-auth의 기본 UserDetailsView 대신 우리가 만든 CustomUserDetailsView를 사용
     path('user/', CustomUserDetailsView.as_view(), name='user_details'),
     
+    # [수정] 마이페이지 통합 데이터
+    path('profile/', views.UserProfileView.as_view(), name='user_profile'),
+
     # /accounts/signup/ -> 회원가입 (POST)
     # dj-rest-auth의 회원가입 기능을 포함
     path('signup/', include('dj_rest_auth.registration.urls')),

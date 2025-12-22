@@ -1,6 +1,7 @@
 from django.urls import path, include
 from . import views
 from reviews.views import ReviewListCreateView # reviews 앱의 뷰를 가져옴
+from .views import StoreAISummaryView
 
 urlpatterns = [
     path('map/', views.MapStoreListView.as_view(), name='map_store_list'),
@@ -11,5 +12,7 @@ urlpatterns = [
     # /stores/<store_pk>/reviews/ 경로에 대한 URL 패턴 추가
     path('<int:store_pk>/reviews/', ReviewListCreateView.as_view(), name='review_list_create'),
     path('my_bookmarks/', views.UserBookmarkListView.as_view(), name='my_bookmarks'), # 추가된 URL
+
+    path('stores/<int:pk>/ai-summary/', StoreAISummaryView.as_view(), name='store-ai-summary'),
 ]
 

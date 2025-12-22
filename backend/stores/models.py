@@ -6,8 +6,8 @@ class Store(models.Model):
     address = models.CharField(max_length=200)
     
     # 좌표는 null 허용 (잘 되어 있음)
-    latitude = models.DecimalField(max_digits=10, decimal_places=8, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     
     # [수정 1] null=True 추가 (데이터가 없어도 에러 안 나게)
     category = models.CharField(max_length=50, blank=True, null=True)

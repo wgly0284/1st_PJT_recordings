@@ -1,14 +1,46 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import apiClient from '@/api/axios'
 
 const router = useRouter()
+const route = useRoute()
+
+// 전체 가게 목록
+const stores = ref([])
+// 검색어
+const storeQuery = ref('')
+// 선택된 가게 id
+const storeId = ref(route.params.storeId || '')
 
 const category = ref('')
 const title = ref('')
 const content = ref('')
+const rating = ref(5)
+const tags = ref('')
+const tasteTags = ref('')
 const imageFile = ref(null)
 const isSubmitting = ref(false)
+
+onMounted(async () => {
+  try {
+    const res = await apiClient.get('/stores/')   // 실제 엔드포인트
+    console.log('stores 응답:', res.data)        // 🔍 여기 추가
+    stores.value = res.data
+  } catch (e) {
+    console.error('가게 목록 불러오기 실패:', e)
+  }
+})
+
+
+// 검색 필터링된 가게들
+const filteredStores = computed(() => {
+  const q = storeQuery.value.trim().toLowerCase()
+  if (!q) return stores.value.slice(0, 20) // 검색어 없으면 상위 20개만
+  return stores.value.filter((s) =>
+    `${s.name} ${s.address || ''}`.toLowerCase().includes(q)
+  ).slice(0, 20) // 최대 20개
+})
 
 const handleImageChange = (e) => {
   const file = e.target.files?.[0]
@@ -21,34 +53,47 @@ const handleSubmit = async () => {
     alert('카테고리, 제목, 내용을 모두 입력해주세요.')
     return
   }
-  
-  // TODO: 백엔드에 커뮤니티 게시글 생성 API가 준비되면 아래 로직을 구현해야 합니다.
-  alert('커뮤니티 글 작성 기능은 현재 준비 중입니다. 백엔드 API 구현이 필요합니다.');
-  
-  // 아래는 실제 구현 시 사용될 예시 코드입니다.
-  /*
-  const formData = new FormData()
-  formData.append('category', category.value)
-  formData.append('title', title.value)
-  formData.append('content', content.value)
-  if (imageFile.value) {
-    formData.append('image', imageFile.value)
+
+  if (category.value === '빵집 추천' && !storeId.value) {
+    alert('빵집 추천 글에는 가게 선택이 필요합니다.')
+    return
   }
 
   try {
     isSubmitting.value = true
-    // const res = await apiClient.post('/community/posts/', formData)
-    // alert('게시글이 등록되었습니다!')
-    // router.push({ name: 'community' }) 
+
+    const formData = new FormData()
+
+    if (category.value === '빵집 추천' && storeId.value) {
+      formData.append('store', storeId.value)
+    }
+
+    formData.append('rating', rating.value)
+    formData.append('title', title.value)
+    formData.append('content', content.value)
+    formData.append('tags', tags.value || category.value)
+    formData.append('taste_tags', tasteTags.value || '')
+
+    if (imageFile.value) {
+      formData.append('image', imageFile.value)
+    }
+
+    await apiClient.post('/reviews/create/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+
+    alert('게시글이 등록되었습니다!')
+    router.push({ name: 'community' })
   } catch (e) {
-    console.error('게시글 등록 실패:', e)
+    console.error('게시글 등록 실패:', e.response?.data || e)
     alert('게시글 등록 중 오류가 발생했습니다.')
   } finally {
     isSubmitting.value = false
   }
-  */
 }
 </script>
+
+
 
 <template>
   <div class="min-h-screen bg-gray-50/50 pt-32 pb-32">
@@ -85,6 +130,52 @@ const handleSubmit = async () => {
               <option value="빵 꿀팁">빵 꿀팁</option>
             </select>
           </label>
+
+          <!-- 가게 검색/선택 (빵집 추천일 때만) -->
+          <div v-if="category === '빵집 추천'" class="space-y-2">
+            <span class="text-sm font-semibold text-gray-700">가게 선택</span>
+
+            <!-- 검색 입력 -->
+            <input
+              v-model="storeQuery"
+              type="text"
+              class="mt-1 w-full border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-800 focus:border-teal-800"
+              placeholder="가게 이름 또는 주소를 입력해서 검색하세요"
+            />
+
+            <!-- 검색 결과 리스트 -->
+            <div
+              v-if="filteredStores.length"
+              class="max-h-52 overflow-y-auto border border-gray-200 rounded-xl divide-y"
+            >
+              <button
+                v-for="store in filteredStores"
+                :key="store.id"
+                type="button"
+                @click="storeId = store.id"
+                :class="[
+                  'w-full px-3 py-2 text-left text-sm hover:bg-teal-50',
+                  storeId === store.id ? 'bg-teal-100' : ''
+                ]"
+              >
+                <div class="font-semibold text-gray-900">
+                  {{ store.name }}
+                </div>
+                <div class="text-xs text-gray-500">
+                  {{ store.address }}
+                </div>
+              </button>
+            </div>
+
+            <p v-else class="text-xs text-gray-400">
+              검색 결과가 없습니다.
+            </p>
+
+            <!-- 선택된 가게 표시 -->
+            <p v-if="storeId" class="text-xs text-teal-700 mt-1">
+              선택된 가게 ID: {{ storeId }}
+            </p>
+          </div>
 
           <!-- 제목 -->
           <label class="block text-left">

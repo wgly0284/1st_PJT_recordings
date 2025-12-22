@@ -54,9 +54,9 @@ const routes = [
     component: ReviewDetail
   },
   {
-    path: '/myreview/new',
+    path: '/stores/:storeId?/newReview', // ? 추가: storeId를 선택적 파라미터로
     name: 'newReview',
-    component: NewReview
+    component: NewReview,
   },
   {
     path: '/community',

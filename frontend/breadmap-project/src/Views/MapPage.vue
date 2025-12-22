@@ -1,8 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router'; // 라우터 사용
 import KakaoMapLoader from '@/components/map/KakaoMapLoader.vue';
 import BakeryMap from '@/components/map/BakeryMap.vue';
-import { Search, MapPin, Star, Heart, Navigation, ThumbsUp, Home, Map as MapIcon, BookOpen, User } from 'lucide-vue-next';
+// ChevronLeft, ChevronRight 아이콘 추가
+import { Search, MapPin, Star, Heart, Navigation, ThumbsUp, Home, Map as MapIcon, BookOpen, User, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+
+const router = useRouter();
 
 // 더미 데이터
 const bakeries = ref([
@@ -14,7 +18,9 @@ const bakeries = ref([
 const selectedBakery = ref(null);
 const currentHotBakery = ref(null);
 const isListOpen = ref(true); // 사이드바 토글 상태
-const currentTab = ref('map'); // 현재 탭 상태
+
+// 지도 컴포넌트 제어용 ref
+const mapRef = ref(null);
 
 // 기분/상황별 필터
 const moods = [
@@ -24,14 +30,11 @@ const moods = [
   { label: "❤️ 데이트", keyword: "데이트" },
 ];
 
-// 마커 클릭 -> 리스트에서 해당 빵집 강조
 const handleMarkerClick = (bakery) => {
   selectedBakery.value = bakery;
-  // 모바일이거나 리스트가 닫혀있다면 열어주기
   if (!isListOpen.value) isListOpen.value = true;
 };
 
-// 리스트 항목 클릭 -> 지도 이동
 const handleListClick = (bakery) => {
   selectedBakery.value = bakery;
 };
@@ -40,10 +43,24 @@ const filterByMood = (keyword) => {
   console.log("Filtering by:", keyword);
 };
 
-// 랜덤 핫한 빵집 추천
 const pickRandomHotBakery = () => {
   const randomIndex = Math.floor(Math.random() * bakeries.value.length);
   currentHotBakery.value = bakeries.value[randomIndex];
+};
+
+// 내 위치 버튼 클릭 핸들러
+const handleMyLocationClick = () => {
+  if (mapRef.value) {
+    mapRef.value.moveToCurrentLocation();
+  }
+};
+
+// 새로고침 대신 지도 초기화 (필요시 구현)
+const refreshMap = () => {
+  if (mapRef.value) {
+    // 지도 리셋 로직 등을 여기에 추가 가능
+    console.log("지도 새로고침");
+  }
 };
 
 onMounted(() => {
@@ -53,45 +70,48 @@ onMounted(() => {
 
 <template>
   <KakaoMapLoader>
-    <!-- 상단 여백 없이 화면 꽉 채움 (h-screen) -->
-    <div class="flex h-screen w-full overflow-hidden relative bg-[#F9F7F2]">
+    <!-- 
+      ✅ fixed inset-0 z-50: 화면 전체를 덮도록 설정하여 기존 Nav바 가림
+    -->
+    <div class="fixed inset-0 z-50 flex w-full h-full bg-[#F9F7F2] overflow-hidden">
       
-      <!-- 0. 세로형 네비게이션 바 (가장 왼쪽) -->
+      <!-- 0. 세로형 네비게이션 바 (GNB) -->
       <nav class="w-[72px] h-full bg-[#1D4E45] flex flex-col items-center py-6 z-50 shrink-0 shadow-lg text-white/70">
         <!-- 로고 -->
-        <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-xl mb-10 cursor-pointer hover:bg-white/20 transition-colors text-white">
+        <router-link :to="{ name: 'home' }" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-xl mb-10 cursor-pointer hover:bg-white/20 transition-colors text-white no-underline">
           🥐
-        </div>
+        </router-link>
 
         <!-- 메뉴 아이콘들 -->
         <div class="flex flex-col gap-8 w-full">
-          <button @click="currentTab = 'home'" :class="{'text-white scale-110': currentTab === 'home'}" class="flex flex-col items-center gap-1 hover:text-white hover:scale-110 transition-all group">
-            <Home class="w-6 h-6 group-hover:stroke-[2.5px]" />
-            <span class="text-[10px] font-medium">홈</span>
-          </button>
           
-          <button @click="currentTab = 'map'" :class="{'text-orange-400 scale-110': currentTab === 'map'}" class="flex flex-col items-center gap-1 hover:text-orange-400 hover:scale-110 transition-all group relative">
-            <MapIcon class="w-6 h-6 group-hover:stroke-[2.5px]" />
+          
+          <!-- 지도 (현재 활성화 상태 고정) -->
+          <button @click="refreshMap" class="flex flex-col items-center gap-1 text-orange-400 scale-110 transition-all group relative">
+            <MapIcon class="w-6 h-6 stroke-[2.5px]" />
             <span class="text-[10px] font-medium">지도</span>
             <!-- 활성 표시 -->
-            <div v-if="currentTab === 'map'" class="absolute -right-[18px] top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-400 rounded-l-full"></div>
+            <div class="absolute -right-[18px] top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-400 rounded-l-full"></div>
           </button>
 
-          <button @click="currentTab = 'magazine'" :class="{'text-white scale-110': currentTab === 'magazine'}" class="flex flex-col items-center gap-1 hover:text-white hover:scale-110 transition-all group">
+          <!-- 매거진 (커뮤니티) -->
+          <router-link :to="{ name: 'community' }" class="flex flex-col items-center gap-1 hover:text-white hover:scale-110 transition-all group no-underline text-white/70">
             <BookOpen class="w-6 h-6 group-hover:stroke-[2.5px]" />
-            <span class="text-[10px] font-medium">매거진</span>
-          </button>
+            <span class="text-[10px] font-medium">커뮤니티</span>
+          </router-link>
 
-          <button @click="currentTab = 'mypage'" :class="{'text-white scale-110': currentTab === 'mypage'}" class="flex flex-col items-center gap-1 hover:text-white hover:scale-110 transition-all group">
+          <!-- 마이페이지 -->
+          <router-link :to="{ name: 'mypage' }" class="flex flex-col items-center gap-1 hover:text-white hover:scale-110 transition-all group no-underline text-white/70">
             <User class="w-6 h-6 group-hover:stroke-[2.5px]" />
             <span class="text-[10px] font-medium">마이</span>
-          </button>
+          </router-link>
         </div>
 
-        <!-- 하단 설정 -->
+        <!-- 하단 프로필 설정 -->
         <div class="mt-auto">
            <button class="w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 hover:border-white transition-colors">
-             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-full h-full bg-white/10">
+             <!-- ✅ 수정: img 태그 닫기 -->
+             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-full h-full bg-white/10" />
            </button>
         </div>
       </nav>
@@ -101,14 +121,15 @@ onMounted(() => {
         class="absolute md:relative z-20 h-full bg-white shadow-xl transition-all duration-300 flex flex-col border-r border-[#1D4E45]/10 left-[72px] md:left-0"
         :class="isListOpen ? 'w-[320px] md:w-[380px] translate-x-0' : 'w-0 -translate-x-full md:w-0 md:-translate-x-0 overflow-hidden'"
       >
-        <!-- 사이드바 헤더: 검색 & 필터 -->
+        <!-- 사이드바 헤더 -->
         <div class="p-5 border-b border-gray-100 bg-white shrink-0 z-10">
           <div class="relative mb-4">
+            <!-- ✅ 수정: input 태그 닫기 -->
             <input 
               type="text" 
               placeholder="장소, 주소, 빵 검색" 
               class="w-full pl-11 pr-4 py-3 bg-[#F9F7F2] rounded-lg border-none outline-none text-[#4A4036] placeholder-gray-400 focus:ring-2 focus:ring-[#1D4E45]/20 transition-all font-medium"
-            >
+            />
             <Search class="absolute left-3.5 top-3.5 w-5 h-5 text-[#1D4E45]" />
           </div>
 
@@ -125,10 +146,10 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- 사이드바 컨텐츠: 추천 & 리스트 -->
+        <!-- 리스트 목록 -->
         <div class="flex-1 overflow-y-auto p-5 space-y-6 hide-scrollbar bg-white">
           
-          <!-- 추천 카드 (Hot Pick) -->
+          <!-- 추천 카드 -->
           <div v-if="currentHotBakery" class="bg-gradient-to-br from-[#1D4E45] to-[#12352E] rounded-2xl p-5 text-white shadow-lg relative overflow-hidden group cursor-pointer" @click="handleListClick(currentHotBakery)">
              <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
              
@@ -141,7 +162,8 @@ onMounted(() => {
              
              <div class="flex gap-4 items-center relative z-10">
                <div class="w-16 h-16 rounded-full bg-white/10 border-2 border-white/20 overflow-hidden shrink-0">
-                 <img :src="currentHotBakery.image" class="w-full h-full object-cover">
+                 <!-- ✅ 수정: img 태그 닫기 -->
+                 <img :src="currentHotBakery.image" class="w-full h-full object-cover" />
                </div>
                <div>
                  <h3 class="font-bold text-lg leading-tight mb-1">{{ currentHotBakery.name }}</h3>
@@ -154,7 +176,7 @@ onMounted(() => {
              </div>
           </div>
 
-          <!-- 빵집 리스트 -->
+          <!-- 리스트 아이템들 -->
           <div>
             <h3 class="font-bold text-[#4A4036] mb-3 text-sm px-1">내 주변 빵집 리스트</h3>
             <div class="space-y-3">
@@ -169,12 +191,11 @@ onMounted(() => {
                     : 'border-gray-100 bg-white hover:border-[#1D4E45]/30'
                 ]"
               >
-                <!-- 썸네일 -->
                 <div class="w-20 h-20 rounded-lg bg-gray-100 overflow-hidden shrink-0">
-                  <img :src="bakery.image" class="w-full h-full object-cover">
+                  <!-- ✅ 수정: img 태그 닫기 -->
+                  <img :src="bakery.image" class="w-full h-full object-cover" />
                 </div>
                 
-                <!-- 정보 -->
                 <div class="flex-1 min-w-0 flex flex-col justify-between">
                   <div class="flex justify-between items-start">
                     <h4 class="font-bold text-[#1D4E45] truncate">{{ bakery.name }}</h4>
@@ -190,32 +211,44 @@ onMounted(() => {
               </div>
             </div>
           </div>
-
         </div>
-
-        <!-- 사이드바 접기/펼치기 버튼 -->
-        <button 
-          @click="isListOpen = !isListOpen"
-          class="absolute top-1/2 -right-6 w-6 h-12 bg-white border border-l-0 border-gray-200 rounded-r-lg flex items-center justify-center text-gray-400 shadow-md hover:text-[#1D4E45] z-30"
-        >
-          <span v-if="isListOpen">◀</span>
-          <span v-else>▶</span>
-        </button>
       </div>
+
+      <!-- ✅ 접기/펼치기 버튼을 사이드바 DIV 밖으로 이동하여 항상 보이게 처리 -->
+      <!-- 
+        left 값 계산식:
+        - 사이드바 열림(Mobile): 72px(Nav) + 320px(Sidebar) = 392px
+        - 사이드바 열림(Desktop): 72px(Nav) + 380px(Sidebar) = 452px
+        - 사이드바 닫힘: 72px(Nav)
+      -->
+      <button 
+        @click="isListOpen = !isListOpen"
+        class="absolute top-1/2 -translate-y-1/2 z-30 w-6 h-12 bg-white border border-l-0 border-gray-200 rounded-r-lg flex items-center justify-center text-gray-400 shadow-md hover:text-[#1D4E45] transition-all duration-300"
+        :class="isListOpen ? 'left-[392px] md:left-[452px]' : 'left-[72px]'"
+      >
+        <ChevronLeft v-if="isListOpen" class="w-4 h-4" />
+        <ChevronRight v-else class="w-4 h-4" />
+      </button>
 
       <!-- 2. 지도 영역 (오른쪽) -->
       <div class="flex-1 h-full relative z-0">
         <BakeryMap 
+          ref="mapRef"
           :bakeries="bakeries" 
           :selected-bakery="selectedBakery"
           @select-marker="handleMarkerClick"
         />
         
-        <!-- 지도 위 플로팅 버튼들 -->
+        <!-- 플로팅 버튼들 -->
         <div class="absolute top-4 right-4 flex flex-col gap-2 z-10">
-          <button class="bg-white p-2.5 rounded shadow-md text-gray-600 hover:text-[#1D4E45] hover:bg-gray-50 transition-colors" title="내 위치">
+          <button 
+            @click="handleMyLocationClick" 
+            class="bg-white p-2.5 rounded shadow-md text-gray-600 hover:text-[#1D4E45] hover:bg-gray-50 transition-colors" 
+            title="내 위치"
+          >
             <Navigation class="w-5 h-5" />
           </button>
+          
           <button class="bg-white p-2.5 rounded shadow-md text-gray-600 hover:text-[#1D4E45] hover:bg-gray-50 transition-colors" title="지도 뷰 변경">
              <MapPin class="w-5 h-5" />
           </button>

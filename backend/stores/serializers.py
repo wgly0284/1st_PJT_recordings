@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Store, Product
-
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -49,3 +48,16 @@ class StoreListSerializer(serializers.ModelSerializer):
         if user and user.is_authenticated:
             return obj.bookmarking_users.filter(pk=user.pk).exists()
         return False
+
+class MapStoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Store
+        fields = (
+            'id',
+            'name',
+            'address',
+            'latitude',
+            'longitude',
+            'avg_rating',
+        )
+

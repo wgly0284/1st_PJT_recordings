@@ -3,7 +3,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Store
-from .serializers import StoreListSerializer, StoreSerializer
+from .serializers import StoreListSerializer, StoreSerializer, MapStoreSerializer
+
+class MapStoreListView(generics.ListAPIView):
+    """
+    지도에 표시할 가게 목록을 조회합니다.
+    """
+    queryset = Store.objects.all()
+    serializer_class = MapStoreSerializer
 
 class StoreListView(generics.ListAPIView):
     """

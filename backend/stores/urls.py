@@ -3,6 +3,7 @@ from . import views
 from reviews.views import ReviewListCreateView # reviews 앱의 뷰를 가져옴
 
 urlpatterns = [
+    path('map/', views.MapStoreListView.as_view(), name='map_store_list'),
     path('', views.StoreListView.as_view(), name='store_list'),
     path('<int:pk>/', views.StoreDetailView.as_view(), name='store_detail'),
     path('<int:store_pk>/bookmark/', views.BookmarkView.as_view(), name='bookmark'),
@@ -11,3 +12,4 @@ urlpatterns = [
     path('<int:store_pk>/reviews/', ReviewListCreateView.as_view(), name='review_list_create'),
     path('my_bookmarks/', views.UserBookmarkListView.as_view(), name='my_bookmarks'), # 추가된 URL
 ]
+

@@ -22,7 +22,7 @@
             <button class="group px-8 py-4 bg-teal-900 text-white text-lg rounded-full font-bold transition-all hover:bg-teal-800 hover:scale-105 shadow-xl flex items-center justify-center gap-3">
               <span>Explore Map</span>
               <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                <ArrowRight class="w-4 h-4" />
               </div>
             </button>
             <button class="px-8 py-4 bg-transparent border-2 border-teal-900/10 text-teal-900 text-lg rounded-full font-bold hover:bg-teal-900 hover:text-white transition-all hover:border-teal-900">
@@ -45,7 +45,7 @@
                   <p class="text-2xl font-playfair font-bold">Onion Bagel, Seongsu</p>
                 </div>
                 <div class="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center">
-                  <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                  <ArrowUpRight class="w-5 h-5" />
                 </div>
               </div>
             </div>
@@ -54,7 +54,7 @@
       </div>
       <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-teal-900/50 animate-bounce">
         <span class="text-[10px] font-bold tracking-widest uppercase">Scroll</span>
-        <i data-lucide="arrow-down" class="w-4 h-4"></i>
+        <ArrowDown class="w-4 h-4" />
       </div>
     </section>
 
@@ -129,6 +129,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BakeryGrid from '@/components/common/BakeryGrid.vue'
+import { ArrowRight, ArrowDown, ArrowUpRight } from 'lucide-vue-next'
 
 const router = useRouter()
 

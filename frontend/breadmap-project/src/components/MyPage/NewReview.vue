@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import apiClient from '@/api/axios'
 
 const router = useRouter()
 
@@ -22,11 +23,6 @@ const handleSubmit = async () => {
     return
   }
   
-  // TODO: 백엔드에 커뮤니티 게시글 생성 API가 준비되면 아래 로직을 구현해야 합니다.
-  alert('커뮤니티 글 작성 기능은 현재 준비 중입니다. 백엔드 API 구현이 필요합니다.');
-  
-  // 아래는 실제 구현 시 사용될 예시 코드입니다.
-  /*
   const formData = new FormData()
   formData.append('category', category.value)
   formData.append('title', title.value)
@@ -37,16 +33,15 @@ const handleSubmit = async () => {
 
   try {
     isSubmitting.value = true
-    // const res = await apiClient.post('/community/posts/', formData)
-    // alert('게시글이 등록되었습니다!')
-    // router.push({ name: 'community' }) 
+    const res = await apiClient.post('/community/create/', formData)
+    alert('게시글이 등록되었습니다!')
+    router.push({ name: 'community' }) 
   } catch (e) {
     console.error('게시글 등록 실패:', e)
     alert('게시글 등록 중 오류가 발생했습니다.')
   } finally {
     isSubmitting.value = false
   }
-  */
 }
 </script>
 

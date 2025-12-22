@@ -242,7 +242,11 @@ import {
   onUnmounted,
   nextTick,
 } from 'vue'
+import { useRouter } from 'vue-router'
+import apiClient from '@/api/axios'
 import DetailCard from '@/components/community/DetailCard.vue'
+
+const router = useRouter()
 
 const categories = [
   { value: 'hot', label: 'HOT' },
@@ -261,125 +265,34 @@ const width = ref(window.innerWidth)
 const onResize = () => {
   width.value = window.innerWidth
 }
-onMounted(() => window.addEventListener('resize', onResize))
+onMounted(() => {
+  window.addEventListener('resize', onResize)
+  fetchPosts() // 컴포넌트 마운트 시 게시글 가져오기
+})
 onUnmounted(() => window.removeEventListener('resize', onResize))
 const isMobile = computed(() => width.value < 1024)
 
-// 목데이터
-const posts = ref([
-  {
-    id: 1,
-    category: '빵 주저리',
-    type: 'chatter',
-    title: '소금빵만 5군데 털어본 후기',
-    content:
-      '성수, 연남, 망원까지 돌면서 먹어본 소금빵 비교. 가격, 크기, 소금 함량까지 꼼꼼하게 비교해봤어요.',
-    likes: 42,
-    comments: 12,
-    views: 1.2,
-    date: '2025.12.20',
-  },
-  {
-    id: 2,
-    category: '빵집 추천',
-    type: 'recommend',
-    title: '서울 밤에 가기 좋은 베이글 맛집',
-    content:
-      '야근 끝나고도 열려있는 베이글 빵집 모음. 늦은 밤 크리미하고 쫀득한 베이글이 땡길 때 딱 좋은 곳들입니다.',
-    likes: 28,
-    comments: 8,
-    views: 0.8,
-    date: '2025.12.19',
-  },
-  {
-    id: 3,
-    category: '빵 꿀팁',
-    type: 'tip',
-    title: '크루아상 바삭하게 보관하는 법',
-    content:
-      '에어프라이어로 3분만에 갓 구운 느낌 살리기. 냉동 보관부터 해동까지 완벽한 크루아상 관리법 공유합니다.',
-    likes: 67,
-    comments: 23,
-    views: 2.3,
-    date: '2025.12.18',
-  },
-  {
-    id: 4,
-    category: '빵집 추천',
-    type: 'recommend',
-    title: '제주도 사워도우 투어 루트',
-    content:
-      '차 없이도 돌아다닐 수 있는 빵지 순례 코스. 제주공항 근처부터 성산까지 버스 타고 즐기는 사워도우 여행.',
-    likes: 35,
-    comments: 15,
-    views: 1.8,
-    date: '2025.12.17',
-  },
-])
+// 게시글 데이터
+const posts = ref([])
 
-const handleWritePost = () => {
-  alert('글 작성 기능은 현재 준비 중입니다. 백엔드 API 구현이 필요합니다.');
+const fetchPosts = async () => {
+  try {
+    const response = await apiClient.get('/community/')
+    posts.value = response.data
+    console.log('Posts fetched from server:', posts.value)
+  } catch (error) {
+    console.error('게시글을 불러오는 데 실패했습니다:', error)
+    alert('게시글을 불러오는 중 오류가 발생했습니다.')
+  }
 };
 
-const fetchPosts = () => {
-  // 나중에는 실제 API를 호출해야 합니다.
-  // 지금은 목업 데이터를 다시 할당하여 새로고침을 흉내냅니다.
-  posts.value = [
-    {
-      id: 1,
-      category: '빵 주저리',
-      type: 'chatter',
-      title: '소금빵만 5군데 털어본 후기',
-      content:
-        '성수, 연남, 망원까지 돌면서 먹어본 소금빵 비교. 가격, 크기, 소금 함량까지 꼼꼼하게 비교해봤어요.',
-      likes: Math.floor(Math.random() * 100),
-      comments: Math.floor(Math.random() * 30),
-      views: (Math.random() * 3).toFixed(1),
-      date: '2025.12.20',
-    },
-    {
-      id: 2,
-      category: '빵집 추천',
-      type: 'recommend',
-      title: '서울 밤에 가기 좋은 베이글 맛집',
-      content:
-        '야근 끝나고도 열려있는 베이글 빵집 모음. 늦은 밤 크리미하고 쫀득한 베이글이 땡길 때 딱 좋은 곳들입니다.',
-      likes: Math.floor(Math.random() * 100),
-      comments: Math.floor(Math.random() * 30),
-      views: (Math.random() * 3).toFixed(1),
-      date: '2025.12.19',
-    },
-    {
-      id: 3,
-      category: '빵 꿀팁',
-      type: 'tip',
-      title: '크루아상 바삭하게 보관하는 법',
-      content:
-        '에어프라이어로 3분만에 갓 구운 느낌 살리기. 냉동 보관부터 해동까지 완벽한 크루아상 관리법 공유합니다.',
-      likes: Math.floor(Math.random() * 100),
-      comments: Math.floor(Math.random() * 30),
-      views: (Math.random() * 3).toFixed(1),
-      date: '2025.12.18',
-    },
-    {
-      id: 4,
-      category: '빵집 추천',
-      type: 'recommend',
-      title: '제주도 사워도우 투어 루트',
-      content:
-        '차 없이도 돌아다닐 수 있는 빵지 순례 코스. 제주공항 근처부터 성산까지 버스 타고 즐기는 사워도우 여행.',
-      likes: Math.floor(Math.random() * 100),
-      comments: Math.floor(Math.random() * 30),
-      views: (Math.random() * 3).toFixed(1),
-      date: '2025.12.17',
-    },
-  ];
-  console.log('Posts refreshed (mock data)');
+const handleWritePost = () => {
+  router.push({ name: 'newReview' }) // 글쓰기 페이지로 이동
 };
 
 const filteredPosts = computed(() => {
-  if (selectedCategory.value === 'hot') return posts.value
-  return posts.value.filter((p) => p.type === selectedCategory.value)
+  if (selectedCategory.value === 'hot') return posts.value // 'hot'은 일단 전체 목록으로
+  return posts.value.filter((p) => p.category === selectedCategory.value)
 })
 
 const currentCategoryLabel = computed(() => {

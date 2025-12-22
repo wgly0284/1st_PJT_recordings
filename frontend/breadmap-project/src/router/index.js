@@ -9,6 +9,7 @@ import ReviewDetail from '@/components/ReviewDetail.vue'
 import NewReview from '@/components/MyPage/NewReview.vue'
 import CommunityMain from '@/components/community/CommunityMain.vue'
 import EditProfile from '@/components/MyPage/EditProfile.vue'
+import MapPage from '@/Views/MapPage.vue'
 
 const routes = [
   {
@@ -60,7 +61,13 @@ const routes = [
     path: '/community',
     name: 'community',
     component: CommunityMain
-  }
+  },
+  {
+    path: '/map',
+    name: 'map',
+    component: MapPage,
+    meta: { hideNavbar: true }
+  },
 ]
 
 export default createRouter({

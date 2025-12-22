@@ -6,7 +6,7 @@
       <div class="absolute top-0 right-0 w-[60%] h-full bg-[#F0EBE0] -z-10 rounded-l-[100px] hidden md:block"></div>
       <div class="max-w-[1400px] mx-auto px-6 md:px-12 w-full flex flex-col md:flex-row items-center gap-16">
         <!-- Text Content -->
-        <div class="md:w-1/2 space-y-10 reveal-hidden delay-100">
+        <div class="md:w-1/2 space-y-10 relative z-10">
           <div class="inline-block border-b border-teal-800 pb-1">
             <span class="text-teal-800 font-bold tracking-widest text-xs uppercase">Premium Bakery Curator</span>
           </div>
@@ -31,9 +31,12 @@
           </div>
         </div>
         <!-- Hero Image -->
-        <div class="md:w-1/2 relative w-full h-[50vh] md:h-[70vh] reveal-hidden delay-200">
-          <div class="absolute inset-0 rounded-[3rem] overflow-hidden shadow-2xl animate-float">
-            <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=1200&auto=format&fit=crop" class="w-full h-full object-cover">
+        <div class="md:w-1/2 relative w-full h-[50vh] md:h-[70vh] z-0">
+          <div class="absolute inset-0 rounded-[3rem] overflow-hidden shadow-2xl">
+            <img
+              src="https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=1200&auto=format&fit=crop"
+              class="w-full h-full object-cover"
+            >
             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
             <div class="absolute bottom-8 left-8 right-8 bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-3xl text-white">
               <div class="flex justify-between items-end">

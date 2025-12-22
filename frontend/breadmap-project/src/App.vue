@@ -1,11 +1,14 @@
-
 <template>
   <div id="app" class="min-h-screen flex flex-col">
-    <GlobalHeader />
+    <!-- ✅ meta.hideNavbar가 true가 아닐 때만 헤더 표시 -->
+    <GlobalHeader v-if="!$route.meta.hideNavbar" />
+    
     <main class="flex-grow">
       <router-view />
     </main>
-    <GlobalFooter />
+    
+    <!-- ✅ 지도 화면에서는 보통 푸터도 안 보이게 설정합니다 (필요하면 v-if 제거하세요) -->
+    <GlobalFooter v-if="!$route.meta.hideNavbar" />
   </div>
 </template>
 

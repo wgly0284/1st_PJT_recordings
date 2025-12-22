@@ -8,18 +8,19 @@ import MyReviews from '@/components/MyPage/MyReviews.vue'
 import ReviewDetail from '@/components/ReviewDetail.vue'
 import NewReview from '@/components/MyPage/NewReview.vue'
 import CommunityMain from '@/components/community/CommunityMain.vue'
+import EditProfile from '@/components/MyPage/EditProfile.vue'
 
 const routes = [
-  { 
-    path: '/', 
-    name: 'home', 
-    component: HomeView 
+  {
+    path: '/',
+    name: 'home',
+    component: HomeView
   },
-  { 
+  {
     path: '/detail/:id',
     name: 'detail',
     component: DetailView
-   },
+  },
   { 
     path: '/mypage', 
     name: 'mypage', 

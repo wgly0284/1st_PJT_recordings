@@ -18,9 +18,9 @@
         </div>
         <h2 class="text-3xl font-bold text-teal-900 mb-1">{{ authStore.currentUser?.nickname || 'Guest' }}</h2>
         <p class="text-gray-400 mb-8">{{ authStore.currentUser?.email || 'Not logged in' }}</p>
-        <button class="w-full py-4 border-2 border-gray-100 rounded-2xl font-bold text-gray-600 hover:bg-teal-50 hover:border-teal-100 hover:text-teal-800 transition-colors">
+        <router-link :to="{ name: 'editprofile' }" class="w-full py-4 border-2 border-gray-100 rounded-2xl font-bold text-gray-600 hover:bg-teal-50 hover:border-teal-100 hover:text-teal-800 transition-colors text-center">
           Edit Profile
-        </button>
+        </router-link>
       </div>
       
       <!-- Stats Right -->
@@ -36,10 +36,10 @@
         </div>
 
         <div class="grid grid-cols-3 gap-6">
-          <div class="text-center p-4 border border-gray-100 rounded-2xl hover:border-teal-800/20 hover:bg-white hover:shadow-lg transition-all">
+          <router-link :to="{ name: 'myreview' }" class="text-center p-4 border border-gray-100 rounded-2xl hover:border-teal-800/20 hover:bg-white hover:shadow-lg transition-all cursor-pointer block">
             <div class="text-3xl font-bold text-teal-900 mb-1">{{ userReviews.length }}</div>
             <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Reviews</div>
-          </div>
+          </router-link>
           <div class="text-center p-4 border border-gray-100 rounded-2xl hover:border-teal-800/20 hover:bg-white hover:shadow-lg transition-all">
             <div class="text-3xl font-bold text-teal-900 mb-1">{{ userBookmarks.length }}</div>
             <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Bookmarks</div>

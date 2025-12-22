@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-[2.5rem] shadow-soft p-8 md:p-16 border border-gray-100" v-scroll>
+  <div class="bg-white rounded-[2.5rem] shadow-soft p-8 md:p-16 border border-gray-100">
     <div class="flex flex-col md:flex-row gap-12 items-center md:items-start">
       <!-- Profile Left -->
       <div class="md:w-1/3 flex flex-col items-center text-center">
@@ -7,14 +7,13 @@
           <div class="absolute inset-0 bg-teal-800 rounded-full opacity-0 group-hover:opacity-10 transition-opacity"></div>
           
           <!-- Profile Image or Default Icon -->
-          <img v-if="authStore.currentUser?.profile_image_url" :src="authStore.currentUser.profile_image_url" class="w-full h-full rounded-full border-4 border-[#F9F7F2] shadow-lg object-cover">
+          <img v-if="authStore.currentUser?.profile_image_url" 
+            :src="getFullImageUrl(authStore.currentUser.profile_image_url)" 
+            class="w-full h-full rounded-full border-4 border-[#F9F7F2] shadow-lg object-cover"
+            @error="handleImageError">
           <div v-else class="w-full h-full rounded-full border-4 border-[#F9F7F2] shadow-lg bg-gray-200 flex items-center justify-center text-5xl">
             🥖
           </div>
-          
-          <button class="absolute bottom-0 right-0 w-10 h-10 bg-teal-800 text-white rounded-full flex items-center justify-center border-4 border-white">
-            <i data-lucide="camera" class="w-4 h-4"></i>
-          </button>
         </div>
         <h2 class="text-3xl font-bold text-teal-900 mb-1">{{ authStore.currentUser?.nickname || 'Guest' }}</h2>
         <p class="text-gray-400 mb-8">{{ authStore.currentUser?.email || 'Not logged in' }}</p>
@@ -87,6 +86,20 @@ import apiClient from '@/api/axios'; // apiClient import
 const authStore = useAuthStore();
 const userReviews = ref([]);
 const userBookmarks = ref([]);
+
+// 상대 URL을 절대 URL로 변환
+const getFullImageUrl = (imageUrl) => {
+  if (!imageUrl) return '';
+  if (imageUrl.startsWith('http')) return imageUrl;  // 이미 절대 URL이면 그대로
+  return `http://127.0.0.1:8000${imageUrl}`;        // 상대 URL이면 호스트 추가
+};
+
+// 이미지 로드 실패시 빵 아이콘으로 fallback
+const handleImageError = (event) => {
+  event.target.style.display = 'none';  // 깨진 이미지 숨기기
+  event.target.nextElementSibling.style.display = 'flex';  // 빵 아이콘 보이기
+};
+
 
 onMounted(async () => {
   if (authStore.isAuthenticated) {

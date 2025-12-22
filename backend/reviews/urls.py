@@ -2,6 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # 전체 리뷰 목록
+    path('', views.ReviewListView.as_view(), name='review_list'),
+
     # 단일 리뷰 조회/수정/삭제
     path('<int:pk>/', views.ReviewDetailView.as_view(), name='review_detail'),
 
@@ -11,6 +14,6 @@ urlpatterns = [
     # 내 리뷰 목록
     path('my/', views.UserReviewListView.as_view(), name='my_reviews'),
 
-    # 새 리뷰 생성 (NewReview.vue 에서 사용)
+    # 새 리뷰 생성
     path('create/', views.ReviewCreateView.as_view(), name='review_create'),
 ]

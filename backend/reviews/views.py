@@ -59,6 +59,16 @@ class ReviewLikeView(APIView):
             return Response({"status": "like added"}, status=status.HTTP_200_OK)
 
 
+class ReviewListView(generics.ListAPIView):
+    """
+    전체 리뷰 목록을 조회합니다.
+    /reviews/ 에 매핑.
+    """
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+
 class UserReviewListView(generics.ListAPIView):
     """
     현재 로그인한 사용자가 작성한 리뷰 목록을 조회합니다.
@@ -82,14 +92,14 @@ class ReviewCreateView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         mutable_data = request.data.copy()
-        
+
         # 1. 이미지 처리
         image_file = request.FILES.get('image')
         if image_file:
             filename = default_storage.save(f'review_photos/{image_file.name}', image_file)
             image_url = default_storage.url(filename)
             mutable_data['photo_urls'] = image_url
-            
+
         # 2. 제목(title)과 내용(content) 합치기
         title = mutable_data.get('title')
         content = mutable_data.get('content', '')
@@ -99,7 +109,11 @@ class ReviewCreateView(generics.CreateAPIView):
 
         # 3. CreateAPIView의 기본 create 로직 다시 호출
         serializer = self.get_serializer(data=mutable_data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            # 디버깅용: 서버 로그에 에러 출력
+            print('ReviewCreateView errors:', serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

@@ -16,4 +16,6 @@ urlpatterns = [
     path('preferences/', views.update_preferences, name='update_preferences'),
     path('profile-image/', views.update_profile_image, name='update_profile_image'),
     path('user/', views.user_detail, name='user_detail'), 
+    path('check-nickname/', views.check_nickname, name='check_nickname'),
+
 ]

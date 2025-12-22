@@ -2,12 +2,15 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+
 from .models import Review
 from .serializers import ReviewSerializer
+
 
 class ReviewListCreateView(generics.ListCreateAPIView):
     """
     특정 가게의 리뷰 목록을 조회하거나 새 리뷰를 작성합니다.
+    /stores/<store_pk>/reviews/ 같은 패턴에서 사용한다고 가정.
     """
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -22,17 +25,21 @@ class ReviewListCreateView(generics.ListCreateAPIView):
         store_pk = self.kwargs.get('store_pk')
         serializer.save(user=self.request.user, store_id=store_pk)
 
+
 class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     단일 리뷰를 조회, 수정, 삭제합니다.
+    /reviews/<pk>/ 에 매핑.
     """
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly] # TODO: 작성자만 수정/삭제하도록 권한 설정 필요
+    permission_classes = [IsAuthenticatedOrReadOnly]  # TODO: 작성자만 수정/삭제하도록 권한 설정 필요
+
 
 class ReviewLikeView(APIView):
     """
     리뷰에 '좋아요'를 추가하거나 제거합니다.
+    /reviews/<review_pk>/like/ 에 매핑.
     """
     permission_classes = [IsAuthenticated]
 
@@ -50,12 +57,28 @@ class ReviewLikeView(APIView):
             review.like_users.add(user)
             return Response({"status": "like added"}, status=status.HTTP_200_OK)
 
+
 class UserReviewListView(generics.ListAPIView):
     """
     현재 로그인한 사용자가 작성한 리뷰 목록을 조회합니다.
+    /reviews/my/ 에 매핑.
     """
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Review.objects.filter(user=self.request.user)
+
+
+class ReviewCreateView(generics.CreateAPIView):
+    """
+    새 리뷰를 생성하는 전용 엔드포인트.
+    /reviews/create/ 에 매핑.
+    프론트의 NewReview.vue 에서 사용.
+    """
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # 필요에 따라 store_id 등 추가 필드를 함께 저장
+        serializer.save(user=self.request.user)

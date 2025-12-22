@@ -7,7 +7,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.core.files.storage import default_storage
-import os
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 # dj-rest-auth의 UserDetailsView를 상속받아 우리가 만든 Serializer를 사용하도록 설정
@@ -65,3 +68,19 @@ def user_detail(request):
     """현재 로그인한 사용자 정보 반환"""
     serializer = UserSerializer(request.user)  # UserSerializer 필요
     return Response(serializer.data)
+
+
+
+def check_nickname(request):
+    nickname = request.GET.get('nickname', '').strip()
+
+    # 비어있으면 사용 불가로 처리
+    if not nickname:
+        return JsonResponse({'available': False}, status=200)
+
+    # 현재 로그인 유저는 자기 닉네임 그대로 쓰는 건 허용
+    if request.user.is_authenticated and request.user.nickname == nickname:
+        return JsonResponse({'available': True}, status=200)
+
+    exists = User.objects.filter(nickname=nickname).exists()
+    return JsonResponse({'available': not exists}, status=200)

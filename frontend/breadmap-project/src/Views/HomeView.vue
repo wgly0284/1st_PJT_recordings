@@ -130,6 +130,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BakeryGrid from '@/components/common/BakeryGrid.vue'
+import { ArrowRight, ArrowDown, ArrowUpRight } from 'lucide-vue-next'
 
 import { ArrowRight, ArrowDown, ArrowUpRight } from 'lucide-vue-next'
 

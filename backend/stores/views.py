@@ -1,16 +1,35 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, filters  # ✅ filters 추가
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Store
-from .serializers import StoreListSerializer, StoreSerializer
+from .serializers import StoreListSerializer, StoreSerializer, MapStoreSerializer
+
+# 지도용 API (가볍게 전체 마커용으로 사용한다면 유지, 아니면 StoreListView 하나로 통합 가능)
+class MapStoreListView(generics.ListAPIView):
+    """
+    지도에 표시할 가게 목록을 조회합니다.
+    """
+    queryset = Store.objects.all()
+    serializer_class = MapStoreSerializer
 
 class StoreListView(generics.ListAPIView):
     """
-    가게 목록을 조회합니다.
+    가게 목록을 조회하고 검색합니다.
+    (?search=키워드 로 검색 가능)
     """
     queryset = Store.objects.all()
     serializer_class = StoreListSerializer
+    
+    # ✅ [추가] 검색 필터 설정
+    filter_backends = [filters.SearchFilter]
+    
+    # ✅ [추가] 검색할 모델 필드 지정
+    # name: 가게 이름
+    # address: 주소
+    # category: 카테고리
+    # representative_tags: 태그 (만약 모델에 있다면)
+    search_fields = ['name', 'address', 'category', 'representative_tags']
 
 class StoreDetailView(generics.RetrieveAPIView):
     """

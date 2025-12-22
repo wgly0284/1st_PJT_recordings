@@ -20,12 +20,6 @@
           <!-- Nav Links & Auth (Desktop) -->
           <nav class="hidden md:flex items-center gap-8
       text-sm font-bold tracking-wide text-gray-600">
-            <router-link to="/" class="hover:text
-    -teal-800 transition-colors relative after:content-
-      [''] after:absolute after:-bottom-2 after:left-0
-      after:w-0 after:h-0.5 after:bg-teal-800 after:
-      transition-all hover:after:w-full">HOME</
-      router-link>
             <router-link :to="{ name: 'community' }" class="hover:text-teal-800
       transition-colors relative after:content-[''] after
       :absolute after:-bottom-2 after:left-0 after:w-0

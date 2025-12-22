@@ -26,16 +26,16 @@
       after:w-0 after:h-0.5 after:bg-teal-800 after:
       transition-all hover:after:w-full">HOME</
       router-link>
+            <router-link :to="{ name: 'community' }" class="hover:text-teal-800
+      transition-colors relative after:content-[''] after
+      :absolute after:-bottom-2 after:left-0 after:w-0
+      after:h-0.5 after:bg-teal-800 after:transition-all
+      hover:after:w-full">COMMUNITY</router-link>
             <a href="#" class="hover:text-teal-800
       transition-colors relative after:content-[''] after
       :absolute after:-bottom-2 after:left-0 after:w-0
       after:h-0.5 after:bg-teal-800 after:transition-all
-      hover:after:w-full">CURATION</a>
-            <a href="#" class="hover:text-teal-800
-      transition-colors relative after:content-[''] after
-      :absolute after:-bottom-2 after:left-0 after:w-0
-      after:h-0.5 after:bg-teal-800 after:transition-all
-      hover:after:w-full">MAGAZINE</a>
+      hover:after:w-full">MAPS</a>
    
             <!-- Conditional Auth Links -->
             <template v-if="authStore.isAuthenticated">

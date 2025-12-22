@@ -1,5 +1,6 @@
 <template>
-  <div class="bg-white rounded-[2.5rem] shadow-soft p-8 md:p-16 border border-gray-100" v-scroll>
+  <!-- 👇 로그인 상태에 따라 조건부 렌더링 -->
+  <div v-if="authStore.isAuthenticated" class="bg-white rounded-[2.5rem] shadow-soft p-8 md:p-16 border border-gray-100">
     <div class="flex flex-col md:flex-row gap-12 items-center md:items-start">
       <!-- Profile Left -->
       <div class="md:w-1/3 flex flex-col items-center text-center">
@@ -7,14 +8,16 @@
           <div class="absolute inset-0 bg-teal-800 rounded-full opacity-0 group-hover:opacity-10 transition-opacity"></div>
           
           <!-- Profile Image or Default Icon -->
-          <img v-if="authStore.currentUser?.profile_image_url" :src="authStore.currentUser.profile_image_url" class="w-full h-full rounded-full border-4 border-[#F9F7F2] shadow-lg object-cover">
+          <img 
+            v-if="authStore.currentUser?.profile_image_url" 
+            :src="getFullImageUrl(authStore.currentUser.profile_image_url)" 
+            class="w-full h-full rounded-full border-4 border-[#F9F7F2] shadow-lg object-cover"
+            @error="handleImageError"
+            :key="authStore.currentUser.profile_image_url"
+          >
           <div v-else class="w-full h-full rounded-full border-4 border-[#F9F7F2] shadow-lg bg-gray-200 flex items-center justify-center text-5xl">
             🥖
           </div>
-          
-          <button class="absolute bottom-0 right-0 w-10 h-10 bg-teal-800 text-white rounded-full flex items-center justify-center border-4 border-white">
-            <i data-lucide="camera" class="w-4 h-4"></i>
-          </button>
         </div>
         <h2 class="text-3xl font-bold text-teal-900 mb-1">{{ authStore.currentUser?.nickname || 'Guest' }}</h2>
         <p class="text-gray-400 mb-8">{{ authStore.currentUser?.email || 'Not logged in' }}</p>
@@ -77,16 +80,63 @@
       </div>
     </div>
   </div>
+
+  <!-- 👇 비로그인 시 표시 (백업 보호) -->
+  <div v-else class="flex flex-col items-center justify-center min-h-[400px] p-8 md:p-16 text-center bg-gray-50 rounded-[2.5rem] border border-gray-100">
+    <div class="text-6xl mb-6">🔒</div>
+    <h2 class="text-3xl font-bold text-teal-900 mb-4">로그인이 필요합니다</h2>
+    <p class="text-xl text-gray-500 mb-8 max-w-md">마이페이지를 보려면 로그인이 필요합니다. 로그인 후 나만의 빵집 리뷰와 북마크를 확인하세요!</p>
+    <div class="space-x-4">
+      <router-link 
+        to="/login" 
+        class="px-8 py-4 bg-teal-800 text-white rounded-2xl font-bold text-lg hover:bg-teal-900 transition-all shadow-lg"
+      >
+        로그인하기
+      </router-link>
+      <router-link 
+        to="/signup" 
+        class="px-8 py-4 border-2 border-teal-800 text-teal-800 rounded-2xl font-bold text-lg hover:bg-teal-50 transition-all"
+      >
+        회원가입
+      </router-link>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeMount } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import apiClient from '@/api/axios'; // apiClient import
+import { useRouter } from 'vue-router';
+import apiClient from '@/api/axios';
 
 const authStore = useAuthStore();
+const router = useRouter();
 const userReviews = ref([]);
 const userBookmarks = ref([]);
+
+// 👇 컴포넌트 마운트 전 로그인 확인 (router 가드 백업)
+onBeforeMount(() => {
+  if (!authStore.isAuthenticated) {
+    // 로그인 페이지로 리다이렉트 (router 가드와 동일)
+    router.push({ 
+      name: 'login', 
+      query: { redirect: router.currentRoute.value.fullPath } 
+    });
+  }
+});
+
+// 상대 URL을 절대 URL로 변환
+const getFullImageUrl = (imageUrl) => {
+  if (!imageUrl) return '';
+  if (imageUrl.startsWith('http')) return imageUrl;
+  return `http://127.0.0.1:8000${imageUrl}`;
+};
+
+// 이미지 로드 실패시 처리
+const handleImageError = (event) => {
+  event.target.style.display = 'none';
+  // 빵 아이콘은 v-else로 자동 표시되므로 추가 작업 불필요
+};
 
 onMounted(async () => {
   if (authStore.isAuthenticated) {

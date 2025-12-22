@@ -236,22 +236,20 @@ const refreshMap = () => {
 };
 
 onMounted(() => {
+  // ❌ 기존 코드 제거 (아래 코드가 있으면 새로고침 시 무조건 검색됨)
+  // fetchBakeries(); 
+  
+  // ✅ [수정] 이렇게 초기화만 하거나, 내 위치로 이동만 시킵니다.
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((pos) => {
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-      
-      // ✅ 초기 로딩 시 검색 실행
-      // 이후 fetchBakeries 내부에서 가장 가까운 빵집으로 panTo 실행됨
-      fetchBakeries('', lat, lng);
-      
-      // ⚠️ 기존의 moveToCurrentLocation 호출 제거함 (사용자 위치로 강제 이동 방지)
-
-    }, (err) => {
-      fetchBakeries('', 37.5665, 126.9780); 
+      // 내 위치 정보만 가져오고, 빵집 검색(fetchBakeries)은 하지 않음
+      // 원한다면 지도 중심만 이동
+      setTimeout(() => {
+        if(mapRef.value) {
+           // mapRef.value.panTo(pos.coords.latitude, pos.coords.longitude); // 선택사항
+        }
+      }, 500);
     });
-  } else {
-    fetchBakeries('', 37.5665, 126.9780);
   }
 });
 </script>

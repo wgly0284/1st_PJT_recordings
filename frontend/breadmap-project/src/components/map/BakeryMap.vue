@@ -21,7 +21,9 @@ const initMap = () => {
 
   const options = {
     center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-    level: 5
+    level: 5,
+    draggable: true, // ✅ 마우스 드래그 이동 허용
+    scrollwheel: true // ✅ 마우스 휠 확대/축소 허용
   };
 
   mapInstance = new window.kakao.maps.Map(mapContainer.value, options);
@@ -73,16 +75,31 @@ const updateMarkers = () => {
 
     markers.push(marker);
   });
+
+  // ✅ [수정] 지도를 전체 마커 범위(bounds)로 넓히지 않고, 가장 가까운(첫번째) 빵집으로 중심만 이동
+  if (props.bakeries.length > 0) {
+    const nearest = props.bakeries[0];
+    const nLat = parseFloat(nearest.lat);
+    const nLng = parseFloat(nearest.lng);
+    
+    if (!isNaN(nLat) && !isNaN(nLng) && nLat !== 0 && nLng !== 0) {
+      const moveLatLon = new window.kakao.maps.LatLng(nLat, nLng);
+      // 줌 레벨을 유지하며 부드럽게 이동
+      mapInstance.panTo(moveLatLon);
+    }
+  }
 };
 
-// ✅ [수정] 외부에서 호출 가능하도록 panTo 함수 보강
+// ✅ [수정] 지도 레이아웃 재계산 후 이동 (화면 깨짐/이동 불가 방지)
 const panTo = (lat, lng) => {
   if (mapInstance && window.kakao) {
     const nLat = parseFloat(lat);
     const nLng = parseFloat(lng);
     if (isNaN(nLat) || isNaN(nLng)) return;
     
-    // 부드러운 이동
+    // 지도가 표시되는 div 크기가 변경되었을 수 있으므로 레이아웃 갱신
+    mapInstance.relayout();
+    
     const moveLatLon = new window.kakao.maps.LatLng(nLat, nLng);
     mapInstance.panTo(moveLatLon);
   }
@@ -101,6 +118,7 @@ const moveToCurrentLocation = () => {
       const locPosition = new window.kakao.maps.LatLng(lat, lng);
 
       if (mapInstance) {
+        mapInstance.relayout(); // 이동 전 레이아웃 갱신
         mapInstance.panTo(locPosition);
       }
       
@@ -157,7 +175,6 @@ onMounted(() => {
   setTimeout(initMap, 200);
 });
 
-// ✅ [수정] panTo 추가
 defineExpose({ moveToCurrentLocation, relayout, getMapCenter, panTo });
 </script>
 

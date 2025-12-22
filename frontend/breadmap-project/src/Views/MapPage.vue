@@ -4,7 +4,8 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 import KakaoMapLoader from '@/components/map/KakaoMapLoader.vue';
 import BakeryMap from '@/components/map/BakeryMap.vue';
-import { Search, MapPin, Star, Heart, Navigation, ThumbsUp, Home, Map as MapIcon, BookOpen, User, ChevronLeft, ChevronRight, RotateCw, ArrowRight } from 'lucide-vue-next';
+import BakeryInfoCard from '@/components/map/BakeryInfoCard.vue';
+import { Search, MapPin, Star, Heart, Navigation, ThumbsUp, Home, Map as MapIcon, BookOpen, User, ChevronLeft, ChevronRight, RotateCw } from 'lucide-vue-next';
 
 const router = useRouter();
 
@@ -83,6 +84,9 @@ const fetchBakeries = async (keyword = '', centerLat = null, centerLng = null) =
   
   showReSearchBtn.value = false;
   isFallbackSearch.value = false; 
+  
+  // 검색 시에는 선택된 빵집 정보 초기화 (리스트 모드로 복귀)
+  selectedBakery.value = null;
 
   try {
     const params = {};
@@ -110,6 +114,13 @@ const fetchBakeries = async (keyword = '', centerLat = null, centerLng = null) =
         tags: (fields.representative_tags && String(fields.representative_tags).trim() !== "") 
               ? String(fields.representative_tags).split(',') 
               : ['맛있는빵집', '추천'],
+        // ✅ [수정] 메뉴 데이터 매핑
+        // 백엔드에서 'products'로 보내준 데이터를 프론트엔드 'menu'로 연결
+        menu: fields.products ? fields.products.map(p => ({
+            name: p.name,
+            price: p.price,
+            image_url: p.image_url // InfoCard는 item.image_url을 사용함
+        })) : [],
         distance: 0 
       };
     });
@@ -200,13 +211,28 @@ const handleMapMoved = () => {
   showReSearchBtn.value = true;
 };
 
+// 마커 클릭 -> InfoCard 모드
 const handleMarkerClick = (bakery) => {
   selectedBakery.value = bakery;
-  router.push({ name: 'detail', params: { id: bakery.id } });
+  isListOpen.value = true; 
 };
 
+// 리스트 클릭 -> InfoCard 모드 & 지도 이동
 const handleListClick = (bakery) => {
   selectedBakery.value = bakery;
+  if (mapRef.value) {
+    mapRef.value.panTo(bakery.lat, bakery.lng);
+  }
+};
+
+// InfoCard 닫기 -> 리스트 모드
+const closeInfoCard = () => {
+  selectedBakery.value = null;
+};
+
+// 상세보기 이동
+const goToDetail = (id) => {
+  router.push({ name: 'detail', params: { id: id } });
 };
 
 const filterByMood = (keyword) => {
@@ -222,7 +248,8 @@ const pickRandomHotBakery = () => {
 
 const handleMyLocationClick = () => {
   if (mapRef.value) {
-    mapRef.value.moveToCurrentLocation();
+    mapRef.value.moveToCurrentLocation().then(pos => {
+    });
   }
 };
 
@@ -250,10 +277,9 @@ onMounted(() => {
 
 <template>
   <KakaoMapLoader>
-    <!-- GNB + Map Layout -->
     <div class="fixed inset-0 z-50 flex w-full h-full bg-[#F9F7F2] overflow-hidden">
       
-      <!-- 0. 세로형 네비게이션 바 (GNB) -->
+      <!-- GNB -->
       <nav class="w-[72px] h-full bg-[#1D4E45] flex flex-col items-center py-6 z-50 shrink-0 shadow-lg text-white/70">
         <router-link :to="{ name: 'home' }" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-xl mb-10 cursor-pointer hover:bg-white/20 transition-colors text-white no-underline">
           🥐
@@ -289,128 +315,121 @@ onMounted(() => {
         </div>
       </nav>
 
-      <!-- 1. 사이드바 (리스트 & 검색) -->
+      <!-- 사이드바 -->
       <div 
         class="absolute md:relative z-20 h-full bg-white shadow-xl transition-all duration-300 flex flex-col border-r border-[#1D4E45]/10 left-[72px] md:left-0"
         :class="isListOpen ? 'w-[320px] md:w-[380px] translate-x-0' : 'w-0 -translate-x-full md:w-0 md:-translate-x-0 overflow-hidden'"
       >
-        <!-- 귀여운 히어로 헤더 -->
-        <div class="bg-[#F9F7F2] p-5 pb-3">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="text-2xl">🏡</span>
-            <h1 class="text-xl font-bold text-[#1D4E45] font-serif tracking-tight">Breadtopia</h1>
-          </div>
-          <p class="text-xs text-gray-500 mb-4">동물 친구들과 함께 맛있는 빵지순례 떠나요! 🐾</p>
-          
-          <!-- 검색창 -->
-          <div class="relative mb-3 group">
-            <input 
-              v-model="searchKeyword"
-              @keyup.enter="searchStores"
-              type="text" 
-              placeholder="소금빵? 몽블랑? 찾아보자!" 
-              class="w-full pl-11 pr-4 py-3 bg-white border border-[#1D4E45]/10 rounded-2xl outline-none text-[#4A4036] placeholder-gray-400 focus:ring-2 focus:ring-[#1D4E45]/20 focus:border-[#1D4E45] transition-all font-medium shadow-sm"
-            />
-            <Search 
-              @click="searchStores"
-              class="absolute left-3.5 top-3.5 w-5 h-5 text-[#1D4E45] cursor-pointer hover:scale-110 transition-transform" 
-            />
-          </div>
-
-          <!-- 필터 칩 (동글동글하게) -->
-          <div class="flex gap-2 overflow-x-auto hide-scrollbar">
-            <button 
-              v-for="mood in moods" 
-              :key="mood.label"
-              @click="filterByMood(mood.keyword)"
-              class="flex-shrink-0 px-3 py-1.5 bg-white border border-[#1D4E45]/20 rounded-xl text-xs font-bold text-[#1D4E45] hover:bg-[#1D4E45] hover:text-white transition-all whitespace-nowrap shadow-sm"
-            >
-              {{ mood.label }}
-            </button>
-          </div>
+        <!-- 🟢 선택된 빵집이 있으면 InfoCard 표시 -->
+        <div v-if="selectedBakery" class="h-full flex flex-col">
+          <BakeryInfoCard 
+            :bakery="selectedBakery" 
+            @close="closeInfoCard"
+            @view-detail="goToDetail"
+          />
         </div>
 
-        <!-- 리스트 목록 -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-4 hide-scrollbar bg-white">
-          
-          <div v-if="isLoading" class="flex flex-col items-center justify-center py-20 gap-4">
-            <div class="animate-bounce text-3xl">🐰</div>
-            <span class="text-sm text-gray-500 font-medium">열심히 빵집 찾는 중...</span>
+        <!-- 🟢 선택된 빵집이 없으면 리스트 표시 -->
+        <div v-else class="h-full flex flex-col">
+          <div class="p-5 border-b border-gray-100 bg-white shrink-0 z-10">
+            <div class="relative mb-4 group">
+              <input 
+                v-model="searchKeyword"
+                @keyup.enter="searchStores"
+                type="text" 
+                placeholder="지역, 빵집 이름 검색" 
+                class="w-full pl-11 pr-4 py-3 bg-[#F9F7F2] rounded-lg border-none outline-none text-[#4A4036] placeholder-gray-400 focus:ring-2 focus:ring-[#1D4E45]/20 transition-all font-medium"
+              />
+              <Search 
+                @click="searchStores"
+                class="absolute left-3.5 top-3.5 w-5 h-5 text-[#1D4E45] cursor-pointer hover:scale-110 transition-transform" 
+              />
+            </div>
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+              <button 
+                v-for="mood in moods" 
+                :key="mood.label"
+                @click="filterByMood(mood.keyword)"
+                class="flex-shrink-0 px-3 py-1.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-[#1D4E45] hover:text-white hover:border-[#1D4E45] transition-all whitespace-nowrap"
+              >
+                {{ mood.label }}
+              </button>
+            </div>
           </div>
 
-          <div v-else-if="bakeries.length === 0" class="flex flex-col items-center justify-center py-20 text-center opacity-60">
-            <div class="text-4xl mb-2 grayscale">🏚️</div>
-            <p class="text-sm text-gray-500">이런! 검색 결과가 없어요.<br>다른 단어로 찾아볼까요?</p>
-          </div>
-
-          <div v-else>
-            <!-- 추천 카드 (브레드토피아 스타일) -->
-            <div v-if="currentHotBakery" class="bg-[#E8F3E8] rounded-3xl p-5 relative overflow-hidden group cursor-pointer border border-[#1D4E45]/10 shadow-sm hover:shadow-md transition-all" @click="handleListClick(currentHotBakery)">
-               <!-- 배경 장식 -->
-               <div class="absolute -right-4 -top-4 w-24 h-24 bg-white rounded-full opacity-50 blur-xl"></div>
-               
-               <div class="flex justify-between items-start mb-3 relative z-10">
-                 <span class="px-2 py-1 bg-[#1D4E45] text-white rounded-lg text-[10px] font-bold tracking-wider flex items-center gap-1 shadow-sm">
-                   <ThumbsUp class="w-3 h-3" /> 이달의 추천
-                 </span>
-                 <button class="text-[#1D4E45]/50 hover:text-red-500 transition-colors"><Heart class="w-5 h-5" /></button>
-               </div>
-               
-               <div class="flex gap-4 items-center relative z-10">
-                 <div class="w-16 h-16 rounded-2xl bg-white border-2 border-white shadow-md overflow-hidden shrink-0">
-                   <img :src="currentHotBakery.image" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
-                 </div>
-                 <div>
-                   <h3 class="font-bold text-lg text-[#1D4E45] leading-tight mb-1">{{ currentHotBakery.name }}</h3>
-                   <div class="flex items-center gap-1 text-xs text-[#1D4E45]/70 mb-1">
-                      <span>🐻</span>
-                      <span class="truncate w-32">{{ currentHotBakery.address }}</span>
-                   </div>
-                   <div class="flex gap-2 text-xs">
-                     <span class="text-orange-500 font-bold bg-white px-1.5 py-0.5 rounded border border-orange-100">★ {{ currentHotBakery.rating }}</span>
-                   </div>
-                 </div>
-               </div>
+          <div class="flex-1 overflow-y-auto p-5 space-y-6 hide-scrollbar bg-white">
+            <div v-if="isLoading" class="flex flex-col items-center justify-center py-20 gap-4">
+              <div class="animate-spin rounded-full h-10 w-10 border-4 border-[#1D4E45] border-t-transparent"></div>
+              <span class="text-sm text-gray-500">맛있는 빵집을 찾고 있어요...</span>
             </div>
 
-            <!-- 검색 결과 리스트 -->
-            <div class="mt-6">
-              <h3 class="font-bold text-[#4A4036] mb-3 text-sm px-1 flex justify-between items-center">
-                <span class="flex items-center gap-1">🧭 {{ isFallbackSearch ? '추천 탐험지' : '주변 탐험지' }}</span>
-                <span class="text-xs font-normal text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-100">{{ bakeries.length }}곳 발견!</span>
-              </h3>
-              
-              <div class="space-y-3">
-                <div 
-                  v-for="bakery in bakeries" 
-                  :key="bakery.id"
-                  @click="handleListClick(bakery)"
-                  :class="[
-                    'p-4 rounded-2xl border transition-all cursor-pointer flex gap-3 hover:shadow-lg hover:-translate-y-0.5 duration-300',
-                    selectedBakery?.id === bakery.id 
-                      ? 'border-orange-300 bg-orange-50/50 shadow-md' 
-                      : 'border-gray-100 bg-white hover:border-[#1D4E45]/30'
-                  ]"
-                >
-                  <div class="w-20 h-20 rounded-xl bg-gray-100 overflow-hidden shrink-0 shadow-sm">
-                    <img :src="bakery.image" class="w-full h-full object-cover" />
-                  </div>
-                  <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                    <div class="flex justify-between items-start">
-                      <h4 class="font-bold text-[#1D4E45] truncate text-base">{{ bakery.name }}</h4>
-                      <span class="text-xs font-bold text-orange-500 flex items-center gap-0.5 bg-orange-50 px-1.5 py-0.5 rounded-md">
-                        <Star class="w-3 h-3 fill-current" /> {{ bakery.rating }}
-                      </span>
+            <div v-else-if="bakeries.length === 0" class="flex flex-col items-center justify-center py-20 text-center opacity-60">
+              <Search class="w-12 h-12 text-gray-300 mb-2" />
+              <p class="text-sm text-gray-500">검색 결과가 없습니다.</p>
+            </div>
+
+            <div v-else>
+              <div v-if="isFallbackSearch" class="mb-4 p-3 bg-orange-50 border border-orange-100 rounded-xl text-xs text-orange-700 font-medium text-center">
+                📍 주변 10km 내 결과가 없어<br>가장 가까운 곳을 찾아보았어요!
+              </div>
+
+              <div v-if="currentHotBakery" class="bg-gradient-to-br from-[#1D4E45] to-[#12352E] rounded-2xl p-5 text-white shadow-lg relative overflow-hidden group cursor-pointer mb-6" @click="handleListClick(currentHotBakery)">
+                 <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                 <div class="flex justify-between items-start mb-3 relative z-10">
+                   <span class="px-2 py-1 bg-white/20 backdrop-blur rounded text-[10px] font-bold tracking-wider flex items-center gap-1">
+                     <ThumbsUp class="w-3 h-3" /> 오늘의 추천
+                   </span>
+                   <button class="text-white/70 hover:text-white"><Heart class="w-4 h-4" /></button>
+                 </div>
+                 <div class="flex gap-4 items-center relative z-10">
+                   <div class="w-16 h-16 rounded-full bg-white/10 border-2 border-white/20 overflow-hidden shrink-0">
+                     <img :src="currentHotBakery.image" class="w-full h-full object-cover" />
+                   </div>
+                   <div>
+                     <h3 class="font-bold text-lg leading-tight mb-1">{{ currentHotBakery.name }}</h3>
+                     <p class="text-xs text-white/70 truncate w-40">{{ currentHotBakery.address }}</p>
+                     <div class="flex gap-2 mt-2 text-xs">
+                       <span class="text-orange-300 font-bold">★ {{ currentHotBakery.rating }}</span>
+                       <span class="text-white/50">#{{ currentHotBakery.tags[0] }}</span>
+                     </div>
+                   </div>
+                 </div>
+              </div>
+
+              <div>
+                <h3 class="font-bold text-[#4A4036] mb-3 text-sm px-1 flex justify-between items-center">
+                  <span>{{ isFallbackSearch ? '추천 빵집 리스트' : '주변 빵집 리스트' }}</span>
+                  <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{{ bakeries.length }}개</span>
+                </h3>
+                <div class="space-y-3">
+                  <div 
+                    v-for="bakery in bakeries" 
+                    :key="bakery.id"
+                    @click="handleListClick(bakery)"
+                    :class="[
+                      'p-4 rounded-xl border transition-all cursor-pointer flex gap-3 hover:shadow-md',
+                      selectedBakery?.id === bakery.id 
+                        ? 'border-[#1D4E45] bg-[#F9F7F2] ring-1 ring-[#1D4E45]/20' 
+                        : 'border-gray-100 bg-white hover:border-[#1D4E45]/30'
+                    ]"
+                  >
+                    <div class="w-20 h-20 rounded-lg bg-gray-100 overflow-hidden shrink-0">
+                      <img :src="bakery.image" class="w-full h-full object-cover" />
                     </div>
-                    <p class="text-xs text-gray-500 line-clamp-1">{{ bakery.address }}</p>
-                    <div class="flex justify-between items-end mt-2">
-                      <div class="flex gap-1">
-                        <span v-for="tag in bakery.tags.slice(0, 2)" :key="tag" class="px-2 py-0.5 bg-[#F9F7F2] rounded-lg text-[10px] text-[#1D4E45] font-bold border border-[#1D4E45]/10">#{{ tag }}</span>
+                    <div class="flex-1 min-w-0 flex flex-col justify-between">
+                      <div class="flex justify-between items-start">
+                        <h4 class="font-bold text-[#1D4E45] truncate">{{ bakery.name }}</h4>
+                        <span class="text-xs font-bold text-orange-500 flex items-center gap-0.5"><Star class="w-3 h-3 fill-current" /> {{ bakery.rating }}</span>
                       </div>
-                      <span v-if="bakery.distance < 9999" class="text-xs font-bold flex items-center gap-1" :class="bakery.distance > 10 ? 'text-orange-400' : 'text-teal-600'">
-                        <span v-if="bakery.distance <= 10">🐾</span>
-                        {{ bakery.distance < 1 ? (bakery.distance * 1000).toFixed(0) + 'm' : bakery.distance.toFixed(1) + 'km' }}
-                      </span>
+                      <p class="text-xs text-gray-500 line-clamp-1">{{ bakery.address }}</p>
+                      <div class="flex justify-between items-end mt-1">
+                        <div class="flex gap-1">
+                          <span v-for="tag in bakery.tags.slice(0, 2)" :key="tag" class="px-1.5 py-0.5 bg-gray-100 rounded text-[10px] text-gray-500 font-medium">#{{ tag }}</span>
+                        </div>
+                        <span v-if="bakery.distance < 9999" class="text-xs font-bold" :class="bakery.distance > 10 ? 'text-orange-500' : 'text-[#1D4E45]'">
+                          {{ bakery.distance < 1 ? (bakery.distance * 1000).toFixed(0) + 'm' : bakery.distance.toFixed(1) + 'km' }}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -420,25 +439,20 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- 접기/펼치기 버튼 -->
-      <button 
-        @click="isListOpen = !isListOpen"
-        class="absolute top-1/2 -translate-y-1/2 z-30 w-6 h-12 bg-white border border-l-0 border-gray-200 rounded-r-xl flex items-center justify-center text-gray-400 shadow-[2px_0_10px_rgba(0,0,0,0.05)] hover:text-[#1D4E45] transition-all duration-300"
-        :class="isListOpen ? 'left-[392px] md:left-[452px]' : 'left-[72px]'"
-      >
+      <button @click="isListOpen = !isListOpen" class="absolute top-1/2 -translate-y-1/2 z-30 w-6 h-12 bg-white border border-l-0 border-gray-200 rounded-r-lg flex items-center justify-center text-gray-400 shadow-md hover:text-[#1D4E45] transition-all duration-300" :class="isListOpen ? 'left-[392px] md:left-[452px]' : 'left-[72px]'">
         <ChevronLeft v-if="isListOpen" class="w-4 h-4" />
         <ChevronRight v-else class="w-4 h-4" />
       </button>
 
       <!-- 지도 영역 -->
       <div class="flex-1 h-full relative z-0">
-        <div v-if="showReSearchBtn" class="absolute top-6 left-1/2 -translate-x-1/2 z-20 animate-bounce-in">
+        <div v-if="showReSearchBtn" class="absolute top-4 left-1/2 -translate-x-1/2 z-20 animate-bounce-in">
           <button 
             @click="handleReSearchInMap"
-            class="flex items-center gap-2 bg-[#1D4E45] text-white px-6 py-3 rounded-full shadow-xl font-bold hover:bg-[#153e35] transition-all transform hover:scale-105 active:scale-95"
+            class="flex items-center gap-2 bg-white text-[#1D4E45] px-5 py-2.5 rounded-full shadow-lg border border-[#1D4E45]/10 font-bold hover:bg-[#1D4E45] hover:text-white transition-all transform hover:scale-105"
           >
-            <RotateCw class="w-4 h-4 animate-spin-slow" />
-            여기서 다시 찾기
+            <RotateCw class="w-4 h-4" />
+            현 지도에서 검색
           </button>
         </div>
 
@@ -450,11 +464,11 @@ onMounted(() => {
           @map-moved="handleMapMoved" 
         />
         
-        <div class="absolute top-6 right-6 flex flex-col gap-3 z-10">
-          <button @click="handleMyLocationClick" class="bg-white p-3 rounded-2xl shadow-lg text-gray-600 hover:text-[#1D4E45] hover:bg-gray-50 transition-all transform hover:scale-105" title="내 위치">
+        <div class="absolute top-4 right-4 flex flex-col gap-2 z-10">
+          <button @click="handleMyLocationClick" class="bg-white p-2.5 rounded shadow-md text-gray-600 hover:text-[#1D4E45] hover:bg-gray-50 transition-colors" title="내 위치">
             <Navigation class="w-5 h-5" />
           </button>
-          <button class="bg-white p-3 rounded-2xl shadow-lg text-gray-600 hover:text-[#1D4E45] hover:bg-gray-50 transition-all transform hover:scale-105" title="지도 뷰 변경">
+          <button class="bg-white p-2.5 rounded shadow-md text-gray-600 hover:text-[#1D4E45] hover:bg-gray-50 transition-colors" title="지도 뷰 변경">
              <MapPin class="w-5 h-5" />
           </button>
         </div>

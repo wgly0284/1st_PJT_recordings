@@ -295,7 +295,10 @@ const width = ref(window.innerWidth)
 const onResize = () => {
   width.value = window.innerWidth
 }
-onMounted(() => window.addEventListener('resize', onResize))
+onMounted(() => {
+  window.addEventListener('resize', onResize)
+  fetchPosts() // 컴포넌트 마운트 시 게시글 가져오기
+})
 onUnmounted(() => window.removeEventListener('resize', onResize))
 const isMobile = computed(() => width.value < 1024)
 
@@ -431,8 +434,8 @@ onMounted(() => {
 })
 
 const filteredPosts = computed(() => {
-  if (selectedCategory.value === 'hot') return posts.value
-  return posts.value.filter((p) => p.type === selectedCategory.value)
+  if (selectedCategory.value === 'hot') return posts.value // 'hot'은 일단 전체 목록으로
+  return posts.value.filter((p) => p.category === selectedCategory.value)
 })
 
 const currentCategoryLabel = computed(() => {

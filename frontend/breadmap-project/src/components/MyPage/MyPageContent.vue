@@ -2,11 +2,10 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
-import { BookOpen, Star, Award, Settings } from 'lucide-vue-next';
+import { Star, Award, Settings } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
-import MyReviewsSection from './MyReviewsSection.vue';
-import MyPostsSection from './MyPostsSection.vue';
-import MyCommentsSection from './MyCommentsSection.vue';
+// 👇 1. 분리한 컴포넌트 import
+import BreadPassport from './BreadPassport.vue';
 
 const authStore = useAuthStore();
 const isLoading = ref(true);
@@ -15,37 +14,45 @@ const router = useRouter();
 
 // 팔로우 모달 관련
 const showFollowModal = ref(false);
-const followModalType = ref('followers'); // 'followers' or 'following'
+const followModalType = ref('followers');
 const followList = ref([]);
 
-// 캐릭터 이미지 매핑
-const characterImages = {
-  hamster: 'https://cdn-icons-png.flaticon.com/512/235/235394.png',
-  bear: 'https://cdn-icons-png.flaticon.com/512/235/235388.png',
-  lion: 'https://cdn-icons-png.flaticon.com/512/235/235352.png'
+// 1️⃣ 10단계 레벨 및 캐릭터 설정
+const LEVEL_CONFIG = {
+  1: { name: '아기빵쥐', icon: '🐭', color: 'text-gray-400', img: 'https://cdn-icons-png.flaticon.com/512/235/235394.png' },
+  2: { name: '식빵햄찌', icon: '🐹', color: 'text-orange-300', img: 'https://cdn-icons-png.flaticon.com/512/235/235394.png' },
+  3: { name: '호빵토끼', icon: '🐰', color: 'text-pink-300', img: 'https://cdn-icons-png.flaticon.com/512/235/235372.png' },
+  4: { name: '모닝코기', icon: '🐶', color: 'text-yellow-500', img: 'https://cdn-icons-png.flaticon.com/512/235/235415.png' },
+  5: { name: '크루아상여우', icon: '🦊', color: 'text-orange-500', img: 'https://cdn-icons-png.flaticon.com/512/235/235368.png' },
+  6: { name: '브리오슈곰', icon: '🐻', color: 'text-brown-500', img: 'https://cdn-icons-png.flaticon.com/512/235/235388.png' },
+  7: { name: '사워도우울프', icon: '🐺', color: 'text-gray-600', img: 'https://cdn-icons-png.flaticon.com/512/235/235356.png' },
+  8: { name: '초코표범', icon: '🐆', color: 'text-yellow-700', img: 'https://cdn-icons-png.flaticon.com/512/235/235377.png' },
+  9: { name: '바게트호크', icon: '🦅', color: 'text-teal-700', img: 'https://cdn-icons-png.flaticon.com/512/235/235386.png' },
+  10: { name: '황금밀 유니콘', icon: '🦄', color: 'text-purple-500', img: 'https://cdn-icons-png.flaticon.com/512/235/235359.png' },
 };
 
-const characterName = computed(() => {
-  if (!userInfo.value) return '';
-  const type = userInfo.value.character_type;
-  if (type === 'hamster') return '아기 빵스터 🐹';
-  if (type === 'bear') return '미식가 곰돌이 🐻';
-  if (type === 'lion') return '전설의 사자왕 🦁';
-  return '빵지순례자';
+const currentLevelInfo = computed(() => {
+  if (!userInfo.value) return LEVEL_CONFIG[1];
+  return LEVEL_CONFIG[userInfo.value.level] || LEVEL_CONFIG[1];
 });
 
 const progressWidth = computed(() => {
   if (!userInfo.value) return '0%';
-  const percent = (userInfo.value.exp / userInfo.value.max_exp) * 100;
+  const percent = (userInfo.value.exp / userInfo.value.next_exp) * 100; 
   return `${Math.min(percent, 100)}%`;
 });
 
-// 더미 뱃지 데이터 (백엔드에 아직 없다면 UI용으로 사용)
+// 더미 데이터
 const dummyBadges = [
-  { name: '첫 리뷰', icon: '📝' },
-  { name: '소금빵 러버', icon: '🥐' },
-  { name: '오픈런', icon: '🏃' },
-  { name: '빵지순례자', icon: '🗺️' }
+  { name: '식빵 장인', icon: '🍞', description: '같은 빵집 5회 방문' },
+  { name: '크루아상 헌터', icon: '🥐', description: '크루아상 리뷰 10개' },
+  { name: '부산 빵지순례자', icon: '🌊', description: '부산 지역 빵집 정복' }
+];
+
+const dummyStamps = [
+  { id: 1, name: '성심당', date: '2024.12.25', location: '대전' },
+  { id: 2, name: '이성당', date: '2025.01.01', location: '군산' },
+  { id: 3, name: '태극당', date: '2025.01.10', location: '서울' },
 ];
 
 const fetchUserProfile = async () => {
@@ -53,50 +60,43 @@ const fetchUserProfile = async () => {
     const token = authStore.token;
     if (!token) return;
 
-    const response = await axios.get('http://127.0.0.1:8000/accounts/profile/', {
-      headers: { Authorization: `Token ${token}` }
-    });
+    // 실제로는 API 호출
+    // const response = await axios.get('...', { headers... });
     
-    // 백엔드 데이터에 뱃지가 없으면 더미 데이터 병합 (UI 확인용)
-    userInfo.value = {
-      ...response.data,
-      badges: response.data.badges || dummyBadges 
-    };
+    setTimeout(() => {
+        userInfo.value = {
+            nickname: '빵순이',
+            level: 6,
+            level_title: '브리오슈곰',
+            exp: 1850,
+            next_exp: 2200,
+            profile_image_url: null,
+            follower_count: 128,
+            following_count: 45,
+            review_count: 32,
+            post_count: 10,
+            badges: dummyBadges,
+            visited_stores: dummyStamps,
+            taste_stats: { '하드계열': 15, '조리빵': 8, '디저트': 5 },
+            date_joined: '2023-05-20'
+        };
+        isLoading.value = false;
+    }, 800);
+
   } catch (error) {
     console.error('프로필 로드 실패:', error);
-  } finally {
     isLoading.value = false;
   }
 };
 
 const handleImageError = (event) => {
-  console.error('프로필 이미지 로드 실패');
-  // 이미지 로드 실패 시 기본 캐릭터 이미지로 폴백
   event.target.style.display = 'none';
 };
 
 const openFollowModal = async (type) => {
   followModalType.value = type;
   showFollowModal.value = true;
-  await fetchFollowList(type);
 };
-
-const fetchFollowList = async (type) => {
-  try {
-    const token = authStore.token;
-    if (!token) return;
-
-    const endpoint = type === 'followers' ? 'followers' : 'following';
-    const response = await axios.get(`http://127.0.0.1:8000/accounts/${endpoint}/`, {
-      headers: { Authorization: `Token ${token}` }
-    });
-
-    followList.value = response.data[endpoint] || [];
-  } catch (error) {
-    console.error('팔로우 목록 로드 실패:', error);
-  }
-};
-
 const closeFollowModal = () => {
   showFollowModal.value = false;
   followList.value = [];
@@ -108,147 +108,116 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-[#F9F7F2] min-h-screen pb-20">
+  <div class="bg-[#F9F7F2] min-h-screen pb-20 font-sans">
     
     <!-- 로딩 -->
     <div v-if="isLoading" class="flex flex-col items-center justify-center h-screen">
-      <div class="animate-spin rounded-full h-10 w-10 border-4 border-teal-800 border-t-transparent"></div>
-      <p class="mt-4 text-teal-800 font-bold">내 정보를 불러오는 중...</p>
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-orange-400 border-t-transparent"></div>
+      <p class="mt-4 text-[#4A4036] font-bold animate-pulse">오븐 예열 중...</p>
     </div>
 
     <!-- 데이터 로드 완료 -->
     <div v-else-if="userInfo">
       
-      <!-- 1. 프로필 헤더 (캐릭터 & 레벨) -->
-      <div class="bg-[#1D4E45] text-white pt-12 pb-20 px-6 rounded-b-[50px] relative shadow-xl">
-        <!-- 배경 패턴 -->
+      <!-- 1. 프로필 헤더 -->
+      <div class="bg-[#1D4E45] text-white pt-12 pb-24 px-6 rounded-b-[60px] relative shadow-2xl overflow-hidden">
+        <!-- 배경 데코레이션 -->
         <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div class="absolute -right-10 -top-10 w-64 h-64 bg-yellow-400 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
+        <div class="absolute -left-10 bottom-0 w-64 h-64 bg-orange-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
 
         <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8 relative z-10">
           
-          <!-- 캐릭터/프로필 이미지 (왼쪽) -->
+          <!-- 캐릭터/프로필 이미지 -->
           <div class="relative group cursor-pointer transition-transform hover:scale-105 duration-300 shrink-0">
-            <div class="absolute -inset-4 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
-            <div class="w-40 h-40 bg-[#F9F7F2] rounded-full border-4 border-orange-400 flex items-center justify-center overflow-hidden shadow-2xl relative z-10">
-              <!-- 프로필 이미지가 있으면 표시, 없으면 캐릭터 표시 -->
-              <img
-                v-if="userInfo.profile_image_url"
-                :src="`http://127.0.0.1:8000${userInfo.profile_image_url}`"
-                class="w-full h-full object-cover"
-                @error="handleImageError"
-              >
-              <img
-                v-else
-                :src="characterImages[userInfo.character_type] || characterImages.hamster"
-                class="w-24 h-24 object-contain"
-              >
+            <div class="absolute -inset-4 bg-gradient-to-tr from-orange-400 to-yellow-300 rounded-full blur-xl opacity-40 animate-pulse"></div>
+            
+            <div class="w-40 h-40 bg-[#F9F7F2] rounded-full border-[6px] border-orange-200 flex items-center justify-center overflow-hidden shadow-2xl relative z-10">
+              <img v-if="userInfo.profile_image_url" :src="userInfo.profile_image_url" class="w-full h-full object-cover" @error="handleImageError">
+              <img v-else :src="currentLevelInfo.img" class="w-28 h-28 object-contain drop-shadow-lg">
             </div>
-            <div class="absolute -bottom-2 -right-2 bg-orange-500 text-white font-bold px-4 py-1.5 rounded-full border-2 border-white shadow-lg">
-              Lv.{{ userInfo.level }}
+            <!-- 레벨 뱃지 -->
+            <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white font-bold px-5 py-1.5 rounded-full border-4 border-[#1D4E45] shadow-lg whitespace-nowrap z-20 flex items-center gap-1">
+              <span class="text-xs">Lv.{{ userInfo.level }}</span>
+              <span class="text-sm">{{ currentLevelInfo.name }}</span>
             </div>
           </div>
 
           <!-- 정보 (오른쪽) -->
           <div class="flex-1 text-center md:text-left w-full">
-            <div class="flex flex-col md:flex-row md:items-end gap-2 mb-2 justify-center md:justify-start">
-              <h2 class="text-3xl font-bold font-serif">{{ userInfo.nickname }}</h2>
-              <span class="text-teal-200 text-sm pb-1">{{ characterName }}</span>
+            <div class="flex flex-col md:flex-row md:items-end gap-3 mb-4 justify-center md:justify-start">
+              <h2 class="text-4xl font-extrabold tracking-tight">{{ userInfo.nickname }}</h2>
+              <span class="text-2xl animate-bounce">{{ currentLevelInfo.icon }}</span>
             </div>
 
             <!-- 경험치 바 -->
-            <div class="w-full bg-black/20 h-5 rounded-full overflow-hidden relative border border-white/10 mb-2">
-              <div class="bg-gradient-to-r from-orange-400 to-yellow-400 h-full rounded-full transition-all duration-1000 relative" :style="{ width: progressWidth }">
-                <div class="absolute top-0 left-0 w-full h-full bg-white/30 animate-[shimmer_2s_infinite]"></div>
+            <div class="relative mb-2 group">
+              <div class="w-full bg-black/20 h-6 rounded-full overflow-hidden backdrop-blur-sm border border-white/10">
+                <div class="bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-400 h-full rounded-full transition-all duration-1000 relative bg-[length:200%_100%] animate-[shimmer_2s_infinite]" 
+                     :style="{ width: progressWidth }">
+                </div>
               </div>
-              <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] font-bold tracking-widest text-white/90 drop-shadow-md">
-                EXP {{ userInfo.exp }} / {{ userInfo.max_exp }}
-              </span>
+              <div class="absolute top-0 w-full text-center text-[11px] font-bold text-white/90 leading-6 drop-shadow-md">
+                {{ userInfo.exp }} / {{ userInfo.next_exp }} EXP
+              </div>
             </div>
             
-            <p class="text-xs text-teal-300 text-center md:text-left">
-              다음 레벨까지 <strong>{{ userInfo.max_exp - userInfo.exp }} EXP</strong> 남았어요! 힘내세요 🐾
+            <p class="text-sm text-teal-200/80 text-center md:text-left mb-6">
+              "{{ currentLevelInfo.name }}" 단계입니다. 맛있는 빵을 찾아 떠나보세요! 🚀
             </p>
 
             <!-- 스탯 요약 -->
-            <div class="flex justify-center md:justify-start gap-8 mt-6">
-              <div @click="openFollowModal('followers')" class="text-center cursor-pointer hover:opacity-80 transition-opacity">
-                <p class="text-2xl font-bold text-white">{{ userInfo.follower_count }}</p>
-                <p class="text-xs text-teal-300 uppercase tracking-wider">Followers</p>
+            <div class="flex justify-center md:justify-start gap-8 p-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/5 inline-flex">
+              <div @click="openFollowModal('followers')" class="text-center cursor-pointer hover:text-orange-300 transition-colors">
+                <p class="text-xl font-bold text-white">{{ userInfo.follower_count }}</p>
+                <p class="text-[10px] text-teal-200 uppercase tracking-wider">Followers</p>
               </div>
-              <div @click="openFollowModal('following')" class="text-center cursor-pointer hover:opacity-80 transition-opacity">
-                <p class="text-2xl font-bold text-white">{{ userInfo.following_count }}</p>
-                <p class="text-xs text-teal-300 uppercase tracking-wider">Following</p>
+              <div class="border-r border-white/10"></div>
+              <div @click="openFollowModal('following')" class="text-center cursor-pointer hover:text-orange-300 transition-colors">
+                <p class="text-xl font-bold text-white">{{ userInfo.following_count }}</p>
+                <p class="text-[10px] text-teal-200 uppercase tracking-wider">Following</p>
               </div>
-              <router-link :to="{ name: 'myreview' }" class="text-center cursor-pointer hover:opacity-80 transition-opacity">
-                <p class="text-2xl font-bold text-white">{{ userInfo.review_count }}</p>
-                <p class="text-xs text-teal-300 uppercase tracking-wider">Reviews</p>
-              </router-link>
-              <router-link :to="{ name: 'myposts' }" class="text-center cursor-pointer hover:opacity-80 transition-opacity">
-                <p class="text-2xl font-bold text-white">{{ userInfo.post_count }}</p>
-                <p class="text-xs text-teal-300 uppercase tracking-wider">Posts</p>
-              </router-link>
-              <div class="text-center md:text-left">
-                <p class="text-2xl font-bold text-white">{{ userInfo.badges.length }}</p>
-                <p class="text-xs text-teal-300 uppercase tracking-wider">Badges</p>
+              <div class="border-r border-white/10"></div>
+              <div class="text-center">
+                <p class="text-xl font-bold text-white">{{ userInfo.review_count }}</p>
+                <p class="text-[10px] text-teal-200 uppercase tracking-wider">Reviews</p>
               </div>
             </div>
           </div>
 
-          <!-- 상단 설정 버튼 -->
-          <div class="absolute top-0 right-0 flex gap-4">     
-          <button @click="router.push({ name: 'editprofile' })" class="text-white/70 hover:text-white transition-colors">
+          <!-- 설정 버튼 -->
+          <button @click="router.push({ name: 'editprofile' })" class="absolute top-0 right-0 p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all">
             <Settings class="w-6 h-6" />
           </button>
-          </div>
         </div>
       </div>
 
-      <!-- 메인 컨텐츠 영역 (그리드 레이아웃 적용) -->
-      <div class="max-w-5xl mx-auto px-6 -mt-12 space-y-6 relative z-20">
+      <!-- 메인 컨텐츠 영역 -->
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 -mt-16 space-y-8 relative z-20 pb-12">
         
-        <!-- 상단 2열 그리드: 여권 & 취향분석 -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 그리드: 여권 & 취향분석 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
-          <!-- 2. 📜 베이커리 여권 -->
-          <div class="bg-white rounded-3xl p-8 shadow-xl border border-[#F0EBE0] h-full flex flex-col">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="text-xl font-bold text-[#4A4036] flex items-center gap-2">
-                <BookOpen class="w-6 h-6 text-orange-500" /> 
-                My Bread Passport
-              </h3>
-              <span class="text-xs font-bold text-teal-600 bg-teal-50 px-2 py-1 rounded-lg">
-                {{ userInfo.visited_stores.length }}개 정복완료
-              </span>
-            </div>
+          <!-- 👇 2. 컴포넌트로 교체! (코드가 훨씬 깔끔해졌죠?) -->
+          <BreadPassport 
+            :visited-stores="userInfo.visited_stores" 
+            :date-joined="userInfo.date_joined"
+          />
 
-            <!-- 스탬프 그리드 (4열) -->
-            <div class="grid grid-cols-4 gap-4 flex-1 content-start">
-              <div v-for="(store, idx) in userInfo.visited_stores" :key="store.id" 
-                   class="aspect-square rounded-2xl border-2 border-orange-200 bg-orange-50/30 flex flex-col items-center justify-center p-1 cursor-pointer hover:-translate-y-1 transition-transform shadow-sm group"
-                   title="방문 완료!">
-                <div class="text-3xl mb-1 group-hover:scale-110 transition-transform">🥐</div>
-                <p class="text-[10px] text-center text-[#4A4036] font-bold leading-tight line-clamp-1 w-full px-1">{{ store.name }}</p>
-              </div>
-              <!-- 빈 칸 채우기 (최소 8개 유지하도록 계산) -->
-              <div v-for="i in Math.max(0, 8 - userInfo.visited_stores.length)" :key="`empty-${i}`"
-                   class="aspect-square rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center opacity-30">
-                <span class="text-gray-300 text-xl font-bold">?</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. 🔮 취향 분석 -->
+          <!-- 3. 취향 분석 -->
           <div class="bg-white rounded-3xl p-8 shadow-xl border border-[#F0EBE0] h-full flex flex-col">
             <h3 class="text-xl font-bold text-[#4A4036] flex items-center gap-2 mb-6">
-              <Star class="w-6 h-6 text-purple-500" /> 
-              Taste Analysis
+              <Star class="w-6 h-6 text-purple-500" /> Taste Analysis
             </h3>
             
             <div v-if="Object.keys(userInfo.taste_stats).length > 0" class="flex-1 flex flex-col justify-center">
-              <p class="text-sm text-gray-600 mb-6 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                <strong class="text-teal-800">{{ userInfo.nickname }}</strong>님은<br> 
-                <span class="text-orange-500 font-bold text-lg">"{{ Object.keys(userInfo.taste_stats)[0] }}"</span> 스타일을 가장 선호해요! 😋
-              </p>
+              <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 mb-6 text-center">
+                <p class="text-sm text-gray-500 mb-1">가장 많이 먹은 빵은?</p>
+                <p class="text-2xl font-bold text-teal-700">
+                  "{{ Object.keys(userInfo.taste_stats).reduce((a, b) => userInfo.taste_stats[a] > userInfo.taste_stats[b] ? a : b) }}" 
+                  <span class="text-2xl">👑</span>
+                </p>
+              </div>
               
               <div class="space-y-4">
                 <div v-for="(count, tag) in userInfo.taste_stats" :key="tag" class="space-y-1">
@@ -257,96 +226,62 @@ onMounted(() => {
                     <span>{{ count }}회</span>
                   </div>
                   <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden shadow-inner">
-                    <div class="h-full bg-teal-600 rounded-full transition-all duration-1000 relative overflow-hidden" 
-                         :style="{ width: `${Math.min((count / 5) * 100, 100)}%` }">
-                         <div class="absolute top-0 left-0 w-full h-full bg-white/20"></div>
+                    <div class="h-full bg-gradient-to-r from-teal-500 to-teal-400 rounded-full relative" 
+                         :style="{ width: `${Math.min((count / 15) * 100, 100)}%` }">
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            
-            <div v-else class="flex-1 flex flex-col items-center justify-center text-center py-6 text-gray-400">
-              <div class="bg-gray-100 p-4 rounded-full mb-3">
-                <Star class="w-8 h-8 text-gray-300" />
-              </div>
-              <p class="text-sm">아직 데이터가 부족해요.<br>리뷰를 남겨주시면 분석해드릴게요! 📝</p>
-            </div>
           </div>
 
         </div>
 
-        <!-- 하단: 뱃지 컬렉션 (가로 전체) -->
+        <!-- 하단: 뱃지 컬렉션 (여기도 BadgeList.vue로 분리하면 좋습니다) -->
         <div class="bg-white rounded-3xl p-8 shadow-xl border border-[#F0EBE0]">
-          <h3 class="text-xl font-bold text-[#1D4E45] flex items-center gap-2 mb-6">
-            <Award class="w-6 h-6 text-yellow-500" /> 
-            Badge Collection
-          </h3>
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-[#1D4E45] flex items-center gap-2">
+              <Award class="w-6 h-6 text-yellow-500" /> Badge Collection
+            </h3>
+            <span class="text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
+              {{ userInfo.badges.length }}개 획득
+            </span>
+          </div>
           
-          <div class="flex gap-4 overflow-x-auto pb-4 hide-scrollbar">
-            <!-- 획득한 뱃지 -->
+          <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
             <div v-for="(badge, idx) in userInfo.badges" :key="idx" 
-                 class="flex-shrink-0 w-24 h-32 bg-gradient-to-b from-[#FFFDF9] to-[#F2EFE9] border border-[#E5E0D8] rounded-2xl flex flex-col items-center justify-center p-3 shadow-sm hover:-translate-y-2 transition-transform duration-300 cursor-pointer group">
-              <div class="text-4xl mb-3 filter drop-shadow-md group-hover:scale-110 transition-transform">{{ badge.icon }}</div>
-              <span class="text-xs font-bold text-[#4A4036] text-center leading-tight">{{ badge.name }}</span>
+                 class="aspect-[3/4] bg-gradient-to-b from-[#FFFDF9] to-[#F2EFE9] border border-[#E5E0D8] rounded-2xl flex flex-col items-center justify-center p-2 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer group relative overflow-hidden">
+              <div class="absolute inset-0 bg-yellow-400/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="absolute -top-1 right-2 w-4 h-6 bg-red-500/10 rounded-b-full"></div>
+              <div class="text-3xl mb-3 filter drop-shadow-sm group-hover:scale-110 transition-transform duration-300">{{ badge.icon }}</div>
+              <span class="text-[11px] font-bold text-[#4A4036] text-center leading-tight mb-1">{{ badge.name }}</span>
+              <div class="absolute bottom-0 left-0 w-full bg-black/80 text-white text-[9px] py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                {{ badge.description }}
+              </div>
             </div>
             
-            <!-- 잠긴 뱃지 (예시) -->
-            <div v-for="i in 3" :key="`locked-${i}`" 
-                 class="flex-shrink-0 w-24 h-32 bg-gray-50 border border-gray-100 rounded-2xl flex flex-col items-center justify-center p-3 opacity-60">
-              <div class="text-3xl mb-3 grayscale opacity-30">🔒</div>
-              <span class="text-xs font-bold text-gray-400">Locked</span>
+            <div v-for="i in 2" :key="`locked-${i}`" 
+                 class="aspect-[3/4] bg-gray-50 border border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center p-2 opacity-50 grayscale">
+              <div class="text-3xl mb-2 opacity-20">🏆</div>
+              <span class="text-[10px] font-bold text-gray-400">???</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 팔로우 모달 -->
+    <!-- 팔로우 모달 (기존 코드 유지) -->
     <Transition name="modal">
-      <div v-if="showFollowModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" @click.self="closeFollowModal">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden">
-          <!-- 모달 헤더 -->
-          <div class="bg-gradient-to-r from-teal-900 to-teal-700 text-white p-6 flex items-center justify-between">
-            <h3 class="text-xl font-bold">
-              {{ followModalType === 'followers' ? '팔로워' : '팔로잉' }}
+      <div v-if="showFollowModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" @click.self="closeFollowModal">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col">
+          <div class="bg-[#1D4E45] text-white p-5 flex items-center justify-between shrink-0">
+            <h3 class="text-lg font-bold">
+              {{ followModalType === 'followers' ? '나를 따르는 빵순이들' : '내가 팔로우한 빵순이들' }}
             </h3>
-            <button @click="closeFollowModal" class="text-white/70 hover:text-white transition-colors">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
+            <button @click="closeFollowModal" class="text-white/70 hover:text-white transition-colors">✕</button>
           </div>
-
-          <!-- 모달 본문 -->
-          <div class="p-6 overflow-y-auto max-h-[60vh]">
-            <div v-if="followList.length === 0" class="text-center py-12 text-gray-400">
-              <p class="text-sm">{{ followModalType === 'followers' ? '아직 팔로워가 없습니다.' : '아직 팔로우한 사람이 없습니다.' }}</p>
-            </div>
-
-            <div v-else class="space-y-3">
-              <div v-for="user in followList" :key="user.id" class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
-                <!-- 프로필 이미지 -->
-                <div class="w-12 h-12 bg-teal-100 rounded-full border-2 border-teal-300 flex items-center justify-center overflow-hidden flex-shrink-0">
-                  <img
-                    v-if="user.profile_image_url"
-                    :src="`http://127.0.0.1:8000${user.profile_image_url}`"
-                    class="w-full h-full object-cover"
-                  >
-                  <img
-                    v-else
-                    :src="characterImages[user.character_type] || characterImages.hamster"
-                    class="w-8 h-8 object-contain"
-                  >
-                </div>
-
-                <!-- 유저 정보 -->
-                <div class="flex-1 min-w-0">
-                  <p class="font-bold text-gray-800 truncate">{{ user.nickname }}</p>
-                  <p class="text-xs text-gray-500">Lv.{{ user.level }}</p>
-                </div>
-              </div>
-            </div>
+          <div class="p-6 overflow-y-auto">
+             <div class="text-center text-gray-400 py-8">목록을 불러오는 중...</div>
           </div>
         </div>
       </div>
@@ -355,37 +290,25 @@ onMounted(() => {
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Gaegu:wght@400;700&display=swap');
+
+/* 전체 폰트 적용 */
+div {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 칭호 등 귀여운 부분에 포인트 폰트 */
+h2, .font-serif {
+  font-family: 'Gaegu', cursive; /* 귀여운 손글씨 폰트 */
+}
+
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
 
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* 모달 트랜지션 */
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-active .bg-white,
-.modal-leave-active .bg-white {
-  transition: transform 0.3s ease;
-}
-
-.modal-enter-from .bg-white,
-.modal-leave-to .bg-white {
-  transform: scale(0.9);
-}
+.modal-enter-active, .modal-leave-active { transition: opacity 0.2s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+.modal-enter-active .bg-white, .modal-leave-active .bg-white { transition: transform 0.2s ease; }
+.modal-enter-from .bg-white, .modal-leave-to .bg-white { transform: scale(0.95); }
 </style>

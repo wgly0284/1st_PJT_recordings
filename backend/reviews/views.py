@@ -4,8 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 
-from .models import Review
-from .serializers import ReviewSerializer
+from .models import Review, Comment
+from .serializers import ReviewSerializer, CommentSerializer
 
 
 class ReviewListCreateView(generics.ListCreateAPIView):
@@ -121,3 +121,49 @@ class ReviewCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         # 리뷰를 작성할 때, 요청을 보낸 사용자를 user 필드에 자동으로 할당
         serializer.save(user=self.request.user)
+
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    """
+    특정 리뷰의 댓글 목록을 조회하거나 새 댓글을 작성합니다.
+    /reviews/<review_pk>/comments/ 에 매핑.
+    """
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        review_pk = self.kwargs.get('review_pk')
+        # parent가 None인 댓글만 반환 (최상위 댓글만)
+        return Comment.objects.filter(review_id=review_pk, parent__isnull=True)
+
+    def perform_create(self, serializer):
+        review_pk = self.kwargs.get('review_pk')
+        serializer.save(user=self.request.user, review_id=review_pk)
+
+
+class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    단일 댓글을 조회, 수정, 삭제합니다.
+    /comments/<pk>/ 에 매핑.
+    """
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+
+class ReplyCreateView(generics.CreateAPIView):
+    """
+    댓글에 답글을 작성합니다.
+    /comments/<comment_pk>/reply/ 에 매핑.
+    """
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        comment_pk = self.kwargs.get('comment_pk')
+        parent_comment = Comment.objects.get(pk=comment_pk)
+        serializer.save(
+            user=self.request.user,
+            review=parent_comment.review,
+            parent=parent_comment
+        )

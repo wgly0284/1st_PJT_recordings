@@ -44,3 +44,30 @@ class Review(models.Model):
         if self.store:
             return f'Review by {self.user.username} for {self.store.name}'
         return f'Review by {self.user.username}'
+
+
+class Comment(models.Model):
+    """
+    리뷰에 대한 댓글 모델
+    """
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # 답글 기능을 위한 자기 참조
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='replies'
+    )
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        if self.parent:
+            return f'Reply by {self.user.username} to comment {self.parent.id}'
+        return f'Comment by {self.user.username} on review {self.review.id}'

@@ -8,6 +8,9 @@ import MyReviews from '@/components/MyPage/MyReviews.vue'
 import ReviewDetail from '@/components/ReviewDetail.vue'
 import NewReview from '@/components/MyPage/NewReview.vue'
 import CommunityMain from '@/components/community/CommunityMain.vue'
+import NewChatter from '@/components/community/NewChatter.vue'
+import NewRecommend from '@/components/community/NewRecommend.vue'
+import NewTip from '@/components/community/NewTip.vue'
 import EditProfile from '@/components/MyPage/EditProfile.vue'
 import MapPage from '@/Views/MapPage.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -64,6 +67,21 @@ const routes = [
     component: CommunityMain
   },
   {
+    path: '/community/chatter/new',
+    name: 'newChatter',
+    component: NewChatter
+  },
+  {
+    path: '/community/recommend/new',
+    name: 'newRecommend',
+    component: NewRecommend
+  },
+  {
+    path: '/community/tip/new',
+    name: 'newTip',
+    component: NewTip
+  },
+  {
     path: '/map',
     name: 'map',
     component: MapPage,
@@ -81,7 +99,7 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   
   // 보호할 페이지들 (name으로 체크)
-  const protectedRoutes = ['mypage', 'editprofile', 'myreview', 'myreview_id', 'newReview']
+  const protectedRoutes = ['mypage', 'editprofile', 'myreview', 'myreview_id', 'newReview', 'newChatter', 'newRecommend', 'newTip']
   
   if (protectedRoutes.includes(to.name)) {
     if (!authStore.isAuthenticated) {

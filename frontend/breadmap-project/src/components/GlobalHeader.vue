@@ -13,8 +13,7 @@
              </div>
             <span class="font-playfair text-xl md:text
       -2xl font-bold tracking-tight text-teal-900
-      group-hover:opacity-80 transition-opacity">Bread
-      Pilgrimage</span>
+      group-hover:opacity-80 transition-opacity">Breadtopia</span>
           </router-link>
    
           <!-- Nav Links & Auth (Desktop) -->

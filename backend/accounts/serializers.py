@@ -1,17 +1,29 @@
 from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
-from allauth.account import app_settings as allauth_settings # allauth 설정 가져오기
-from .models import User
+from allauth.account import app_settings as allauth_settings
 from django.contrib.auth import get_user_model
+from .models import Badge
 
 User = get_user_model()
 
+# -------------------------------------------------------------------------
+# 1. 뱃지 시리얼라이저
+# -------------------------------------------------------------------------
+class BadgeSerializer(serializers.ModelSerializer):
+    icon = serializers.SerializerMethodField()
 
-# dj-rest-auth의 기본 회원가입 시리얼라이저를 상속받아 커스텀 필드 처리 로직 추가
+    class Meta:
+        model = Badge
+        fields = ['id', 'name', 'description', 'category', 'image_url', 'icon']
+
+    def get_icon(self, obj):
+        return "🏅"
+
+# -------------------------------------------------------------------------
+# 2. 회원가입 시리얼라이저
+# -------------------------------------------------------------------------
 class CustomRegisterSerializer(RegisterSerializer):
-    # username 필드를 명시적으로 오버라이드하여 필수가 아니도록 설정
     username = serializers.CharField(
-        # User 모델의 username 필드에서 max_length 값을 직접 가져옴
         max_length=User._meta.get_field('username').max_length,
         min_length=allauth_settings.USERNAME_MIN_LENGTH,
         required=False,
@@ -25,50 +37,96 @@ class CustomRegisterSerializer(RegisterSerializer):
         data['nickname'] = self.validated_data.get('nickname', '')
         data['bread_preferences'] = self.validated_data.get('bread_preferences', '')
         
-        # username이 제공되지 않았다면 None으로 설정하여 allauth가 자동으로 생성하도록 유도
         if not self.validated_data.get('username'):
             data['username'] = None
         
         return data
 
     def save(self, request):
-        # Call the parent save method to handle user creation and standard fields
         user = super().save(request)
-        
-        # Add the custom data
         user.nickname = self.validated_data.get('nickname', '')
         user.bread_preferences = self.validated_data.get('bread_preferences', '')
         user.save()
-        
         return user
 
-# 사용자 정보 조회/수정을 위한 시리얼라이저
+# -------------------------------------------------------------------------
+# 3. 유저 정보 수정용 시리얼라이저 (내 정보 수정)
+# -------------------------------------------------------------------------
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        # API를 통해 보여주고 수정할 필드 목록
         fields = (
             'pk',
             'email',
             'nickname',
             'profile_image_url',
             'bread_preferences',
-            # [추가] 캐릭터 성장 관련 필드
             'level',
             'exp',
-            'character_type',
+            'level_title',
         )
-        # API를 통해 직접 수정할 수 없는 읽기 전용 필드
-        # 레벨과 경험치는 서버 로직에 의해서만 변경되어야 하므로 read_only에 추가
-        read_only_fields = ('pk', 'email', 'level', 'exp', 'character_type')
+        read_only_fields = ('pk', 'email', 'level', 'exp', 'level_title')
 
+# -------------------------------------------------------------------------
+# 4. 상세 프로필 시리얼라이저 (마이페이지 조회용)
+# -------------------------------------------------------------------------
+class UserProfileSerializer(serializers.ModelSerializer):
+    badges = BadgeSerializer(many=True, read_only=True)
+    next_exp = serializers.SerializerMethodField()
+    review_count = serializers.SerializerMethodField()
+    post_count = serializers.SerializerMethodField()
+    visited_stores = serializers.SerializerMethodField()
+    taste_stats = serializers.SerializerMethodField()
+    bookmarked_stores = serializers.SerializerMethodField()
+    follower_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = User
+        fields = [
+            'id', 'email', 'nickname', 'profile_image_url',
+            'level', 'exp', 'level_title', 'next_exp',
+            'badges', 'review_count', 'post_count',
+            'visited_stores', 'bookmarked_stores', 'taste_stats',
+            'follower_count', 'following_count',
+            'date_joined'
+        ]
+        read_only_fields = ['email', 'level', 'exp', 'level_title', 'date_joined']
 
+    def get_next_exp(self, obj):
+        if hasattr(obj, 'LEVEL_SYSTEM'):
+            return obj.LEVEL_SYSTEM.get(obj.level, {}).get('next_exp', 0)
+        return 0
+
+    def get_review_count(self, obj):
+        return getattr(obj, 'reviews', []).count() if hasattr(obj, 'reviews') else 0
+
+    def get_post_count(self, obj):
+        return getattr(obj, 'posts', []).count() if hasattr(obj, 'posts') else 0
+
+    def get_visited_stores(self, obj):
+        return []
+
+    def get_bookmarked_stores(self, obj):
+        return []
+
+    def get_taste_stats(self, obj):
+        return {"크림빵": 5, "하드계열": 3}
+    
+    def get_follower_count(self, obj):
+        return obj.followers.count()
+
+    def get_following_count(self, obj):
+        return obj.follows.count()
+
+# -------------------------------------------------------------------------
+# 5. 기본 유저 시리얼라이저 (views.py에서 참조 중인 것) - [복구 완료]
+# -------------------------------------------------------------------------
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
             'id', 'email', 'nickname', 'profile_image_url', 
             'bread_preferences', 'follows', 'followers',
-            # [추가] 캐릭터 성장 관련 필드
-            'level', 'exp', 'character_type'
+            'level', 'exp', 'level_title' # character_type 대신 level_title 사용
         ]

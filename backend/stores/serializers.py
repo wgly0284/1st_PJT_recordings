@@ -37,8 +37,10 @@ class StoreSerializer(serializers.ModelSerializer):
 
 # ✅ [수정] StoreListSerializer에도 products 추가
 class StoreListSerializer(serializers.ModelSerializer):
-    products = ProductSerializer(many=True, read_only=True) # 여기 추가!
+    products = ProductSerializer(many=True, read_only=True)
     is_bookmarked = serializers.SerializerMethodField()
+    product_keywords = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Store
@@ -46,12 +48,14 @@ class StoreListSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'address',
-            'latitude', # 지도에 마커 찍으려면 좌표도 필요할 수 있음
+            'latitude',
             'longitude',
             'avg_rating',
-            'products', # 필드 목록에도 추가!
+            'products',
             'is_bookmarked',
-            'representative_tags', # 태그 정보도 리스트에서 쓰면 좋음
+            'representative_tags',
+            'product_keywords',
+            'image',
         )
     
     def get_is_bookmarked(self, obj):
@@ -59,6 +63,22 @@ class StoreListSerializer(serializers.ModelSerializer):
         if user and user.is_authenticated:
             return obj.bookmarking_users.filter(pk=user.pk).exists()
         return False
+
+    def get_product_keywords(self, obj):
+        # 모든 제품의 모든 키워드를 하나로 합칩니다.
+        keywords = set()
+        for product in obj.products.all():
+            for keyword in product.keywords.all():
+                keywords.add(keyword.name)
+        # 앞에서 3개만 잘라서 반환
+        return list(keywords)[:3]
+
+    def get_image(self, obj):
+        # 첫 번째 제품의 이미지를 대표 이미지로 사용
+        first_product = obj.products.first()
+        if first_product:
+            return first_product.image_url
+        return None
 
 class MapStoreSerializer(serializers.ModelSerializer):
     class Meta:

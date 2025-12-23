@@ -1,7 +1,8 @@
 <template>
   <main class="flex-grow bg-gradient-to-b from-[#FFF9F0] to-[#E6F4D7] overflow-hidden">
     <!-- 1. Hero Section -->
-    <section class="relative min-h-screen flex items-center pt-20">
+    <!-- flex-col과 justify-center를 사용하여 내용이 수직 중앙에 오도록 하고, pb-20으로 하단 여백 확보 -->
+    <section class="relative min-h-screen flex flex-col justify-center items-center pt-20 pb-20">
       <!-- 수채화 배경 얼룩 -->
       <div
         class="absolute top-16 right-[-10%] w-[520px] h-[520px]
@@ -12,7 +13,8 @@
                bg-[#9AC89A]/20 rounded-[999px] blur-3xl -z-10"
       ></div>
 
-      <div class="max-w-[1200px] mx-auto px-6 w-full flex flex-col md:flex-row items-center gap-12">
+      <!-- 메인 컨텐츠 영역 -->
+      <div class="max-w-[1200px] mx-auto px-6 w-full flex flex-col md:flex-row items-center gap-12 mb-12">
         <!-- 텍스트 -->
         <div class="md:w-1/2 space-y-6 relative z-10 text-center md:text-left">
           <div
@@ -111,17 +113,83 @@
         </div>
       </div>
 
-      <!-- 스크롤 유도 -->
+      <!-- 둥글둥글 검색바 (위치 수정됨) -->
+      <!-- absolute 제거 및 margin-top 추가로 겹침 방지 -->
+      <div class="w-full max-w-xl px-6 relative z-20 mt-4 md:mt-8">
+        <div class="bg-white p-2.5 rounded-full shadow-[0_8px_24px_rgba(201,151,104,0.35)] flex items-center gap-3 border-4 border-[#FFF3DD] hover:border-[#F3B37A]/50 transition-all duration-300">
+          <div class="pl-5 text-[#C99768]">
+            <!-- 돋보기 아이콘 교체 -->
+            <Search class="w-6 h-6" />
+          </div>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="어떤 빵 친구를 찾으시나요?"
+            class="flex-grow py-3 px-2 bg-transparent focus:outline-none text-[#6B4A38] placeholder-[#C99768]/60 font-jua text-lg"
+            @keyup.enter="handleSearch"
+          >
+          <button
+            @click="handleSearch"
+            class="bg-[#F3B37A] text-white w-14 h-14 rounded-full flex items-center justify-center hover:bg-[#C99768] transition transform hover:scale-110 shadow-md group"
+          >
+            <!-- 동물 발바닥 아이콘 교체 -->
+            <PawPrint class="w-7 h-7 fill-white/20 group-hover:rotate-12 transition-transform" />
+          </button>
+        </div>
+      </div>
+
+      <!-- 스크롤 유도 (위치 및 배치 방식 전면 수정) -->
+      <!-- absolute를 제거하고, margin-top(mt-16)을 넉넉히 주어 검색바 아래에 겹치지 않게 배치 -->
+      <!-- text-center와 mx-auto로 가로 중앙 정렬 보장 -->
       <div
-        class="absolute bottom-8 left-1/2 -translate-x-1/2 text-center
-               animate-bounce opacity-70 font-jua text-[#8B6A55]"
+        class="mt-16 text-center animate-bounce opacity-70 font-jua text-[#8B6A55] z-10"
       >
         <p class="text-sm mb-1">아래로 스크롤해서 빵집을 더 만나보세요</p>
         <ArrowDown class="w-5 h-5 text-[#C99768] mx-auto" />
       </div>
     </section>
 
-    <!-- 2. Weekly Curation -->
+    <!-- 2. 어디로 갈까요? 지역 선택 -->
+    <section class="py-20 bg-white relative overflow-hidden">
+      <!-- 배경 장식 -->
+      <div class="absolute top-10 right-10 w-64 h-64 bg-orange-100 rounded-full opacity-20 blur-3xl"></div>
+      <div class="absolute bottom-10 left-10 w-72 h-72 bg-teal-100 rounded-full opacity-20 blur-3xl"></div>
+
+      <div class="max-w-6xl mx-auto px-6 relative z-10">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-[#1D4E45] mb-3 font-jua">
+            어디로 갈까요? 🗺️
+          </h2>
+          <p class="text-gray-600">지역을 선택하면 근처 빵집을 추천해드려요</p>
+        </div>
+
+        <!-- 지역 그리드 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <button
+            v-for="region in regions"
+            :key="region.id"
+            @click="goToRegion(region.id)"
+            class="group relative bg-gradient-to-br from-white to-orange-50 p-8 rounded-3xl border-2 border-orange-100 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-3 transition-all duration-300"
+          >
+            <!-- 발자국/빵 아이콘 -->
+            <div class="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">
+              {{ region.icon }}
+            </div>
+            <h3 class="text-xl font-bold text-[#1D4E45] group-hover:text-orange-600 transition-colors font-jua">
+              {{ region.name }}
+            </h3>
+            <p class="text-sm text-gray-500 mt-1">{{ region.count }}개의 빵집</p>
+
+            <!-- 호버 화살표 -->
+            <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              <ArrowRight class="w-5 h-5 text-orange-500" />
+            </div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Weekly Curation -->
     <section class="py-24 bg-[#FFF9F0]/90 relative">
       <div class="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180">
         <svg
@@ -161,7 +229,8 @@
 
         <BakeryGrid :bakeries="bakeries" @open-detail="openDetail" />
 
-        <div class="text-center mt-12">
+        <!-- mt-12 -> mt-24로 변경하여 상단 여백 추가 -->
+        <div class="text-center mt-24">
           <button
             class="inline-flex items-center gap-2 text-[#6B4A38] text-lg font-jua
                    hover:text-[#C99768] transition-colors border-b-2 border-transparent
@@ -252,64 +321,64 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import BakeryGrid from '@/components/common/BakeryGrid.vue'
-import { ArrowRight, ArrowDown } from 'lucide-vue-next'
+import { ArrowRight, ArrowDown, PawPrint, Search } from 'lucide-vue-next'
+import axios from 'axios'
 
 const router = useRouter()
+const searchQuery = ref('')
+const bakeries = ref([])
 
-// 더미 데이터 (실제로는 API 연동)
-const bakeries = ref([
-  {
-    id: 1,
-    bakeryName: '버터하우스',
-    name: '클래식 소금빵',
-    location: '부산 전포동',
-    rating: 4.8,
-    image:
-      'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&q=80&w=800',
-    tags: ['버터가득', '겉바속촉'],
-    menu: [{ name: '소금빵', price: '3,500', img: '' }]
-  },
-  {
-    id: 2,
-    bakeryName: '무슈 크루아상',
-    name: '말차 크루아상',
-    location: '서울 성수동',
-    rating: 4.9,
-    image:
-      'https://images.unsplash.com/photo-1530610476181-d8ceb28bc272?auto=format&fit=crop&q=80&w=800',
-    tags: ['결이살아있는', '프랑스밀가루'],
-    menu: []
-  },
-  {
-    id: 3,
-    bakeryName: '선데이 베이글',
-    name: '블루베리 샌드',
-    location: '서울 연남동',
-    rating: 4.5,
-    image:
-      'https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80&w=800',
-    tags: ['런던스타일', '크림치즈'],
-    menu: []
-  },
-  {
-    id: 4,
-    bakeryName: '건강한 통밀',
-    name: '사워도우',
-    location: '제주 애월읍',
-    rating: 4.7,
-    image:
-      'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=800',
-    tags: ['비건', '건강식'],
-    menu: []
-  }
+// 지역 데이터
+const regions = ref([
+  { id: 'gangnam', name: '강남', icon: '🥖', count: '12+' },
+  { id: 'apgujeong', name: '압구정', icon: '🥐', count: '8+' },
+  { id: 'seongsu', name: '성수', icon: '🍞', count: '15+' },
+  { id: 'itaewon', name: '이태원', icon: '🥯', count: '10+' },
+  { id: 'hongdae', name: '홍대', icon: '🥨', count: '20+' },
+  { id: 'jamsil', name: '잠실', icon: '🧁', count: '9+' },
+  { id: 'gangbuk', name: '강북', icon: '🍰', count: '6+' },
+  { id: 'yeonnam', name: '연남', icon: '🎂', count: '11+' }
 ])
 
-const openDetail = bakery => {
-  router.push(`/detail/${bakery.id}`)
+// 실제 데이터 로드 (Weekly Pick용)
+const fetchBakeries = async () => {
+  try {
+    const response = await axios.get('http://127.0.0.1:8000/stores/weekly-pick/')
+    bakeries.value = response.data.map(bakery => ({
+      id: bakery.id,
+      bakeryName: bakery.name,
+      name: bakery.name,
+      location: bakery.address,
+      rating: bakery.avg_rating || 4.5,
+      image: bakery.image || 'https://source.unsplash.com/random/800x600/?bakery',
+      tags: bakery.product_keywords || ['신선함', '맛있어요'],
+      menu: []
+    }))
+  } catch (error) {
+    console.error('빵집 로드 실패:', error)
+  }
 }
+
+const openDetail = bakery => {
+  router.push({ name: 'map', query: { store_id: bakery.id } })
+}
+
+const handleSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.push({ name: 'search', query: { search: searchQuery.value } })
+  }
+}
+
+const goToRegion = (regionId) => {
+  router.push({ name: 'region', params: { region: regionId } })
+}
+
+onMounted(() => {
+  fetchBakeries()
+})
 </script>
 
 <style scoped>

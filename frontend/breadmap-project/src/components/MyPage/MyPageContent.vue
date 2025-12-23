@@ -61,6 +61,12 @@ const fetchUserProfile = async () => {
   }
 };
 
+const handleImageError = (event) => {
+  console.error('프로필 이미지 로드 실패');
+  // 이미지 로드 실패 시 기본 캐릭터 이미지로 폴백
+  event.target.style.display = 'none';
+};
+
 onMounted(() => {
   fetchUserProfile();
 });
@@ -85,11 +91,22 @@ onMounted(() => {
 
         <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8 relative z-10">
           
-          <!-- 캐릭터 (왼쪽) -->
+          <!-- 캐릭터/프로필 이미지 (왼쪽) -->
           <div class="relative group cursor-pointer transition-transform hover:scale-105 duration-300 shrink-0">
             <div class="absolute -inset-4 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
             <div class="w-40 h-40 bg-[#F9F7F2] rounded-full border-4 border-orange-400 flex items-center justify-center overflow-hidden shadow-2xl relative z-10">
-              <img :src="characterImages[userInfo.character_type] || characterImages.hamster" class="w-24 h-24 object-contain">
+              <!-- 프로필 이미지가 있으면 표시, 없으면 캐릭터 표시 -->
+              <img
+                v-if="userInfo.profile_image_url"
+                :src="`http://127.0.0.1:8000${userInfo.profile_image_url}`"
+                class="w-full h-full object-cover"
+                @error="handleImageError"
+              >
+              <img
+                v-else
+                :src="characterImages[userInfo.character_type] || characterImages.hamster"
+                class="w-24 h-24 object-contain"
+              >
             </div>
             <div class="absolute -bottom-2 -right-2 bg-orange-500 text-white font-bold px-4 py-1.5 rounded-full border-2 border-white shadow-lg">
               Lv.{{ userInfo.level }}

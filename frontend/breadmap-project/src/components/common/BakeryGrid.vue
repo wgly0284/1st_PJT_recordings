@@ -17,7 +17,7 @@
         <div class="flex justify-between items-center mb-2">
           <h3 class="text-2xl font-playfair font-bold text-teal-900">{{ bakery.bakeryName }}</h3>
           <div class="flex items-center gap-1 text-orange-600 font-bold text-sm">
-            <i data-lucide="star" class="w-3 h-3 fill-current"></i> {{ bakery.rating }}
+            <i data-lucide="star" class="w-3 h-3 fill-current"></i> {{ Number(bakery.rating).toFixed(1) }}
           </div>
         </div>
         <p class="text-sm text-gray-500">{{ bakery.name }}</p>

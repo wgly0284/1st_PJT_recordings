@@ -13,6 +13,7 @@ urlpatterns = [
     path('<int:store_pk>/reviews/', ReviewListCreateView.as_view(), name='review_list_create'),
     path('my_bookmarks/', views.UserBookmarkListView.as_view(), name='my_bookmarks'), # 추가된 URL
 
+    path('weekly-pick/', views.WeeklyPickView.as_view(), name='weekly_pick'),
     path('stores/<int:pk>/ai-summary/', StoreAISummaryView.as_view(), name='store-ai-summary'),
 ]
 

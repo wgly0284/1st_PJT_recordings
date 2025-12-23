@@ -2,32 +2,52 @@
 import { ref, onMounted, watch, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth';
 import KakaoMapLoader from '@/components/map/KakaoMapLoader.vue';
 import BakeryMap from '@/components/map/BakeryMap.vue';
 import BakeryInfoCard from '@/components/map/BakeryInfoCard.vue';
+import StoreReviewWrite from '@/components/map/StoreReviewWrite.vue';
 import { Search, MapPin, Star, Heart, Navigation, ThumbsUp, Home, Map as MapIcon, BookOpen, User, ChevronLeft, ChevronRight, RotateCw } from 'lucide-vue-next';
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 // 데이터 상태
-const bakeries = ref([]); 
+const bakeries = ref([]);
 const isLoading = ref(false);
 const searchKeyword = ref('');
 
 const selectedBakery = ref(null);
-const currentHotBakery = ref(null); 
-const isListOpen = ref(true); 
-const currentTab = ref('map'); 
+const currentHotBakery = ref(null);
+const isListOpen = ref(true);
+const currentTab = ref('map');
 const mapRef = ref(null);
 
 const showReSearchBtn = ref(false);
 const isFallbackSearch = ref(false);
 
+// 프로필 데이터
+const userProfile = ref(null);
+
+// 캐릭터 이미지 매핑
+const characterImages = {
+  hamster: 'https://cdn-icons-png.flaticon.com/512/235/235394.png',
+  bear: 'https://cdn-icons-png.flaticon.com/512/235/235388.png',
+  lion: 'https://cdn-icons-png.flaticon.com/512/235/235352.png'
+};
+
+// 리뷰 작성 모달 상태
+const showReviewWrite = ref(false);
+const reviewStoreId = ref(null);
+const reviewStoreName = ref('');
+
+// 키워드 필터
+const selectedMood = ref(null);
 const moods = [
-  { label: "☁️ 우울할 땐", keyword: "달달함" },
-  { label: "🤯 스트레스", keyword: "매콤" },
-  { label: "☕ 브런치", keyword: "담백함" },
-  { label: "❤️ 데이트", keyword: "데이트" },
+  { label: "☁️ 우울할 땐", keyword: "달달한" },
+  { label: "😊 기분 좋을 땐", keyword: "상큼한" },
+  { label: "☕ 브런치", keyword: "담백한" },
+  { label: "❤️ 데이트", keyword: "꾸덕한" },
 ];
 
 watch(isListOpen, async () => {
@@ -235,8 +255,15 @@ const goToDetail = (id) => {
   router.push({ name: 'detail', params: { id: id } });
 };
 
-const filterByMood = (keyword) => {
-  searchKeyword.value = keyword;
+const filterByMood = (mood) => {
+  if (selectedMood.value === mood.keyword) {
+    // 이미 선택된 키워드를 다시 클릭하면 필터 해제
+    selectedMood.value = null;
+    searchKeyword.value = '';
+  } else {
+    selectedMood.value = mood.keyword;
+    searchKeyword.value = mood.keyword;
+  }
   searchStores();
 };
 
@@ -257,17 +284,58 @@ const refreshMap = () => {
   location.reload();
 };
 
+// 프로필 정보 가져오기
+const fetchUserProfile = async () => {
+  try {
+    const token = authStore.token;
+    if (!token) return;
+
+    const response = await axios.get('http://127.0.0.1:8000/accounts/profile/', {
+      headers: { Authorization: `Token ${token}` }
+    });
+    userProfile.value = response.data;
+  } catch (error) {
+    console.error('프로필 로드 실패:', error);
+  }
+};
+
+// 프로필 이미지 URL 계산
+const profileImageUrl = () => {
+  if (!userProfile.value) return characterImages.hamster;
+  if (userProfile.value.profile_image_url) {
+    return `http://127.0.0.1:8000${userProfile.value.profile_image_url}`;
+  }
+  return characterImages[userProfile.value.character_type] || characterImages.hamster;
+};
+
+// 리뷰 작성 모달 열기
+const openReviewWrite = (storeId) => {
+  const store = bakeries.value.find(b => b.id === storeId);
+  if (store) {
+    reviewStoreId.value = storeId;
+    reviewStoreName.value = store.name;
+    showReviewWrite.value = true;
+  }
+};
+
+// 리뷰 작성 완료 후
+const handleReviewCreated = () => {
+  showReviewWrite.value = false;
+  // 리뷰 목록 새로고침 (BakeryInfoCard에서 자동으로 처리됨)
+};
+
 onMounted(() => {
+  fetchUserProfile();
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((pos) => {
       fetchBakeries('', pos.coords.latitude, pos.coords.longitude);
-      
+
       setTimeout(() => {
-        if(mapRef.value) mapRef.value.moveToCurrentLocation(); 
+        if(mapRef.value) mapRef.value.moveToCurrentLocation();
       }, 500);
 
     }, (err) => {
-      fetchBakeries('', 37.5665, 126.9780); 
+      fetchBakeries('', 37.5665, 126.9780);
     });
   } else {
     fetchBakeries('', 37.5665, 126.9780);
@@ -286,10 +354,6 @@ onMounted(() => {
         </router-link>
 
         <div class="flex flex-col gap-8 w-full">
-          <router-link :to="{ name: 'home' }" class="flex flex-col items-center gap-1 hover:text-white hover:scale-110 transition-all group no-underline text-white/70">
-            <Home class="w-6 h-6 group-hover:stroke-[2.5px]" />
-            <span class="text-[10px] font-medium">홈</span>
-          </router-link>
           
           <button @click="refreshMap" class="flex flex-col items-center gap-1 text-orange-400 scale-110 transition-all group relative">
             <MapIcon class="w-6 h-6 stroke-[2.5px]" />
@@ -301,17 +365,12 @@ onMounted(() => {
             <BookOpen class="w-6 h-6 group-hover:stroke-[2.5px]" />
             <span class="text-[10px] font-medium">커뮤니티</span>
           </router-link>
-
-          <router-link :to="{ name: 'mypage' }" class="flex flex-col items-center gap-1 hover:text-white hover:scale-110 transition-all group no-underline text-white/70">
-            <User class="w-6 h-6 group-hover:stroke-[2.5px]" />
-            <span class="text-[10px] font-medium">마이</span>
-          </router-link>
         </div>
 
         <div class="mt-auto">
-           <button class="w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 hover:border-white transition-colors">
-             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-full h-full bg-white/10" />
-           </button>
+           <router-link :to="{ name: 'mypage' }" class="block w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 hover:border-white hover:scale-110 transition-all cursor-pointer">
+             <img :src="profileImageUrl()" class="w-full h-full object-cover bg-white/10" />
+           </router-link>
         </div>
       </nav>
 
@@ -322,10 +381,11 @@ onMounted(() => {
       >
         <!-- 🟢 선택된 빵집이 있으면 InfoCard 표시 -->
         <div v-if="selectedBakery" class="h-full flex flex-col">
-          <BakeryInfoCard 
-            :bakery="selectedBakery" 
+          <BakeryInfoCard
+            :bakery="selectedBakery"
             @close="closeInfoCard"
             @view-detail="goToDetail"
+            @write-review="openReviewWrite"
           />
         </div>
 
@@ -344,16 +404,6 @@ onMounted(() => {
                 @click="searchStores"
                 class="absolute left-3.5 top-3.5 w-5 h-5 text-[#1D4E45] cursor-pointer hover:scale-110 transition-transform" 
               />
-            </div>
-            <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
-              <button 
-                v-for="mood in moods" 
-                :key="mood.label"
-                @click="filterByMood(mood.keyword)"
-                class="flex-shrink-0 px-3 py-1.5 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-[#1D4E45] hover:text-white hover:border-[#1D4E45] transition-all whitespace-nowrap"
-              >
-                {{ mood.label }}
-              </button>
             </div>
           </div>
 
@@ -446,10 +496,28 @@ onMounted(() => {
 
       <!-- 지도 영역 -->
       <div class="flex-1 h-full relative z-0">
-        <div v-if="showReSearchBtn" class="absolute top-4 left-1/2 -translate-x-1/2 z-20 animate-bounce-in">
-          <button 
+        <!-- 키워드 필터 버튼 (네이버 지도 스타일) -->
+        <div class="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex flex-col gap-3 items-center">
+          <!-- 키워드 버튼 그룹 -->
+          <div class="flex gap-2 bg-white/95 backdrop-blur-sm p-2 rounded-full shadow-lg border border-gray-200">
+            <button
+              v-for="mood in moods"
+              :key="mood.label"
+              @click="filterByMood(mood)"
+              class="px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap"
+              :class="selectedMood === mood.keyword
+                ? 'bg-[#1D4E45] text-white shadow-md'
+                : 'bg-white text-gray-700 hover:bg-gray-100'"
+            >
+              {{ mood.label }}
+            </button>
+          </div>
+
+          <!-- 현 지도에서 검색 버튼 -->
+          <button
+            v-if="showReSearchBtn"
             @click="handleReSearchInMap"
-            class="flex items-center gap-2 bg-white text-[#1D4E45] px-5 py-2.5 rounded-full shadow-lg border border-[#1D4E45]/10 font-bold hover:bg-[#1D4E45] hover:text-white transition-all transform hover:scale-105"
+            class="flex items-center gap-2 bg-white text-[#1D4E45] px-5 py-2.5 rounded-full shadow-lg border border-[#1D4E45]/10 font-bold hover:bg-[#1D4E45] hover:text-white transition-all transform hover:scale-105 animate-bounce-in"
           >
             <RotateCw class="w-4 h-4" />
             현 지도에서 검색
@@ -475,6 +543,15 @@ onMounted(() => {
       </div>
 
     </div>
+
+    <!-- 리뷰 작성 모달 -->
+    <StoreReviewWrite
+      v-if="showReviewWrite"
+      :store-id="reviewStoreId"
+      :store-name="reviewStoreName"
+      @close="showReviewWrite = false"
+      @review-created="handleReviewCreated"
+    />
   </KakaoMapLoader>
 </template>
 

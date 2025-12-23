@@ -13,6 +13,8 @@ import NewRecommend from '@/components/community/NewRecommend.vue'
 import NewTip from '@/components/community/NewTip.vue'
 import EditProfile from '@/components/MyPage/EditProfile.vue'
 import MapPage from '@/Views/MapPage.vue'
+import SearchResultView from '@/Views/SearchResultView.vue'
+import RegionBakeryView from '@/Views/RegionBakeryView.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const routes = [
@@ -20,6 +22,16 @@ const routes = [
     path: '/',
     name: 'home',
     component: HomeView
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: SearchResultView
+  },
+  {
+    path: '/region/:region',
+    name: 'region',
+    component: RegionBakeryView
   },
   {
     path: '/detail/:id',

@@ -31,7 +31,7 @@ class StoreListView(generics.ListAPIView):
     # address: 주소
     # category: 카테고리
     # representative_tags: 태그 (만약 모델에 있다면)
-    search_fields = ['name', 'address', 'category', 'representative_tags', 'products__name']
+    search_fields = ['name', 'address', 'category', 'representative_tags', 'products__name', 'products__keywords__name']
 
 class StoreDetailView(generics.RetrieveAPIView):
     """
@@ -72,6 +72,16 @@ class UserBookmarkListView(generics.ListAPIView):
     def get_queryset(self):
         return self.request.user.bookmarked_stores.all()
     
+class WeeklyPickView(generics.ListAPIView):
+    """
+    이번 주 추천 가게 4개를 랜덤으로 조회합니다.
+    """
+    serializer_class = StoreListSerializer
+
+    def get_queryset(self):
+        # 랜덤으로 4개의 가게를 가져옵니다.
+        return Store.objects.order_by('?').all()[:4]
+
 class StoreAISummaryView(APIView):
     """
     특정 가게(pk)의 리뷰들을 모아 AI 요약을 반환합니다.

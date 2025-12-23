@@ -91,6 +91,8 @@ const fetchPosts = async () => {
         comments: r.comments_count || 0,
         views: 0,
         date: r.created_at.slice(0, 10),
+        author_id: r.user,
+        user_nickname: r.user_nickname,
       }))
       .filter((p) => p.likes >= 10) // 좋아요 10개 이상만 필터링
       .sort((a, b) => b.likes - a.likes) // 좋아요 수 내림차순 정렬

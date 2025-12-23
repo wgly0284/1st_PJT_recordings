@@ -97,6 +97,8 @@ const fetchPosts = async () => {
         comments: r.comments_count || 0,
         views: 0,
         date: r.created_at.slice(0, 10),
+        author_id: r.user,
+        user_nickname: r.user_nickname,
       }))
     console.log('빵집 추천 로드:', posts.value)
   } catch (e) {

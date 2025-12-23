@@ -13,6 +13,11 @@ const isLoading = ref(true);
 const userInfo = ref(null);
 const router = useRouter();
 
+// 팔로우 모달 관련
+const showFollowModal = ref(false);
+const followModalType = ref('followers'); // 'followers' or 'following'
+const followList = ref([]);
+
 // 캐릭터 이미지 매핑
 const characterImages = {
   hamster: 'https://cdn-icons-png.flaticon.com/512/235/235394.png',
@@ -68,6 +73,33 @@ const handleImageError = (event) => {
   console.error('프로필 이미지 로드 실패');
   // 이미지 로드 실패 시 기본 캐릭터 이미지로 폴백
   event.target.style.display = 'none';
+};
+
+const openFollowModal = async (type) => {
+  followModalType.value = type;
+  showFollowModal.value = true;
+  await fetchFollowList(type);
+};
+
+const fetchFollowList = async (type) => {
+  try {
+    const token = authStore.token;
+    if (!token) return;
+
+    const endpoint = type === 'followers' ? 'followers' : 'following';
+    const response = await axios.get(`http://127.0.0.1:8000/accounts/${endpoint}/`, {
+      headers: { Authorization: `Token ${token}` }
+    });
+
+    followList.value = response.data[endpoint] || [];
+  } catch (error) {
+    console.error('팔로우 목록 로드 실패:', error);
+  }
+};
+
+const closeFollowModal = () => {
+  showFollowModal.value = false;
+  followList.value = [];
 };
 
 onMounted(() => {
@@ -139,11 +171,11 @@ onMounted(() => {
 
             <!-- 스탯 요약 -->
             <div class="flex justify-center md:justify-start gap-8 mt-6">
-              <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+              <div @click="openFollowModal('followers')" class="text-center cursor-pointer hover:opacity-80 transition-opacity">
                 <p class="text-2xl font-bold text-white">{{ userInfo.follower_count }}</p>
                 <p class="text-xs text-teal-300 uppercase tracking-wider">Followers</p>
               </div>
-              <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+              <div @click="openFollowModal('following')" class="text-center cursor-pointer hover:opacity-80 transition-opacity">
                 <p class="text-2xl font-bold text-white">{{ userInfo.following_count }}</p>
                 <p class="text-xs text-teal-300 uppercase tracking-wider">Following</p>
               </div>
@@ -271,14 +303,58 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <!-- 내가 작성한 활동 (리뷰, 게시글, 댓글) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <MyReviewsSection :reviews="userInfo.user_reviews" />
-          <MyPostsSection :posts="userInfo.user_posts" />
-          <MyCommentsSection :comments="userInfo.user_comments" />
-        </div>
       </div>
     </div>
+
+    <!-- 팔로우 모달 -->
+    <Transition name="modal">
+      <div v-if="showFollowModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" @click.self="closeFollowModal">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden">
+          <!-- 모달 헤더 -->
+          <div class="bg-gradient-to-r from-teal-900 to-teal-700 text-white p-6 flex items-center justify-between">
+            <h3 class="text-xl font-bold">
+              {{ followModalType === 'followers' ? '팔로워' : '팔로잉' }}
+            </h3>
+            <button @click="closeFollowModal" class="text-white/70 hover:text-white transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- 모달 본문 -->
+          <div class="p-6 overflow-y-auto max-h-[60vh]">
+            <div v-if="followList.length === 0" class="text-center py-12 text-gray-400">
+              <p class="text-sm">{{ followModalType === 'followers' ? '아직 팔로워가 없습니다.' : '아직 팔로우한 사람이 없습니다.' }}</p>
+            </div>
+
+            <div v-else class="space-y-3">
+              <div v-for="user in followList" :key="user.id" class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
+                <!-- 프로필 이미지 -->
+                <div class="w-12 h-12 bg-teal-100 rounded-full border-2 border-teal-300 flex items-center justify-center overflow-hidden flex-shrink-0">
+                  <img
+                    v-if="user.profile_image_url"
+                    :src="`http://127.0.0.1:8000${user.profile_image_url}`"
+                    class="w-full h-full object-cover"
+                  >
+                  <img
+                    v-else
+                    :src="characterImages[user.character_type] || characterImages.hamster"
+                    class="w-8 h-8 object-contain"
+                  >
+                </div>
+
+                <!-- 유저 정보 -->
+                <div class="flex-1 min-w-0">
+                  <p class="font-bold text-gray-800 truncate">{{ user.nickname }}</p>
+                  <p class="text-xs text-gray-500">Lv.{{ user.level }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -294,5 +370,26 @@ onMounted(() => {
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* 모달 트랜지션 */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active .bg-white,
+.modal-leave-active .bg-white {
+  transition: transform 0.3s ease;
+}
+
+.modal-enter-from .bg-white,
+.modal-leave-to .bg-white {
+  transform: scale(0.9);
 }
 </style>

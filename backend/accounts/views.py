@@ -99,6 +99,25 @@ class UserProfileView(APIView):
         # 많이 나온 순서대로 정렬 (상위 5개 정도만 보내줘도 됨)
         sorted_taste = dict(sorted(taste_counts.items(), key=lambda item: item[1], reverse=True)[:5])
 
+        # 3. 커뮤니티 게시글 및 댓글 수 집계
+        from community.models import Post
+        from reviews.models import Comment
+
+        post_count = Post.objects.filter(author=user).count()
+        comment_count = Comment.objects.filter(user=user).count()
+
+        # 4. 팔로워/팔로잉 수
+        follower_count = user.followers.count()
+        following_count = user.follows.count()
+
+        # 5. 뱃지 데이터 (임시 더미 데이터)
+        badges = [
+            { 'name': '첫 리뷰', 'icon': '📝' },
+            { 'name': '소금빵 러버', 'icon': '🥐' },
+            { 'name': '오픈런', 'icon': '🏃' },
+            { 'name': '빵지순례자', 'icon': '🗺️' }
+        ]
+
         return Response({
             "username": user.username,
             "nickname": user.nickname,
@@ -109,8 +128,16 @@ class UserProfileView(APIView):
             "profile_image_url": user.profile_image_url,
             "visit_count": len(visited_stores), # 방문 수
             "review_count": user.review_set.count(), # 리뷰 수
+            "post_count": post_count, # 게시글 수
+            "comment_count": comment_count, # 댓글 수
+            "follower_count": follower_count, # 팔로워 수
+            "following_count": following_count, # 팔로잉 수
             "visited_stores": list(visited_stores), # 스탬프 목록
             "taste_stats": sorted_taste, # 취향 분석 결과
+            "badges": badges, # 뱃지 목록
+            "user_reviews": list(user.review_set.all()[:3].values('id', 'content', 'rating', 'created_at')), # 최근 리뷰 3개
+            "user_posts": list(Post.objects.filter(author=user)[:3].values('id', 'title', 'category', 'created_at')), # 최근 게시글 3개
+            "user_comments": list(Comment.objects.filter(user=user)[:3].values('id', 'content', 'created_at')), # 최근 댓글 3개
         }, status=status.HTTP_200_OK)
 
 
@@ -127,3 +154,72 @@ def check_nickname(request):
 
     exists = User.objects.filter(nickname=nickname).exists()
     return JsonResponse({'available': not exists}, status=200)
+
+
+# 팔로우/언팔로우 API
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def follow_user(request, user_id):
+    """특정 사용자를 팔로우/언팔로우합니다."""
+    try:
+        target_user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': '사용자를 찾을 수 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # 자기 자신을 팔로우할 수 없음
+    if request.user == target_user:
+        return Response({'error': '자기 자신을 팔로우할 수 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # 이미 팔로우 중이면 언팔로우, 아니면 팔로우
+    if target_user in request.user.follows.all():
+        request.user.follows.remove(target_user)
+        return Response({
+            'status': 'unfollowed',
+            'message': f'{target_user.nickname}님을 언팔로우했습니다.'
+        }, status=status.HTTP_200_OK)
+    else:
+        request.user.follows.add(target_user)
+        return Response({
+            'status': 'followed',
+            'message': f'{target_user.nickname}님을 팔로우했습니다.'
+        }, status=status.HTTP_200_OK)
+
+
+# 팔로워 목록 조회 API
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def followers_list(request):
+    """현재 사용자를 팔로우하는 사람들의 목록을 반환합니다."""
+    followers = request.user.followers.all()
+    followers_data = [{
+        'id': user.id,
+        'nickname': user.nickname,
+        'profile_image_url': user.profile_image_url,
+        'level': user.level,
+        'character_type': user.character_type,
+    } for user in followers]
+
+    return Response({
+        'count': len(followers_data),
+        'followers': followers_data
+    }, status=status.HTTP_200_OK)
+
+
+# 팔로잉 목록 조회 API
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def following_list(request):
+    """현재 사용자가 팔로우하는 사람들의 목록을 반환합니다."""
+    following = request.user.follows.all()
+    following_data = [{
+        'id': user.id,
+        'nickname': user.nickname,
+        'profile_image_url': user.profile_image_url,
+        'level': user.level,
+        'character_type': user.character_type,
+    } for user in following]
+
+    return Response({
+        'count': len(following_data),
+        'following': following_data
+    }, status=status.HTTP_200_OK)

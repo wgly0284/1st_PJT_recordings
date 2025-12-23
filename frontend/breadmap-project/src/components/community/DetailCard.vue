@@ -15,9 +15,25 @@
       <h2 class="text-2xl lg:text-3xl font-bold mb-3 leading-tight">
         {{ post.title }}
       </h2>
-      <p class="text-xs lg:text-sm opacity-80">
-        {{ post.date }} · {{ post.user_nickname || '빵순이🥐' }}
-      </p>
+      <div class="flex items-center justify-between">
+        <p class="text-xs lg:text-sm opacity-80">
+          {{ post.date }} · {{ post.user_nickname || '빵순이🥐' }}
+        </p>
+        <button
+          v-if="post.author_id && authStore.user?.pk !== post.author_id"
+          @click="handleFollow"
+          :disabled="isFollowing"
+          :class="[
+            'px-4 py-1.5 rounded-full text-xs font-semibold transition-all',
+            isFollowed
+              ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              : 'bg-white/20 text-white hover:bg-white/30 border border-white/30',
+            isFollowing ? 'opacity-50 cursor-not-allowed' : ''
+          ]"
+        >
+          {{ isFollowed ? '팔로잉' : '팔로우' }}
+        </button>
+      </div>
     </header>
 
     <!-- 본문 -->
@@ -214,6 +230,10 @@ const localLikes = ref(props.post.likes)
 const isLiked = ref(false)
 const isLiking = ref(false)
 
+// 팔로우 관련
+const isFollowed = ref(false)
+const isFollowing = ref(false)
+
 // 댓글 관련
 const comments = ref([])
 const commentsCount = ref(props.post.comments || 0)
@@ -350,6 +370,31 @@ const handleLike = async () => {
     alert('좋아요 처리 중 오류가 발생했습니다.')
   } finally {
     isLiking.value = false
+  }
+}
+
+const handleFollow = async () => {
+  if (!authStore.isAuthenticated) {
+    alert('로그인이 필요합니다.')
+    return
+  }
+
+  if (isFollowing.value) return
+
+  try {
+    isFollowing.value = true
+    const response = await apiClient.post(`/accounts/follow/${props.post.author_id}/`)
+
+    if (response.data.status === 'followed') {
+      isFollowed.value = true
+    } else if (response.data.status === 'unfollowed') {
+      isFollowed.value = false
+    }
+  } catch (error) {
+    console.error('팔로우 처리 실패:', error)
+    alert(error.response?.data?.error || '팔로우 처리 중 오류가 발생했습니다.')
+  } finally {
+    isFollowing.value = false
   }
 }
 </script>

@@ -76,9 +76,18 @@
             v-if="selectedReview"
             class="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm space-y-3"
           >
-            <h3 class="text-sm font-bold text-gray-500 tracking-widest mb-1">
-              REVIEW DETAIL
-            </h3>
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-gray-500 tracking-widest mb-1">
+                REVIEW DETAIL
+              </h3>
+              <button
+                @click="deleteReview(selectedReview.id)"
+                :disabled="isDeletingReview"
+                class="px-3 py-1.5 text-xs font-semibold text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {{ isDeletingReview ? '삭제 중...' : '삭제' }}
+              </button>
+            </div>
             <p class="text-xs text-gray-400">
               {{ selectedReview.store?.name || selectedReview.bakeryName || '알 수 없는 가게' }}
             </p>
@@ -207,45 +216,18 @@ import apiClient from '@/api/axios'
 
 const myReviews = ref([])
 const selectedReview = ref(null)
-
-// 개발용 목데이터
-const mockReviews = [
-  {
-    id: 1,
-    title: '성수 어니언 베이글 존맛',
-    bakeryName: 'Onion Bagle',
-    content: '바삭+쫄깃 조합 최고였어요. 크림치즈도 넉넉하게 들어있어서 만족!',
-    rating: 5,
-    created_at: '2025-12-20',
-  },
-  {
-    id: 2,
-    title: '제주 사워도우 빵지순례',
-    bakeryName: 'Wheat & Grain',
-    content: '산미가 은은하고 속은 촉촉해서 계속 손이 갔던 사워도우입니다.',
-    rating: 4,
-    created_at: '2025-12-18',
-  },
-]
+const isDeletingReview = ref(false)
 
 const fetchMyReviews = async () => {
   try {
     const res = await apiClient.get('/reviews/my/')
     myReviews.value = res.data
 
-    if (import.meta.env.DEV && myReviews.value.length === 0) {
-      myReviews.value = mockReviews
-    }
-
     if (myReviews.value.length > 0) {
       selectedReview.value = myReviews.value[0]
     }
   } catch (error) {
     console.error('Failed to fetch my reviews:', error)
-    if (import.meta.env.DEV) {
-      myReviews.value = mockReviews
-      selectedReview.value = mockReviews[0]
-    }
   }
 }
 
@@ -263,6 +245,31 @@ const formatDate = (value) => {
   return `${y}.${m}.${day}`
 }
 
+const deleteReview = async (reviewId) => {
+  if (!confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
+    return
+  }
+
+  try {
+    isDeletingReview.value = true
+    await apiClient.delete(`/reviews/${reviewId}/`)
+
+    // 리뷰 목록에서 제거
+    myReviews.value = myReviews.value.filter(r => r.id !== reviewId)
+
+    // 선택된 리뷰가 삭제된 리뷰라면 선택 해제
+    if (selectedReview.value?.id === reviewId) {
+      selectedReview.value = myReviews.value.length > 0 ? myReviews.value[0] : null
+    }
+
+    alert('리뷰가 삭제되었습니다.')
+  } catch (error) {
+    console.error('리뷰 삭제 실패:', error)
+    alert('리뷰 삭제 중 오류가 발생했습니다.')
+  } finally {
+    isDeletingReview.value = false
+  }
+}
 
 import { useRoute } from 'vue-router'
 

@@ -183,14 +183,10 @@ onMounted(() => {
                 <p class="text-2xl font-bold text-white">{{ userInfo.review_count }}</p>
                 <p class="text-xs text-teal-300 uppercase tracking-wider">Reviews</p>
               </router-link>
-              <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+              <router-link :to="{ name: 'myposts' }" class="text-center cursor-pointer hover:opacity-80 transition-opacity">
                 <p class="text-2xl font-bold text-white">{{ userInfo.post_count }}</p>
                 <p class="text-xs text-teal-300 uppercase tracking-wider">Posts</p>
-              </div>
-              <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
-                <p class="text-2xl font-bold text-white">{{ userInfo.comment_count }}</p>
-                <p class="text-xs text-teal-300 uppercase tracking-wider">Comments</p>
-              </div>
+              </router-link>
               <div class="text-center md:text-left">
                 <p class="text-2xl font-bold text-white">{{ userInfo.badges.length }}</p>
                 <p class="text-xs text-teal-300 uppercase tracking-wider">Badges</p>

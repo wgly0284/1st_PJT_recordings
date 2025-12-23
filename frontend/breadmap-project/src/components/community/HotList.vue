@@ -77,22 +77,22 @@ const posts = ref([])
 
 const fetchPosts = async () => {
   try {
-    const res = await apiClient.get('/reviews/')
+    const res = await apiClient.get('/community/')
     // 좋아요 10개 이상인 게시글만 가져와서 좋아요 수로 정렬 (인기순)
     posts.value = res.data
-      .map((r) => ({
-        id: r.id,
-        category: r.tags || '빵 주저리',
+      .map((p) => ({
+        id: p.id,
+        category: p.category || '빵 주저리',
         type: 'hot',
-        title: r.content.split('\n')[0].replace(/\*\*/g, ''),
-        content: r.content,
-        likes: r.like_users.length,
-        like_user_ids: r.like_users,
-        comments: r.comments_count || 0,
+        title: p.title,
+        content: p.content,
+        likes: p.like_count || 0,
+        like_user_ids: p.like_users || [],
+        comments: p.comments_count || 0,
         views: 0,
-        date: r.created_at.slice(0, 10),
-        author_id: r.user,
-        user_nickname: r.user_nickname,
+        date: p.created_at.slice(0, 10),
+        author_id: p.author,
+        user_nickname: p.author_nickname,
       }))
       .filter((p) => p.likes >= 10) // 좋아요 10개 이상만 필터링
       .sort((a, b) => b.likes - a.likes) // 좋아요 수 내림차순 정렬

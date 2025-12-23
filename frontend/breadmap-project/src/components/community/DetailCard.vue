@@ -6,10 +6,18 @@
         <span class="px-4 py-1 bg-white/20 rounded-full text-xs font-bold">
           {{ post.category }}
         </span>
-        <div class="flex gap-4 text-xs lg:text-sm opacity-90 flex-wrap">
+        <div class="flex gap-4 text-xs lg:text-sm opacity-90 flex-wrap items-center">
           <span>❤️ {{ localLikes }}</span>
           <span>💬 {{ commentsCount }}</span>
           <span>👀 {{ post.views }}k</span>
+          <button
+            v-if="post.author_id && authStore.user?.pk === post.author_id"
+            @click="deletePost"
+            :disabled="isDeletingPost"
+            class="px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600 border border-white/30 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ isDeletingPost ? '삭제 중...' : '게시글 삭제' }}
+          </button>
         </div>
       </div>
       <h2 class="text-2xl lg:text-3xl font-bold mb-3 leading-tight">
@@ -111,7 +119,17 @@
                   <span class="text-xs font-bold">🍞</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-xs font-semibold mb-1">{{ comment.user_nickname }}</p>
+                  <div class="flex items-center justify-between mb-1">
+                    <p class="text-xs font-semibold">{{ comment.user_nickname }}</p>
+                    <button
+                      v-if="comment.author_id && authStore.user?.pk === comment.author_id"
+                      @click="deleteComment(comment.id)"
+                      :disabled="isDeletingComment === comment.id"
+                      class="text-[11px] text-red-600 hover:underline disabled:opacity-50"
+                    >
+                      {{ isDeletingComment === comment.id ? '삭제 중...' : '삭제' }}
+                    </button>
+                  </div>
                   <p class="text-xs text-gray-700 whitespace-pre-line">{{ comment.content }}</p>
                   <div class="flex items-center gap-3 mt-1">
                     <p class="text-[11px] text-gray-400">
@@ -138,7 +156,17 @@
                     <span class="text-xs font-bold">🥐</span>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <p class="text-xs font-semibold mb-1">{{ reply.user_nickname }}</p>
+                    <div class="flex items-center justify-between mb-1">
+                      <p class="text-xs font-semibold">{{ reply.user_nickname }}</p>
+                      <button
+                        v-if="reply.author_id && authStore.user?.pk === reply.author_id"
+                        @click="deleteReply(reply.id, comment.id)"
+                        :disabled="isDeletingComment === reply.id"
+                        class="text-[11px] text-red-600 hover:underline disabled:opacity-50"
+                      >
+                        {{ isDeletingComment === reply.id ? '삭제 중...' : '삭제' }}
+                      </button>
+                    </div>
                     <p class="text-xs text-gray-700 whitespace-pre-line">{{ reply.content }}</p>
                     <p class="text-[11px] text-gray-400 mt-1">
                       {{ formatDate(reply.created_at) }}
@@ -246,6 +274,10 @@ const replyingTo = ref(null)
 const replyContent = ref('')
 const isSubmittingReply = ref(false)
 
+// 삭제 관련
+const isDeletingPost = ref(false)
+const isDeletingComment = ref(null) // 삭제 중인 댓글/답글 ID
+
 // post의 like_user_ids를 확인하여 초기 좋아요 상태 설정
 watch(() => props.post, (newPost) => {
   if (newPost) {
@@ -278,7 +310,7 @@ const toggleComments = async () => {
 
 const fetchComments = async () => {
   try {
-    const res = await apiClient.get(`/reviews/${props.post.id}/comments/`)
+    const res = await apiClient.get(`/community/${props.post.id}/comments/`)
     comments.value = res.data
     commentsCount.value = res.data.reduce((count, comment) => {
       return count + 1 + (comment.replies ? comment.replies.length : 0)
@@ -298,7 +330,7 @@ const submitComment = async () => {
 
   try {
     isSubmittingComment.value = true
-    await apiClient.post(`/reviews/${props.post.id}/comments/`, {
+    await apiClient.post(`/community/${props.post.id}/comments/create/`, {
       content: newComment.value
     })
     newComment.value = ''
@@ -330,7 +362,7 @@ const submitReply = async () => {
 
   try {
     isSubmittingReply.value = true
-    await apiClient.post(`/reviews/comments/${replyingTo.value.id}/reply/`, {
+    await apiClient.post(`/community/comments/${replyingTo.value.id}/reply/`, {
       content: replyContent.value
     })
     replyContent.value = ''
@@ -354,7 +386,7 @@ const handleLike = async () => {
 
   try {
     isLiking.value = true
-    const response = await apiClient.post(`/reviews/${props.post.id}/like/`)
+    const response = await apiClient.post(`/community/${props.post.id}/like/`)
 
     if (response.data.status === 'like added') {
       isLiked.value = true
@@ -395,6 +427,66 @@ const handleFollow = async () => {
     alert(error.response?.data?.error || '팔로우 처리 중 오류가 발생했습니다.')
   } finally {
     isFollowing.value = false
+  }
+}
+
+const deletePost = async () => {
+  if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+    return
+  }
+
+  try {
+    isDeletingPost.value = true
+    await apiClient.delete(`/community/${props.post.id}/`)
+
+    alert('게시글이 삭제되었습니다.')
+    // 게시글 목록으로 돌아가기 (부모 컴포넌트에서 처리하도록 이벤트 발생)
+    window.location.reload()
+  } catch (error) {
+    console.error('게시글 삭제 실패:', error)
+    alert('게시글 삭제 중 오류가 발생했습니다.')
+  } finally {
+    isDeletingPost.value = false
+  }
+}
+
+const deleteComment = async (commentId) => {
+  if (!confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
+    return
+  }
+
+  try {
+    isDeletingComment.value = commentId
+    await apiClient.delete(`/community/comments/${commentId}/`)
+
+    // 댓글 목록 새로고침
+    await fetchComments()
+    alert('댓글이 삭제되었습니다.')
+  } catch (error) {
+    console.error('댓글 삭제 실패:', error)
+    alert('댓글 삭제 중 오류가 발생했습니다.')
+  } finally {
+    isDeletingComment.value = null
+  }
+}
+
+const deleteReply = async (replyId, parentCommentId) => {
+  if (!confirm('정말로 이 답글을 삭제하시겠습니까?')) {
+    return
+  }
+
+  try {
+    isDeletingComment.value = replyId
+    await apiClient.delete(`/community/comments/${replyId}/`)
+
+    // 댓글 목록 새로고침
+    await fetchComments()
+    alert('답글이 삭제되었습니다.')
+  } catch (error) {
+    console.error('답글 삭제 실패:', error)
+    alert('답글 삭제 중 오류가 발생했습니다.')
+  } finally {
+    isDeletingComment.value = null
   }
 }
 </script>

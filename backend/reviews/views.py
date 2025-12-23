@@ -2,10 +2,22 @@ from django.core.files.storage import default_storage
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, BasePermission
 
 from .models import Review, Comment
 from .serializers import ReviewSerializer, CommentSerializer
+
+
+class IsAuthorOrReadOnly(BasePermission):
+    """
+    작성자만 수정/삭제 가능하도록 하는 커스텀 권한
+    """
+    def has_object_permission(self, request, view, obj):
+        # 읽기 권한은 모두에게
+        if request.method in ['GET', 'HEAD', 'OPTIONS']:
+            return True
+        # 쓰기 권한은 작성자에게만
+        return obj.user == request.user
 
 
 class ReviewListCreateView(generics.ListCreateAPIView):
@@ -34,7 +46,7 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]  # TODO: 작성자만 수정/삭제하도록 권한 설정 필요
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
 
 class ReviewLikeView(APIView):

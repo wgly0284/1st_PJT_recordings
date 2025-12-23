@@ -6,10 +6,10 @@
         <h1
           class="text-4xl md:text-5xl font-playfair font-bold bg-gradient-to-r from-teal-900 to-teal-700 bg-clip-text text-transparent mb-2"
         >
-          MY REVIEWS
+          MY POSTS
         </h1>
         <p class="text-xl text-gray-600">
-          내가 남긴 빵집 리뷰들을 한눈에 모아보는 공간
+          내가 작성한 커뮤니티 게시글을 한눈에 모아보는 공간
         </p>
       </div>
 
@@ -18,39 +18,40 @@
         <!-- 리스트 영역 -->
         <section class="space-y-6 lg:col-span-2">
           <h2 class="text-sm font-bold text-gray-500 tracking-widest">
-            REVIEW LIST
+            POST LIST
           </h2>
 
           <div class="space-y-4">
             <article
-              v-for="review in myReviews"
-              :key="review.id"
-              @click="selectReview(review)"
+              v-for="post in myPosts"
+              :key="post.id"
+              @click="selectPost(post)"
               :class="[
                 'group bg-white p-5 rounded-3xl border border-gray-100 cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all',
-                selectedReview && selectedReview.id === review.id ? 'ring-2 ring-teal-500 bg-teal-50' : '',
+                selectedPost && selectedPost.id === post.id ? 'ring-2 ring-teal-500 bg-teal-50' : '',
               ]"
             >
               <div class="flex items-center justify-between mb-2 text-xs text-gray-400">
-                <span class="font-medium">
-                  {{ review.store?.name || review.bakeryName || '알 수 없는 가게' }}
+                <span class="px-3 py-1 bg-teal-50 text-teal-700 font-semibold rounded-full">
+                  {{ post.category }}
                 </span>
-                <span v-if="review.created_at">
-                  {{ formatDate(review.created_at) }}
+                <span v-if="post.created_at">
+                  {{ formatDate(post.created_at) }}
                 </span>
               </div>
               <h3
                 class="text-lg font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-teal-900 transition-colors"
               >
-                {{ review.title || '제목 없는 리뷰' }}
+                {{ post.title || '제목 없는 게시글' }}
               </h3>
               <p class="text-sm text-gray-600 line-clamp-2">
-                {{ review.content }}
+                {{ post.content }}
               </p>
               <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
-                <span class="text-yellow-500 font-semibold">
-                  ★ {{ review.rating ?? '-' }}/5
-                </span>
+                <div class="flex gap-3">
+                  <span>❤️ {{ post.likes || 0 }}</span>
+                  <span>💬 {{ post.comments || 0 }}</span>
+                </div>
                 <button
                   type="button"
                   class="inline-flex items-center gap-1 text-teal-700"
@@ -61,10 +62,10 @@
             </article>
 
             <p
-              v-if="!myReviews.length"
+              v-if="!myPosts.length"
               class="text-center text-sm text-gray-500 py-10"
             >
-              아직 작성한 리뷰가 없습니다. 첫 번째 빵집 후기를 남겨보세요!
+              아직 작성한 게시글이 없습니다. 커뮤니티에 첫 번째 글을 남겨보세요!
             </p>
           </div>
         </section>
@@ -73,53 +74,54 @@
         <section class="lg:col-span-1 space-y-4">
           <!-- 상세 카드 -->
           <div
-            v-if="selectedReview"
+            v-if="selectedPost"
             class="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm space-y-3"
           >
             <div class="flex items-center justify-between">
               <h3 class="text-sm font-bold text-gray-500 tracking-widest mb-1">
-                REVIEW DETAIL
+                POST DETAIL
               </h3>
               <button
-                @click="deleteReview(selectedReview.id)"
-                :disabled="isDeletingReview"
+                @click="deletePost(selectedPost.id)"
+                :disabled="isDeletingPost"
                 class="px-3 py-1.5 text-xs font-semibold text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {{ isDeletingReview ? '삭제 중...' : '삭제' }}
+                {{ isDeletingPost ? '삭제 중...' : '삭제' }}
               </button>
             </div>
-            <p class="text-xs text-gray-400">
-              {{ selectedReview.store?.name || selectedReview.bakeryName || '알 수 없는 가게' }}
-            </p>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="px-3 py-1 bg-teal-50 text-teal-700 text-xs font-semibold rounded-full">
+                {{ selectedPost.category }}
+              </span>
+            </div>
             <h2 class="text-xl font-bold text-gray-900 mb-1">
-              {{ selectedReview.title || '제목 없는 리뷰' }}
+              {{ selectedPost.title || '제목 없는 게시글' }}
             </h2>
             <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
-              <span class="text-yellow-500 font-semibold">
-                ★ {{ selectedReview.rating ?? '-' }}/5
-              </span>
-              <span v-if="selectedReview.created_at">
-                · {{ formatDate(selectedReview.created_at) }}
+              <span>❤️ {{ selectedPost.likes || 0 }}</span>
+              <span>💬 {{ selectedPost.comments || 0 }}</span>
+              <span v-if="selectedPost.created_at">
+                · {{ formatDate(selectedPost.created_at) }}
               </span>
             </div>
             <p class="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
-              {{ selectedReview.content }}
+              {{ selectedPost.content }}
             </p>
           </div>
 
-          <!-- 새 리뷰 작성 카드 -->
+          <!-- 새 글 작성 카드 -->
           <div class="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
-            <h3 class="text-lg font-bold text-teal-900 mb-2">새 리뷰 작성</h3>
+            <h3 class="text-lg font-bold text-teal-900 mb-2">새 글 작성</h3>
             <p class="text-sm text-gray-600 mb-4">
-              최근 방문한 빵집의 맛과 분위기를 기록해두면,
-              나중에 빵지순례 루트 짤 때 큰 도움이 돼요.
+              빵 이야기를 나누고 싶으신가요?
+              커뮤니티에 새로운 글을 작성해보세요.
             </p>
             <router-link
-              :to="{ name: 'newReview' }"
+              :to="{ name: 'community' }"
               class="inline-flex items-center justify-center w-full px-6 py-3 bg-teal-900 text-white text-sm font-bold
                      rounded-full hover:bg-teal-800 transition-all duration-300"
             >
-              리뷰 작성하기
+              커뮤니티로 이동
             </router-link>
           </div>
 
@@ -128,8 +130,7 @@
               TIP
             </h4>
             <p class="text-sm">
-              한 줄 평 + 상세 설명 + 별점까지 남겨두면,
-              다른 빵덕후들에게도 큰 도움이 됩니다.
+              다른 빵덕후들과 소통하며 더 많은 빵집 정보를 얻어보세요!
             </p>
           </div>
         </section>
@@ -139,38 +140,39 @@
       <div class="lg:hidden space-y-6">
         <section class="space-y-4">
           <h2 class="text-sm font-bold text-gray-500 tracking-widest text-center">
-            MY REVIEWS
+            MY POSTS
           </h2>
 
           <article
-            v-for="review in myReviews"
-            :key="review.id"
-            @click="selectReview(review)"
+            v-for="post in myPosts"
+            :key="post.id"
+            @click="selectPost(post)"
             :class="[
               'group bg-white p-5 rounded-3xl border border-gray-100 cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all',
-              selectedReview && selectedReview.id === review.id ? 'ring-2 ring-teal-500 bg-teal-50' : '',
+              selectedPost && selectedPost.id === post.id ? 'ring-2 ring-teal-500 bg-teal-50' : '',
             ]"
           >
             <div class="flex items-center justify-between mb-2 text-xs text-gray-400">
-              <span class="font-medium">
-                {{ review.store?.name || review.bakeryName || '알 수 없는 가게' }}
+              <span class="px-3 py-1 bg-teal-50 text-teal-700 font-semibold rounded-full">
+                {{ post.category }}
               </span>
-              <span v-if="review.created_at">
-                {{ formatDate(review.created_at) }}
+              <span v-if="post.created_at">
+                {{ formatDate(post.created_at) }}
               </span>
             </div>
             <h3
               class="text-base font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-teal-900 transition-colors"
             >
-              {{ review.title || '제목 없는 리뷰' }}
+              {{ post.title || '제목 없는 게시글' }}
             </h3>
             <p class="text-sm text-gray-600 line-clamp-2">
-              {{ review.content }}
+              {{ post.content }}
             </p>
             <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
-              <span class="text-yellow-500 font-semibold">
-                ★ {{ review.rating ?? '-' }}/5
-              </span>
+              <div class="flex gap-3">
+                <span>❤️ {{ post.likes || 0 }}</span>
+                <span>💬 {{ post.comments || 0 }}</span>
+              </div>
               <button
                 type="button"
                 class="inline-flex items-center gap-1 text-teal-700"
@@ -181,28 +183,28 @@
 
             <!-- 모바일 상세: 선택된 카드 아래에 전체 내용 표시 -->
             <div
-              v-if="selectedReview && selectedReview.id === review.id"
+              v-if="selectedPost && selectedPost.id === post.id"
               class="mt-4 border-t border-gray-100 pt-3 text-sm text-gray-700 whitespace-pre-line"
             >
-              {{ review.content }}
+              {{ post.content }}
             </div>
           </article>
 
           <p
-            v-if="!myReviews.length"
+            v-if="!myPosts.length"
             class="text-center text-sm text-gray-500 py-10"
           >
-            아직 작성한 리뷰가 없습니다. 첫 번째 빵집 후기를 남겨보세요!
+            아직 작성한 게시글이 없습니다. 커뮤니티에 첫 번째 글을 남겨보세요!
           </p>
         </section>
 
         <section class="pt-2">
           <router-link
-            :to="{ name: 'newReview' }"
+            :to="{ name: 'community' }"
             class="inline-flex items-center justify-center w-full px-6 py-3 bg-teal-900 text-white text-sm font-bold
                    rounded-full hover:bg-teal-800 transition-all duration-300"
           >
-            리뷰 작성하기
+            커뮤니티로 이동
           </router-link>
         </section>
       </div>
@@ -214,25 +216,25 @@
 import { ref, onMounted } from 'vue'
 import apiClient from '@/api/axios'
 
-const myReviews = ref([])
-const selectedReview = ref(null)
-const isDeletingReview = ref(false)
+const myPosts = ref([])
+const selectedPost = ref(null)
+const isDeletingPost = ref(false)
 
-const fetchMyReviews = async () => {
+const fetchMyPosts = async () => {
   try {
-    const res = await apiClient.get('/reviews/my/')
-    myReviews.value = res.data
+    const res = await apiClient.get('/community/my/')
+    myPosts.value = res.data
 
-    if (myReviews.value.length > 0) {
-      selectedReview.value = myReviews.value[0]
+    if (myPosts.value.length > 0) {
+      selectedPost.value = myPosts.value[0]
     }
   } catch (error) {
-    console.error('Failed to fetch my reviews:', error)
+    console.error('Failed to fetch my posts:', error)
   }
 }
 
-const selectReview = (review) => {
-  selectedReview.value = review
+const selectPost = (post) => {
+  selectedPost.value = post
 }
 
 const formatDate = (value) => {
@@ -245,29 +247,29 @@ const formatDate = (value) => {
   return `${y}.${m}.${day}`
 }
 
-const deleteReview = async (reviewId) => {
-  if (!confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
+const deletePost = async (postId) => {
+  if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
     return
   }
 
   try {
-    isDeletingReview.value = true
-    await apiClient.delete(`/reviews/${reviewId}/`)
+    isDeletingPost.value = true
+    await apiClient.delete(`/community/${postId}/`)
 
-    // 리뷰 목록에서 제거
-    myReviews.value = myReviews.value.filter(r => r.id !== reviewId)
+    // 게시글 목록에서 제거
+    myPosts.value = myPosts.value.filter(p => p.id !== postId)
 
-    // 선택된 리뷰가 삭제된 리뷰라면 선택 해제
-    if (selectedReview.value?.id === reviewId) {
-      selectedReview.value = myReviews.value.length > 0 ? myReviews.value[0] : null
+    // 선택된 게시글이 삭제된 게시글이라면 선택 해제
+    if (selectedPost.value?.id === postId) {
+      selectedPost.value = myPosts.value.length > 0 ? myPosts.value[0] : null
     }
 
-    alert('리뷰가 삭제되었습니다.')
+    alert('게시글이 삭제되었습니다.')
   } catch (error) {
-    console.error('리뷰 삭제 실패:', error)
-    alert('리뷰 삭제 중 오류가 발생했습니다.')
+    console.error('게시글 삭제 실패:', error)
+    alert('게시글 삭제 중 오류가 발생했습니다.')
   } finally {
-    isDeletingReview.value = false
+    isDeletingPost.value = false
   }
 }
 
@@ -276,14 +278,12 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 onMounted(() => {
-  fetchMyReviews().then(() => {
+  fetchMyPosts().then(() => {
     const selectedId = Number(route.query.selectedId)
-    if (selectedId && myReviews.value.length) {
-      const found = myReviews.value.find(r => r.id === selectedId)
-      if (found) selectedReview.value = found
+    if (selectedId && myPosts.value.length) {
+      const found = myPosts.value.find(p => p.id === selectedId)
+      if (found) selectedPost.value = found
     }
   })
 })
-
-
 </script>

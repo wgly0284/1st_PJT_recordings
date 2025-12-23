@@ -37,7 +37,7 @@ const handleSubmit = async () => {
     }
 
     // Community 앱 API 호출 (기존 코드에서 review 호출하던 부분 수정됨)
-    await apiClient.post('/api/community/create/', formData, {
+    await apiClient.post('/community/create/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
 

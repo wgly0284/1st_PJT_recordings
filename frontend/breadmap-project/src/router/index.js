@@ -5,6 +5,7 @@ import MyPage from '@/Views/MyPage.vue'
 import SignUpView from '@/AccountsViews/SignUp.vue'
 import LoginView from '@/AccountsViews/Login.vue'
 import MyReviews from '@/components/MyPage/MyReviews.vue'
+import MyPosts from '@/components/MyPage/MyPosts.vue'
 import ReviewDetail from '@/components/ReviewDetail.vue'
 import NewReview from '@/components/MyPage/NewReview.vue'
 import CommunityMain from '@/components/community/CommunityMain.vue'
@@ -69,6 +70,11 @@ const routes = [
     component: ReviewDetail
   },
   {
+    path: '/myposts',
+    name: 'myposts',
+    component: MyPosts
+  },
+  {
     path: '/stores/:storeId?/newReview', // ? 추가: storeId를 선택적 파라미터로
     name: 'newReview',
     component: NewReview,
@@ -111,7 +117,7 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   
   // 보호할 페이지들 (name으로 체크)
-  const protectedRoutes = ['mypage', 'editprofile', 'myreview', 'myreview_id', 'newReview', 'newChatter', 'newRecommend', 'newTip']
+  const protectedRoutes = ['mypage', 'editprofile', 'myreview', 'myreview_id', 'myposts', 'newReview', 'newChatter', 'newRecommend', 'newTip']
   
   if (protectedRoutes.includes(to.name)) {
     if (!authStore.isAuthenticated) {

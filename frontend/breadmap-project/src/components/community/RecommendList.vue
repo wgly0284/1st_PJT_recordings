@@ -83,22 +83,22 @@ const posts = ref([])
 
 const fetchPosts = async () => {
   try {
-    const res = await apiClient.get('/reviews/')
+    const res = await apiClient.get('/community/')
     posts.value = res.data
-      .filter((r) => r.tags === '빵집 추천')
-      .map((r) => ({
-        id: r.id,
-        category: r.tags,
+      .filter((p) => p.category === '빵집 추천')
+      .map((p) => ({
+        id: p.id,
+        category: p.category,
         type: 'recommend',
-        title: r.content.split('\n')[0].replace(/\*\*/g, ''),
-        content: r.content,
-        likes: r.like_users.length,
-        like_user_ids: r.like_users,
-        comments: r.comments_count || 0,
+        title: p.title,
+        content: p.content,
+        likes: p.like_count || 0,
+        like_user_ids: p.like_users || [],
+        comments: p.comments_count || 0,
         views: 0,
-        date: r.created_at.slice(0, 10),
-        author_id: r.user,
-        user_nickname: r.user_nickname,
+        date: p.created_at.slice(0, 10),
+        author_id: p.author,
+        user_nickname: p.author_nickname,
       }))
     console.log('빵집 추천 로드:', posts.value)
   } catch (e) {

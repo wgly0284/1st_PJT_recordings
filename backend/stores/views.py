@@ -1,13 +1,20 @@
-from rest_framework import generics, status, filters  # ✅ filters 추가
+from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from .models import Store
-from .serializers import StoreListSerializer, StoreSerializer, MapStoreSerializer
-from .utils import generate_store_summary
 from django.shortcuts import get_object_or_404
 
-# 지도용 API (가볍게 전체 마커용으로 사용한다면 유지, 아니면 StoreListView 하나로 통합 가능)
+# 모델 임포트
+from .models import Store
+from reviews.models import Review  # Review 모델 명시적 임포트 (확실한 쿼리를 위해)
+
+# 시리얼라이저 임포트
+from .serializers import StoreListSerializer, StoreSerializer, MapStoreSerializer
+
+# ✅ [수정] AI 요약 서비스 함수 임포트 (utils가 아닌 store_summary_service에서 가져옵니다)
+from .utils import generate_store_summary
+
+# 지도용 API
 class MapStoreListView(generics.ListAPIView):
     """
     지도에 표시할 가게 목록을 조회합니다.
@@ -23,14 +30,10 @@ class StoreListView(generics.ListAPIView):
     queryset = Store.objects.all()
     serializer_class = StoreListSerializer
     
-    # ✅ [추가] 검색 필터 설정
+    # 검색 필터 설정
     filter_backends = [filters.SearchFilter]
     
-    # ✅ [추가] 검색할 모델 필드 지정
-    # name: 가게 이름
-    # address: 주소
-    # category: 카테고리
-    # representative_tags: 태그 (만약 모델에 있다면)
+    # 검색할 모델 필드 지정
     search_fields = ['name', 'address', 'category', 'representative_tags', 'products__name', 'products__keywords__name']
 
 class StoreDetailView(generics.RetrieveAPIView):
@@ -90,12 +93,14 @@ class StoreAISummaryView(APIView):
     def get(self, request, pk):
         store = get_object_or_404(Store, pk=pk)
         
-        # 가게에 달린 리뷰 내용만 리스트로 추출
-        # (related_name='reviews'가 모델에 설정되어 있어야 함)
-        reviews = store.reviews.all().values_list('content', flat=True)
-        reviews_list = list(reviews)
+        # ✅ [수정] 최신 리뷰 30개만 가져오기 (토큰 제한 및 성능 최적화)
+        # Review 모델을 직접 쿼리하여 최신순 정렬 후 슬라이싱
+        reviews = Review.objects.filter(store=store).order_by('-created_at')[:30]
         
-        # AI 요약 함수 실행
+        # 내용만 리스트로 추출
+        reviews_list = [review.content for review in reviews]
+        
+        # ✅ [호출] 분리해둔 서비스 파일의 함수 실행
         ai_result = generate_store_summary(store.name, reviews_list)
         
         return Response(ai_result, status=status.HTTP_200_OK)

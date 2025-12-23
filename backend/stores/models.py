@@ -25,6 +25,7 @@ class Store(models.Model):
     avg_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     
     bookmarking_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='bookmarked_stores', blank=True) # blank=True 추가 권장 (즐겨찾기 없는 경우)
+    preview_image = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.name

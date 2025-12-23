@@ -27,6 +27,7 @@ class StoreSerializer(serializers.ModelSerializer):
             'avg_rating',
             'products',
             'is_bookmarked',
+            "preview_image", 
         )
 
     def get_is_bookmarked(self, obj):
@@ -74,13 +75,12 @@ class StoreListSerializer(serializers.ModelSerializer):
         return list(keywords)[:3]
 
     def get_image(self, obj):
-        # 첫 번째 제품의 이미지를 대표 이미지로 사용
-        first_product = obj.products.first()
-        if first_product:
-            return first_product.image_url
-        return None
+        # preview_image를 대표 이미지로 사용
+        return obj.preview_image if obj.preview_image else None
 
 class MapStoreSerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=True, read_only=True)
+
     class Meta:
         model = Store
         fields = (
@@ -90,4 +90,9 @@ class MapStoreSerializer(serializers.ModelSerializer):
             'latitude',
             'longitude',
             'avg_rating',
+            'preview_image',
+            'products',
+            'representative_tags',
+            'business_hours',
+            'contact',
         )

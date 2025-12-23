@@ -65,14 +65,14 @@
           </div>
 
           <h1 class="text-5xl md:text-7xl font-jua text-[#6B4A38] leading-tight drop-shadow-sm">
-            몽글몽글한
+            친구들과
             <span class="inline-block text-[#C99768] relative px-2">
               빵지순례
               <svg class="absolute -bottom-2 left-0 w-full h-3 text-[#F3B37A]/40" viewBox="0 0 100 10" preserveAspectRatio="none">
                 <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
               </svg>
             </span>
-            를<br class="hidden md:block" /> 떠나요
+            <br class="hidden md:block" /> 떠나기
           </h1>
 
           <p
@@ -141,6 +141,9 @@
         <ArrowDown class="w-6 h-6 text-[#C99768] mx-auto" />
       </div>
     </section>
+
+    <!-- 1.5 Daily Recommendation (AI 추천) -->
+    <DailyBakeryCard />
 
     <!-- 2. 어디로 갈까요? 지역 선택 -->
     <section id="content-start" class="py-20 bg-white relative overflow-hidden">
@@ -316,6 +319,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import BakeryGrid from '@/components/common/BakeryGrid.vue'
+import DailyBakeryCard from '@/AccountsViews/DailyBakeryCard.vue'
 import { ArrowRight, ArrowDown, PawPrint, Search } from 'lucide-vue-next'
 import axios from 'axios'
 
@@ -326,16 +330,16 @@ const router = useRouter()
 const searchQuery = ref('')
 const bakeries = ref([])
 
-// 지역 데이터
+// 지역 데이터 (부산광역시 기준)
 const regions = ref([
-  { id: 'gangnam', name: '강남', icon: '🥖', count: '12+' },
-  { id: 'apgujeong', name: '압구정', icon: '🥐', count: '8+' },
-  { id: 'seongsu', name: '성수', icon: '🍞', count: '15+' },
-  { id: 'itaewon', name: '이태원', icon: '🥯', count: '10+' },
-  { id: 'hongdae', name: '홍대', icon: '🥨', count: '20+' },
-  { id: 'jamsil', name: '잠실', icon: '🧁', count: '9+' },
-  { id: 'gangbuk', name: '강북', icon: '🍰', count: '6+' },
-  { id: 'yeonnam', name: '연남', icon: '🎂', count: '11+' }
+  { id: 'sasang', name: '사상구', searchKeyword: '사상', icon: '🥖', count: '200+' },
+  { id: 'busanjin', name: '부산진구', searchKeyword: '부산진', icon: '🥐', count: '800+' },
+  { id: 'jung', name: '중구', searchKeyword: '중구', icon: '🍞', count: '200+' },
+  { id: 'dong', name: '동구', searchKeyword: '동구', icon: '🥯', count: '100+' },
+  { id: 'buk', name: '북구', searchKeyword: '북구', icon: '🥨', count: '100+' },
+  { id: 'suyeong', name: '수영구', searchKeyword: '수영', icon: '🧁', count: '100+' },
+  { id: 'haeundae', name: '해운대구', searchKeyword: '해운대', icon: '🍰', count: '200+' },
+  { id: 'nam', name: '남구', searchKeyword: '남구', icon: '🎂', count: '100+' }
 ])
 
 // 실제 데이터 로드 (Weekly Pick용)

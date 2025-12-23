@@ -9,8 +9,7 @@
 
       <!-- Form Section -->
       <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative">
-        <!-- 나중에 이미지를 교체해주세요 -->
-        <img src="https://i.imgur.com/JzJ4JzL.png" alt="A croissant" class="absolute top-4 right-4 w-20">
+        <img :src="BaguetteCorgi" alt="바게트 코기" class="absolute top-4 right-4 w-20 opacity-80">
         
         <h1 class="text-4xl font-bold text-brown-text font-serif mb-2">다시 오셨군요!</h1>
         <p class="text-gray-600 mb-8">맛있는 빵집 정보를 확인하려면<br>로그인하세요.</p>
@@ -63,6 +62,7 @@
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { RouterLink } from 'vue-router';
+import BaguetteCorgi from '@/assets/images/바게트코기.png';
 
 const email = ref('');
 const password = ref('');

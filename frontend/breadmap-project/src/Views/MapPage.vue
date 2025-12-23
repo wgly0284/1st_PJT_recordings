@@ -14,8 +14,11 @@ const authStore = useAuthStore();
 
 // 데이터 상태
 const bakeries = ref([]);
+const allBakeries = ref([]); // 전체 데이터 저장
 const isLoading = ref(false);
 const searchKeyword = ref('');
+const displayLimit = ref(20); // 초기 표시 개수
+const hasMore = ref(false); // 더 로드할 데이터가 있는지
 
 const selectedBakery = ref(null);
 const currentHotBakery = ref(null);
@@ -152,7 +155,7 @@ const fetchBakeries = async (keyword = '', centerLat = null, centerLng = null) =
         if (b.lat && b.lng) {
           b.distance = getDistanceFromLatLonInKm(centerLat, centerLng, b.lat, b.lng);
         } else {
-          b.distance = 99999; 
+          b.distance = 99999;
         }
         return b;
       });
@@ -162,21 +165,26 @@ const fetchBakeries = async (keyword = '', centerLat = null, centerLng = null) =
       const nearbyData = mappedData.filter(b => b.distance <= 10);
 
       if (nearbyData.length > 0) {
-        bakeries.value = nearbyData.slice(0, 50);
+        allBakeries.value = nearbyData;
       } else {
-        bakeries.value = mappedData.slice(0, 20); 
-        isFallbackSearch.value = true; 
+        allBakeries.value = mappedData;
+        isFallbackSearch.value = true;
       }
     } else {
-      bakeries.value = mappedData.slice(0, 50);
+      allBakeries.value = mappedData;
     }
+
+    // 초기에는 20개만 표시
+    displayLimit.value = 20;
+    bakeries.value = allBakeries.value.slice(0, displayLimit.value);
+    hasMore.value = allBakeries.value.length > displayLimit.value;
 
     fillMissingCoordinates();
 
     if (bakeries.value.length > 0) {
       if (!currentHotBakery.value) pickRandomHotBakery();
       if (keyword) isListOpen.value = true;
-      
+
       const nearest = bakeries.value[0];
       if (mapRef.value && nearest.lat && nearest.lng) {
         setTimeout(() => {
@@ -199,15 +207,15 @@ const searchStores = async () => {
     alert("검색어를 입력해주세요!");
     return;
   }
-  
+
   if (mapRef.value) {
     let center = mapRef.value.getMapCenter();
-    
+
     if (!center && navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((pos) => {
             fetchBakeries(searchKeyword.value, pos.coords.latitude, pos.coords.longitude);
         }, () => {
-            fetchBakeries(searchKeyword.value); 
+            fetchBakeries(searchKeyword.value);
         });
     } else if (center) {
         fetchBakeries(searchKeyword.value, center.lat, center.lng);
@@ -326,21 +334,40 @@ const handleReviewCreated = () => {
   // 리뷰 목록 새로고침 (BakeryInfoCard에서 자동으로 처리됨)
 };
 
+// 스크롤 이벤트 핸들러 - 더 많은 데이터 로드
+const handleScroll = (event) => {
+  const element = event.target;
+  const scrollPosition = element.scrollTop + element.clientHeight;
+  const scrollHeight = element.scrollHeight;
+
+  // 스크롤이 바닥에서 100px 이내에 도달하면 추가 로드
+  if (scrollHeight - scrollPosition < 100 && hasMore.value && !isLoading.value) {
+    loadMoreBakeries();
+  }
+};
+
+// 추가 데이터 로드
+const loadMoreBakeries = () => {
+  const newLimit = displayLimit.value + 20;
+  displayLimit.value = newLimit;
+  bakeries.value = allBakeries.value.slice(0, newLimit);
+  hasMore.value = allBakeries.value.length > newLimit;
+};
+
 onMounted(() => {
   fetchUserProfile();
+  // 초기 로딩 시 데이터를 가져오지 않고 지도만 표시
+  // 사용자가 검색하거나 키워드를 선택할 때만 데이터 로드
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((pos) => {
-      fetchBakeries('', pos.coords.latitude, pos.coords.longitude);
-
+      // 현재 위치로 지도만 이동
       setTimeout(() => {
         if(mapRef.value) mapRef.value.moveToCurrentLocation();
       }, 500);
-
     }, (err) => {
-      fetchBakeries('', 37.5665, 126.9780);
+      // 위치 권한 없어도 서울 중심으로 지도만 표시
+      console.log('위치 권한 없음, 기본 위치로 지도 표시');
     });
-  } else {
-    fetchBakeries('', 37.5665, 126.9780);
   }
 });
 </script>
@@ -395,29 +422,33 @@ onMounted(() => {
         <div v-else class="h-full flex flex-col">
           <div class="p-5 border-b border-gray-100 bg-white shrink-0 z-10">
             <div class="relative mb-4 group">
-              <input 
+              <input
                 v-model="searchKeyword"
                 @keyup.enter="searchStores"
-                type="text" 
-                placeholder="지역, 빵집 이름 검색" 
+                type="text"
+                placeholder="지역, 빵집 이름 검색"
                 class="w-full pl-11 pr-4 py-3 bg-[#F9F7F2] rounded-lg border-none outline-none text-[#4A4036] placeholder-gray-400 focus:ring-2 focus:ring-[#1D4E45]/20 transition-all font-medium"
               />
-              <Search 
+              <Search
+                v-if="!isLoading"
                 @click="searchStores"
-                class="absolute left-3.5 top-3.5 w-5 h-5 text-[#1D4E45] cursor-pointer hover:scale-110 transition-transform" 
+                class="absolute left-3.5 top-3.5 w-5 h-5 text-[#1D4E45] cursor-pointer hover:scale-110 transition-transform"
               />
+              <div v-else class="absolute left-3.5 top-3.5 w-5 h-5">
+                <div class="animate-spin rounded-full h-5 w-5 border-2 border-[#1D4E45] border-t-transparent"></div>
+              </div>
             </div>
           </div>
 
-          <div class="flex-1 overflow-y-auto p-5 space-y-6 hide-scrollbar bg-white">
-            <div v-if="isLoading" class="flex flex-col items-center justify-center py-20 gap-4">
+          <div class="flex-1 overflow-y-auto p-5 space-y-6 hide-scrollbar bg-white" @scroll="handleScroll">
+            <div v-if="isLoading && bakeries.length === 0" class="flex flex-col items-center justify-center py-20 gap-4">
               <div class="animate-spin rounded-full h-10 w-10 border-4 border-[#1D4E45] border-t-transparent"></div>
               <span class="text-sm text-gray-500">맛있는 빵집을 찾고 있어요...</span>
             </div>
 
             <div v-else-if="bakeries.length === 0" class="flex flex-col items-center justify-center py-20 text-center opacity-60">
               <Search class="w-12 h-12 text-gray-300 mb-2" />
-              <p class="text-sm text-gray-500">검색 결과가 없습니다.</p>
+              <p class="text-sm text-gray-500">키워드를 검색하여 빵집을 찾아보세요!</p>
             </div>
 
             <div v-else>
@@ -492,6 +523,15 @@ onMounted(() => {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                <!-- 더 불러오기 인디케이터 -->
+                <div v-if="hasMore" class="flex items-center justify-center py-4">
+                  <div class="animate-spin rounded-full h-6 w-6 border-2 border-[#1D4E45] border-t-transparent"></div>
+                  <span class="ml-2 text-xs text-gray-500">더 불러오는 중...</span>
+                </div>
+                <div v-else-if="bakeries.length > 0" class="text-center py-4 text-xs text-gray-400">
+                  모든 빵집을 불러왔습니다 ({{ bakeries.length }}개)
                 </div>
               </div>
             </div>

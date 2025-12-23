@@ -11,10 +11,10 @@ urlpatterns = [
     path('<int:pk>/', views.StoreDetailView.as_view(), name='store_detail'),
     
     path('<int:store_pk>/bookmark/', views.BookmarkView.as_view(), name='bookmark'),
-    
+
     # 리뷰: /stores/1/reviews/
     path('<int:store_pk>/reviews/', ReviewListCreateView.as_view(), name='review_list_create'),
-    path('my_bookmarks/', views.UserBookmarkListView.as_view(), name='my_bookmarks'),
+    path('bookmarks/', views.UserBookmarkListView.as_view(), name='my_bookmarks'),
     
     path('weekly-pick/', views.WeeklyPickView.as_view(), name='weekly_pick'),
 

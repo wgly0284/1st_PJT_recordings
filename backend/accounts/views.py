@@ -77,68 +77,121 @@ class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        
-        # 1. 📜 스탬프 데이터: 내가 리뷰를 남긴 가게들 (중복 제거)
-        # Store 모델과 연결된 reviews 역참조 활용
-        visited_stores = Store.objects.filter(reviews__user=user).distinct().values('id', 'name', 'category')
-        
-        # 2. 🔮 취향 분석 데이터: 내가 쓴 리뷰들의 taste_tags 집계
-        all_tags = []
-        for review in user.review_set.all():
-            if review.taste_tags:
-                # 콤마로 구분된 태그들을 분리해서 리스트에 추가
-                tags = [t.strip() for t in review.taste_tags.split(',') if t.strip()]
-                all_tags.extend(tags)
-        
-        # 태그 빈도수 계산
-        from collections import Counter
-        taste_counts = Counter(all_tags)
-        # 예: {'달달함': 5, '바삭함': 2}
-        
-        # 많이 나온 순서대로 정렬 (상위 5개 정도만 보내줘도 됨)
-        sorted_taste = dict(sorted(taste_counts.items(), key=lambda item: item[1], reverse=True)[:5])
+        try:
+            user = request.user
 
-        # 3. 커뮤니티 게시글 및 댓글 수 집계
-        from community.models import Post
-        from reviews.models import Comment
+            # 1. 📜 스탬프 데이터: 내가 리뷰를 남긴 가게들 (중복 제거)
+            # Store 모델과 연결된 reviews 역참조 활용
+            try:
+                visited_stores = Store.objects.filter(reviews__user=user).distinct().values('id', 'name', 'category')
+            except Exception as e:
+                print(f"visited_stores 에러: {e}")
+                visited_stores = []
 
-        post_count = Post.objects.filter(author=user).count()
-        comment_count = Comment.objects.filter(user=user).count()
+            # 2. 🔮 취향 분석 데이터: 내가 쓴 리뷰들의 taste_tags 집계
+            all_tags = []
+            try:
+                for review in user.review_set.all():
+                    if review.taste_tags:
+                        # 콤마로 구분된 태그들을 분리해서 리스트에 추가
+                        tags = [t.strip() for t in review.taste_tags.split(',') if t.strip()]
+                        all_tags.extend(tags)
+            except Exception as e:
+                print(f"taste_tags 에러: {e}")
 
-        # 4. 팔로워/팔로잉 수
-        follower_count = user.followers.count()
-        following_count = user.follows.count()
+            # 태그 빈도수 계산
+            from collections import Counter
+            taste_counts = Counter(all_tags)
+            # 예: {'달달함': 5, '바삭함': 2}
 
-        # 5. 뱃지 데이터 (임시 더미 데이터)
-        badges = [
-            { 'name': '첫 리뷰', 'icon': '📝' },
-            { 'name': '소금빵 러버', 'icon': '🥐' },
-            { 'name': '오픈런', 'icon': '🏃' },
-            { 'name': '빵지순례자', 'icon': '🗺️' }
-        ]
+            # 많이 나온 순서대로 정렬 (상위 5개 정도만 보내줘도 됨)
+            sorted_taste = dict(sorted(taste_counts.items(), key=lambda item: item[1], reverse=True)[:5])
 
-        return Response({
-            "username": user.username,
-            "nickname": user.nickname,
-            "level": user.level,
-            "exp": user.exp,
-            "max_exp": user.level * 100, # 다음 레벨까지 필요한 경험치 (공식은 변경 가능)
-            "character_type": user.character_type,
-            "profile_image_url": user.profile_image_url,
-            "visit_count": len(visited_stores), # 방문 수
-            "review_count": user.review_set.count(), # 리뷰 수
-            "post_count": post_count, # 게시글 수
-            "comment_count": comment_count, # 댓글 수
-            "follower_count": follower_count, # 팔로워 수
-            "following_count": following_count, # 팔로잉 수
-            "visited_stores": list(visited_stores), # 스탬프 목록
-            "taste_stats": sorted_taste, # 취향 분석 결과
-            "badges": badges, # 뱃지 목록
-            "user_reviews": list(user.review_set.all()[:3].values('id', 'content', 'rating', 'created_at')), # 최근 리뷰 3개
-            "user_posts": list(Post.objects.filter(author=user)[:3].values('id', 'title', 'category', 'created_at')), # 최근 게시글 3개
-            "user_comments": list(Comment.objects.filter(user=user)[:3].values('id', 'content', 'created_at')), # 최근 댓글 3개
-        }, status=status.HTTP_200_OK)
+            # 3. 커뮤니티 게시글 및 댓글 수 집계
+            try:
+                from community.models import Post
+                from reviews.models import Comment
+
+                post_count = Post.objects.filter(author=user).count()
+                comment_count = Comment.objects.filter(user=user).count()
+            except Exception as e:
+                print(f"post/comment count 에러: {e}")
+                post_count = 0
+                comment_count = 0
+
+            # 4. 팔로워/팔로잉 수
+            try:
+                follower_count = user.followers.count()
+                following_count = user.follows.count()
+            except Exception as e:
+                print(f"follower/following count 에러: {e}")
+                follower_count = 0
+                following_count = 0
+
+            # 5. 뱃지 데이터 (임시 더미 데이터)
+            badges = [
+                { 'name': '첫 리뷰', 'icon': '📝' },
+                { 'name': '소금빵 러버', 'icon': '🥐' },
+                { 'name': '오픈런', 'icon': '🏃' },
+                { 'name': '빵지순례자', 'icon': '🗺️' }
+            ]
+
+            # 6. 최근 데이터 조회
+            try:
+                # 리뷰 데이터에 store 이름 포함 (select_related로 조인)
+                user_reviews = list(
+                    user.review_set.select_related('store')
+                    .all()
+                    .values('id', 'content', 'rating', 'created_at', 'store__name')
+                )
+            except Exception as e:
+                print(f"user_reviews 에러: {e}")
+                user_reviews = []
+
+            try:
+                from community.models import Post
+                # 전체 게시글 가져오기
+                user_posts = list(Post.objects.filter(author=user).values('id', 'title', 'category', 'created_at'))
+            except Exception as e:
+                print(f"user_posts 에러: {e}")
+                user_posts = []
+
+            try:
+                from reviews.models import Comment
+                user_comments = list(Comment.objects.filter(user=user)[:3].values('id', 'content', 'created_at'))
+            except Exception as e:
+                print(f"user_comments 에러: {e}")
+                user_comments = []
+
+            return Response({
+                "username": user.username,
+                "nickname": user.nickname if hasattr(user, 'nickname') else user.username,
+                "level": user.level if hasattr(user, 'level') else 1,
+                "exp": user.exp if hasattr(user, 'exp') else 0,
+                "max_exp": (user.level if hasattr(user, 'level') else 1) * 100,
+                "character_type": user.character_type if hasattr(user, 'character_type') else 'hamster',
+                "profile_image_url": user.profile_image_url if hasattr(user, 'profile_image_url') else None,
+                "visit_count": len(visited_stores),
+                "review_count": user.review_set.count() if hasattr(user, 'review_set') else 0,
+                "post_count": post_count,
+                "comment_count": comment_count,
+                "follower_count": follower_count,
+                "following_count": following_count,
+                "visited_stores": list(visited_stores),
+                "taste_stats": sorted_taste,
+                "badges": badges,
+                "user_reviews": user_reviews,
+                "user_posts": user_posts,
+                "user_comments": user_comments,
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"UserProfileView 전체 에러: {e}")
+            import traceback
+            traceback.print_exc()
+            return Response({
+                "error": "프로필을 불러오는 중 오류가 발생했습니다.",
+                "detail": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 def check_nickname(request):

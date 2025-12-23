@@ -2,198 +2,225 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import apiClient from '@/api/axios'
+import { useAuthStore } from '@/stores/auth'
+import { X } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
+const authStore = useAuthStore()
 
 const stores = ref([])
 const storeQuery = ref('')
-// 라우터 파라미터로 storeId가 넘어오면 미리 선택
 const storeId = ref(route.params.storeId || '')
-
 const title = ref('')
 const content = ref('')
 const rating = ref(5)
-const tasteTags = ref('')
+const categoryLabel = '빵집 추천'
+
 const imageFile = ref(null)
+const fileInputRef = ref(null)
 const isSubmitting = ref(false)
 
-// 가게 목록 불러오기
 onMounted(async () => {
-  try {
+  try { 
     const res = await apiClient.get('/stores/')
-    stores.value = res.data
-  } catch (e) {
-    console.error('가게 목록 로드 실패:', e)
+    stores.value = res.data 
+  } catch (e) { 
+    console.error('가게 목록 로드 실패:', e) 
   }
 })
 
-// 가게 검색 필터링
 const filteredStores = computed(() => {
   const q = storeQuery.value.trim().toLowerCase()
   if (!q) return stores.value.slice(0, 20)
-  return stores.value.filter((s) =>
-    `${s.name} ${s.address || ''}`.toLowerCase().includes(q)
-  ).slice(0, 20)
+  return stores.value.filter((s) => `${s.name} ${s.address || ''}`.toLowerCase().includes(q)).slice(0, 20)
 })
 
 const handleImageChange = (e) => {
   const file = e.target.files?.[0]
-  if (!file) return
-  imageFile.value = file
+  if (file) {
+    imageFile.value = file
+  }
+}
+
+// 🗑️ 이미지 삭제 함수
+const removeImage = () => {
+  imageFile.value = null
+  if (fileInputRef.value) {
+    fileInputRef.value.value = ''
+  }
 }
 
 const handleSubmit = async () => {
-  if (!storeId.value) {
-    alert('추천할 빵집을 선택해주세요.')
-    return
-  }
-  if (!title.value || !content.value) {
-    alert('제목과 내용을 모두 입력해주세요.')
+  if (!authStore.token) {
+    alert('로그인이 필요한 기능입니다.')
     return
   }
 
+  if (!storeId.value) { alert('추천할 빵집을 선택해주세요.'); return }
+  if (!title.value || !content.value) { alert('제목과 내용을 입력해주세요.'); return }
+  
   try {
     isSubmitting.value = true
-
+    
     const formData = new FormData()
-    formData.append('store', storeId.value) // 필수: 가게 ID
-    formData.append('rating', rating.value) // 필수: 평점
+    formData.append('store', storeId.value)
+    formData.append('rating', rating.value)
     formData.append('title', title.value)
     formData.append('content', content.value)
-    formData.append('tags', '빵집 추천') // 리뷰 모델의 태그로 구분
-    formData.append('taste_tags', tasteTags.value || '')
-
+    // 추천글은 태그로 구분하는 경우 'tags' 사용 (백엔드 확인 필요)
+    formData.append('tags', '빵집 추천') 
+    
     if (imageFile.value) {
       formData.append('image', imageFile.value)
     }
-
-    // Review 앱 API 사용 (가게 정보 연결을 위해)
-    await apiClient.post('/reviews/create/', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    
+    // Review API 호출
+    await apiClient.post('/reviews/create/', formData, { 
+      headers: { 
+        'Authorization': `Token ${authStore.token}` 
+      } 
     })
-
-    alert('빵집 추천글이 등록되었습니다!')
+    
+    alert('추천글이 등록되었습니다! 🥯')
     router.push({ name: 'community' })
-  } catch (e) {
-    console.error('추천글 등록 실패:', e.response?.data || e)
-    alert('등록 중 오류가 발생했습니다.')
-  } finally {
-    isSubmitting.value = false
+
+  } catch (e) { 
+    console.error('실패:', e)
+    if (e.response?.status === 401) {
+      alert('인증 정보가 유효하지 않습니다. 다시 로그인해주세요.')
+    } else if (e.response?.status === 400) {
+      alert('입력 정보를 확인해주세요.')
+    } else {
+      alert('오류가 발생했습니다.') 
+    }
+  } finally { 
+    isSubmitting.value = false 
   }
 }
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto px-6 space-y-8 py-10">
-    <div class="text-center lg:text-left">
-      <h1 class="text-3xl md:text-4xl font-playfair font-bold text-teal-900 mb-2">
-        빵집 추천하기
-      </h1>
-      <p class="text-lg text-gray-600">
-        맛있는 빵집을 다른 사람들에게 알려주세요.
-      </p>
-    </div>
-
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 md:p-8">
-      <div class="flex items-center gap-2 mb-4">
-        <span class="px-3 py-1 bg-teal-100 text-teal-800 text-xs font-bold rounded-full">
-          빵집 추천
-        </span>
+  <div class="min-h-screen bg-[#F9F7F2] py-20 px-6 font-sans">
+    <div class="max-w-4xl mx-auto space-y-8">
+      <div class="text-center lg:text-left">
+        <h1 class="text-4xl font-serif font-bold text-[#4E342E] mb-2 tracking-wide flex items-center justify-center lg:justify-start gap-2">
+          <span class="text-3xl">🥯</span> 빵집 추천하기
+        </h1>
+        <p class="text-lg text-[#8D6E63] font-medium">나만 알기 아까운 인생 빵집을 공유해주세요!</p>
       </div>
 
-      <div class="space-y-5">
-        <!-- 가게 검색 -->
-        <div class="space-y-2">
-          <span class="text-sm font-semibold text-gray-700">가게 선택 (필수)</span>
-          <input
-            v-model="storeQuery"
-            type="text"
-            class="mt-1 w-full border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-800"
-            placeholder="가게 이름 검색..."
-          />
+      <div class="bg-white rounded-[40px] shadow-2xl border border-[#D7CCC8] p-8 md:p-12 relative">
+        <div class="space-y-6">
           
-          <!-- 검색 결과 -->
-          <div v-if="storeQuery && filteredStores.length" class="max-h-40 overflow-y-auto border rounded-lg divide-y mt-1">
-            <button
-              v-for="store in filteredStores"
-              :key="store.id"
-              @click="storeId = store.id; storeQuery = store.name"
-              class="w-full text-left px-3 py-2 text-sm hover:bg-teal-50 flex flex-col"
-              :class="{ 'bg-teal-50': storeId === store.id }"
-            >
-              <span class="font-bold">{{ store.name }}</span>
-              <span class="text-xs text-gray-500">{{ store.address }}</span>
-            </button>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-4 py-1.5 bg-[#EFEBE9] text-[#5D4037] text-xs font-bold rounded-full border border-[#D7CCC8]">
+              {{ categoryLabel }}
+            </span>
           </div>
-          <p v-if="storeId" class="text-xs text-teal-600 font-bold mt-1">
-            ✓ 가게가 선택되었습니다.
-          </p>
+
+          <!-- 가게 검색 -->
+          <div class="space-y-2 relative">
+            <span class="text-sm font-bold text-[#5D4037]">가게 선택 <span class="text-[#FF7043]">*</span></span>
+            <input
+              v-model="storeQuery"
+              type="text"
+              class="w-full border border-[#D7CCC8] rounded-xl px-4 py-3 text-sm bg-[#FAFAFA] focus:outline-none focus:ring-2 focus:ring-[#8D6E63] placeholder-[#BCAAA4]"
+              placeholder="가게 이름을 검색해보세요..."
+            />
+            <div v-if="storeQuery && filteredStores.length" class="absolute z-20 w-full max-h-48 overflow-y-auto border border-[#D7CCC8] rounded-xl bg-white shadow-lg mt-1 custom-scroll">
+              <button
+                v-for="store in filteredStores"
+                :key="store.id"
+                @click="storeId = store.id; storeQuery = store.name"
+                class="w-full text-left px-4 py-3 text-sm hover:bg-[#EFEBE9] flex flex-col border-b border-[#F5F5F5] last:border-0"
+                :class="{ 'bg-[#EFEBE9]': storeId === store.id }"
+              >
+                <span class="font-bold text-[#4E342E]">{{ store.name }}</span>
+                <span class="text-xs text-[#8D6E63]">{{ store.address }}</span>
+              </button>
+            </div>
+            <p v-if="storeId" class="text-xs text-[#5D4037] font-bold mt-1 flex items-center gap-1">
+              ✅ 가게가 선택되었습니다.
+            </p>
+          </div>
+
+          <!-- 별점 -->
+          <div class="space-y-2">
+            <span class="text-sm font-bold text-[#5D4037]">평점</span>
+            <div class="flex items-center gap-2 bg-[#FAFAFA] p-3 rounded-xl border border-[#D7CCC8] w-fit">
+              <button 
+                v-for="star in 5" :key="star" @click="rating = star"
+                type="button"
+                class="text-2xl focus:outline-none transition-transform active:scale-125"
+                :class="star <= rating ? 'text-[#FFB74D] drop-shadow-sm' : 'text-[#E0E0E0]'"
+              >★</button>
+              <span class="text-sm font-bold text-[#5D4037] ml-2">{{ rating }}점</span>
+            </div>
+          </div>
+
+          <label class="block text-left">
+            <span class="text-sm font-bold text-[#5D4037] mb-2 block">제목</span>
+            <input v-model="title" type="text" class="w-full border border-[#D7CCC8] rounded-xl px-4 py-3 text-sm bg-[#FAFAFA] focus:outline-none focus:ring-2 focus:ring-[#8D6E63]" placeholder="제목을 입력해주세요" />
+          </label>
+
+          <label class="block text-left">
+            <span class="text-sm font-bold text-[#5D4037] mb-2 block">내용</span>
+            <textarea v-model="content" class="w-full border border-[#D7CCC8] rounded-xl px-4 py-3 text-sm min-h-[200px] bg-[#FAFAFA] focus:outline-none focus:ring-2 focus:ring-[#8D6E63] resize-none" placeholder="추천 이유를 자세히 적어주세요."></textarea>
+          </label>
+
+          <label class="block text-left">
+            <span class="text-sm font-bold text-[#5D4037] mb-2 block">사진 첨부</span>
+            
+            <!-- 파일 선택 전 -->
+            <div v-if="!imageFile" class="relative group cursor-pointer">
+              <input 
+                ref="fileInputRef"
+                type="file" 
+                accept="image/*" 
+                @change="handleImageChange" 
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+              />
+              <div class="w-full border-2 border-dashed border-[#D7CCC8] rounded-xl p-4 text-center bg-[#F9F7F2] group-hover:bg-[#EFEBE9] transition-colors">
+                <p class="text-sm text-[#8D6E63] font-medium">
+                  클릭하여 사진을 올려주세요 📸
+                </p>
+              </div>
+            </div>
+
+            <!-- 파일 선택 후 -->
+            <div v-else class="flex items-center gap-3 p-3 border border-[#D7CCC8] rounded-xl bg-[#EFEBE9]">
+              <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-lg shadow-sm">🖼️</div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-[#5D4037] font-bold truncate">{{ imageFile.name }}</p>
+                <p class="text-xs text-[#8D6E63]">업로드 준비 완료</p>
+              </div>
+              <button 
+                @click.prevent="removeImage"
+                type="button"
+                class="p-2 text-[#8D6E63] hover:bg-[#D7CCC8] rounded-full transition-colors"
+                title="사진 삭제"
+              >
+                <X class="w-5 h-5" />
+              </button>
+            </div>
+          </label>
         </div>
 
-        <label class="block text-left">
-          <span class="text-sm font-semibold text-gray-700">제목</span>
-          <input
-            v-model="title"
-            type="text"
-            class="mt-1 w-full border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-800"
-            placeholder="제목을 입력해주세요"
-          />
-        </label>
-
-        <label class="block text-left">
-          <span class="text-sm font-semibold text-gray-700">내용</span>
-          <textarea
-            v-model="content"
-            class="mt-1 w-full border rounded-lg px-3 py-2 text-sm min-h-[160px] bg-white focus:outline-none focus:ring-2 focus:ring-teal-800"
-            placeholder="추천 이유를 자세히 적어주세요."
-          ></textarea>
-        </label>
-
-        <!-- 평점 선택 -->
-        <label class="block text-left">
-          <span class="text-sm font-semibold text-gray-700">평점</span>
-          <div class="flex gap-2 mt-1">
-            <button 
-              v-for="star in 5" 
-              :key="star" 
-              @click="rating = star"
-              type="button"
-              class="text-2xl focus:outline-none transition-transform active:scale-110"
-              :class="star <= rating ? 'text-yellow-400' : 'text-gray-300'"
-            >
-              ★
-            </button>
-            <span class="text-sm text-gray-500 self-center ml-2">{{ rating }}점</span>
-          </div>
-        </label>
-
-        <label class="block text-left">
-          <span class="text-sm font-semibold text-gray-700">이미지 첨부</span>
-          <input
-            type="file"
-            accept="image/*"
-            @change="handleImageChange"
-            class="mt-1 block w-full text-sm text-gray-700"
-          />
-        </label>
-      </div>
-
-      <div class="mt-8 flex flex-col sm:flex-row justify-between gap-3">
-        <button
-          @click="router.go(-1)"
-          class="inline-flex items-center justify-center px-6 py-3 border border-gray-200 text-sm font-semibold rounded-full text-gray-600 hover:bg-gray-50"
-        >
-          취소
-        </button>
-        <button
-          @click="handleSubmit"
-          :disabled="isSubmitting"
-          class="inline-flex items-center justify-center px-8 py-3 bg-teal-900 text-white text-sm font-bold rounded-full hover:bg-teal-800 disabled:bg-gray-400 transition-all"
-        >
-          {{ isSubmitting ? '등록 중...' : '등록하기' }}
-        </button>
+        <div class="mt-10 flex justify-end gap-4 pt-6 border-t border-[#EFEBE9]">
+          <button @click="router.go(-1)" class="px-8 py-3 border border-[#D7CCC8] text-sm font-bold rounded-full text-[#8D6E63] hover:bg-[#EFEBE9]">취소</button>
+          <button @click="handleSubmit" :disabled="isSubmitting" class="px-10 py-3 bg-[#8D6E63] text-white text-sm font-bold rounded-full hover:bg-[#6D4C41] shadow-lg transform hover:-translate-y-1 transition-all disabled:bg-[#BCAAA4]">
+            {{ isSubmitting ? '등록 중...' : '추천하기' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap');
+.font-serif { font-family: 'Gaegu', cursive; }
+.custom-scroll::-webkit-scrollbar { width: 4px; }
+.custom-scroll::-webkit-scrollbar-thumb { background-color: #D7CCC8; border-radius: 4px; }
+</style>

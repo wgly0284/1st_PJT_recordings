@@ -4,9 +4,16 @@
     <div class="max-w-[1400px] mx-auto px-6 md:px-12 flex justify-between items-center">
       <!-- Logo -->
       <router-link to="/" class="flex items-center gap-2 cursor-pointer group">
-        <div class="w-10 h-10 rounded-full bg-[#F3B37A] flex items-center justify-center text-white transition-transform duration-500 group-hover:rotate-12">
-          <span class="text-base">🥖</span>
-        </div>
+        <!-- 
+             [변경됨] 기존 이모지 대신 이미지를 사용합니다.
+             이미지 크기는 class의 w-10 h-10 등으로 조절하세요.
+        -->
+        <img 
+          :src="logoImage" 
+          alt="Breadtopia Logo" 
+          class="w-10 h-10 object-contain transition-transform duration-500 group-hover:rotate-12"
+        />
+        
         <span class="font-jua text-2xl md:text-3xl font-bold tracking-tight text-[#6B4A38] group-hover:text-[#C99768] transition-colors">
           Breadtopia
         </span>
@@ -70,6 +77,10 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { RouterLink } from 'vue-router'
+
+// [중요] assets 폴더에 있는 로고 이미지를 import 합니다.
+// 실제 파일명(예: logo.png)에 맞게 경로를 수정해주세요.
+import logoImage from '@/assets/images/logo.png'
 
 const authStore = useAuthStore()
 const isScrolled = ref(false)

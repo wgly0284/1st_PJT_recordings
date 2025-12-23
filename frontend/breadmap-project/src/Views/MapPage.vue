@@ -8,6 +8,7 @@ import BakeryMap from '@/components/map/BakeryMap.vue';
 import BakeryInfoCard from '@/components/map/BakeryInfoCard.vue';
 import StoreReviewWrite from '@/components/map/StoreReviewWrite.vue';
 import { Search, MapPin, Star, Heart, Navigation, ThumbsUp, Home, Map as MapIcon, BookOpen, User, ChevronLeft, ChevronRight, RotateCw } from 'lucide-vue-next';
+import logoImage from '@/assets/images/logo.png'
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -350,7 +351,11 @@ onMounted(() => {
       <!-- GNB -->
       <nav class="w-[72px] h-full bg-[#1D4E45] flex flex-col items-center py-6 z-50 shrink-0 shadow-lg text-white/70">
         <router-link :to="{ name: 'home' }" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-xl mb-10 cursor-pointer hover:bg-white/20 transition-colors text-white no-underline">
-          🥐
+        <img 
+          :src="logoImage" 
+          alt="Breadtopia Logo" 
+          class="w-10 h-10 object-contain transition-transform duration-500 group-hover:rotate-12"
+        />
         </router-link>
 
         <div class="flex flex-col gap-8 w-full">

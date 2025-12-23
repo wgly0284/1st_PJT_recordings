@@ -4,6 +4,9 @@ import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import { BookOpen, Star, Award, Settings } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
+import MyReviewsSection from './MyReviewsSection.vue';
+import MyPostsSection from './MyPostsSection.vue';
+import MyCommentsSection from './MyCommentsSection.vue';
 
 const authStore = useAuthStore();
 const isLoading = ref(true);
@@ -136,14 +139,27 @@ onMounted(() => {
 
             <!-- 스탯 요약 -->
             <div class="flex justify-center md:justify-start gap-8 mt-6">
-                          <div class="text-center md:text-left">
-                            <p class="text-2xl font-bold text-white">{{ userInfo.visit_count }}</p>
-                            <p class="text-xs text-teal-300 uppercase tracking-wider">Visits</p>
-                          </div>
-                          <router-link :to="{ name: 'myreview' }" class="text-center cursor-pointer hover:opacity-80 transition-opacity">
-                            <p class="text-2xl font-bold text-white">{{ userInfo.review_count }}</p>
-                            <p class="text-xs text-teal-300 uppercase tracking-wider">Reviews</p>
-                          </router-link>              <div class="text-center md:text-left">
+              <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+                <p class="text-2xl font-bold text-white">{{ userInfo.follower_count }}</p>
+                <p class="text-xs text-teal-300 uppercase tracking-wider">Followers</p>
+              </div>
+              <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+                <p class="text-2xl font-bold text-white">{{ userInfo.following_count }}</p>
+                <p class="text-xs text-teal-300 uppercase tracking-wider">Following</p>
+              </div>
+              <router-link :to="{ name: 'myreview' }" class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+                <p class="text-2xl font-bold text-white">{{ userInfo.review_count }}</p>
+                <p class="text-xs text-teal-300 uppercase tracking-wider">Reviews</p>
+              </router-link>
+              <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+                <p class="text-2xl font-bold text-white">{{ userInfo.post_count }}</p>
+                <p class="text-xs text-teal-300 uppercase tracking-wider">Posts</p>
+              </div>
+              <div class="text-center cursor-pointer hover:opacity-80 transition-opacity">
+                <p class="text-2xl font-bold text-white">{{ userInfo.comment_count }}</p>
+                <p class="text-xs text-teal-300 uppercase tracking-wider">Comments</p>
+              </div>
+              <div class="text-center md:text-left">
                 <p class="text-2xl font-bold text-white">{{ userInfo.badges.length }}</p>
                 <p class="text-xs text-teal-300 uppercase tracking-wider">Badges</p>
               </div>
@@ -255,7 +271,12 @@ onMounted(() => {
             </div>
           </div>
         </div>
-
+        <!-- 내가 작성한 활동 (리뷰, 게시글, 댓글) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <MyReviewsSection :reviews="userInfo.user_reviews" />
+          <MyPostsSection :posts="userInfo.user_posts" />
+          <MyCommentsSection :comments="userInfo.user_comments" />
+        </div>
       </div>
     </div>
   </div>

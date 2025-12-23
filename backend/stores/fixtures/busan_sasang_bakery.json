@@ -1,0 +1,869 @@
+[
+  {
+    "model": "stores.store",
+    "pk": 1,
+    "fields": {
+      "name": "베리노베이커리",
+      "address": "부산광역시 사상구 사상로 483-1 (모라동)",
+      "latitude": 35.18772116338625,
+      "longitude": 128.9875581949803,
+      "category": "제과점",
+      "contact": "051-302-1792",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 2,
+    "fields": {
+      "name": "슈메르브레드",
+      "address": "부산광역시 사상구 새벽로167번길 5-4 (감전동)",
+      "latitude": 35.1560553576368,
+      "longitude": 128.982741693588,
+      "category": "제과점",
+      "contact": "051-323-6206",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 3,
+    "fields": {
+      "name": "몽블랑베이커리",
+      "address": "부산광역시 사상구 사상로531번길 7 (모라동)",
+      "latitude": 35.0468025231803,
+      "longitude": 126.840725502279,
+      "category": "제과점",
+      "contact": "051-302-8644",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 4,
+    "fields": {
+      "name": "케익 하우스 델리",
+      "address": "부산광역시 사상구 모라로110번길 96, 104호 (모라동, 백양그린@상가)",
+      "latitude": 37.45204164449708,
+      "longitude": 126.72076825175938,
+      "category": "제과점",
+      "contact": "051-304-2925",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 5,
+    "fields": {
+      "name": "빵사랑 베이커리",
+      "address": "부산광역시 사상구 학감대로49번길 34 (학장동, 도개공@상가 지하1호)",
+      "latitude": 37.51150821952696,
+      "longitude": 127.1140604545702,
+      "category": "제과점",
+      "contact": "051-325-8404",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 6,
+    "fields": {
+      "name": "파란풍차제과점",
+      "address": "부산광역시 사상구 사상로309번길 7 (덕포동)",
+      "latitude": 35.1722685459124,
+      "longitude": 128.982788565607,
+      "category": "제과점",
+      "contact": "051-301-5372",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 7,
+    "fields": {
+      "name": "파밀리아제과점",
+      "address": "부산광역시 사상구 대동로 101, 1층 (학장동)",
+      "latitude": 35.1386740753512,
+      "longitude": 128.978623986386,
+      "category": "제과점",
+      "contact": "051-326-7671",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 8,
+    "fields": {
+      "name": "파리바게뜨(주례점)",
+      "address": "부산광역시 사상구 가야대로282번길 1 (주례동)",
+      "latitude": 35.15009340512806,
+      "longitude": 129.00337385494015,
+      "category": "제과점",
+      "contact": "051-324-7016",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 9,
+    "fields": {
+      "name": "파레토네제과점",
+      "address": "부산광역시 사상구 사상로342번길 27, 2동 105호 (덕포동, 벽산늘푸른APT상가)",
+      "latitude": 35.1750286928806,
+      "longitude": 128.985877166657,
+      "category": "제과점",
+      "contact": "051-304-5232",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 10,
+    "fields": {
+      "name": "달 보드레",
+      "address": "부산광역시 사상구 대동로64번길 20, 1층 105,106,107호 (엄궁동)",
+      "latitude": 37.358285592416905,
+      "longitude": 126.93230788017381,
+      "category": "제과점",
+      "contact": "051-312-0133",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 11,
+    "fields": {
+      "name": "베이커리팩토리 사상점",
+      "address": "부산광역시 사상구 낙동대로 733 (엄궁동, 외 3필지)",
+      "latitude": null,
+      "longitude": null,
+      "category": "제과점",
+      "contact": "051-313-8141",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 12,
+    "fields": {
+      "name": "부산엄궁 뚜레쥬르",
+      "address": "부산광역시 사상구 엄궁로203번길 40, 1층 (엄궁동)",
+      "latitude": 35.12887354311832,
+      "longitude": 128.97183702382486,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 13,
+    "fields": {
+      "name": "뚜레쥬르(신모라사거리점)",
+      "address": "부산광역시 사상구 백양대로 893, 301호 (모라동)",
+      "latitude": 35.186019496306315,
+      "longitude": 128.99070007039694,
+      "category": "제과점",
+      "contact": "051-316-7260",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 14,
+    "fields": {
+      "name": "파리바게뜨 부산엄궁점",
+      "address": "부산광역시 사상구 엄궁북로 25, 1,2층 (엄궁동)",
+      "latitude": 35.128632274741065,
+      "longitude": 128.97309486981385,
+      "category": "제과점",
+      "contact": "051-312-3332",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 15,
+    "fields": {
+      "name": "꼬마베이커리",
+      "address": "부산광역시 사상구 사상로250번길 11, 1층 (괘법동)",
+      "latitude": 37.597000046042574,
+      "longitude": 126.71556213096177,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 16,
+    "fields": {
+      "name": "파리바게뜨구덕우성점",
+      "address": "부산광역시 사상구 학감대로 116 (학장동)",
+      "latitude": 35.1415364635429,
+      "longitude": 128.989064177031,
+      "category": "제과점",
+      "contact": "051-326-7444",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 17,
+    "fields": {
+      "name": "파리바게뜨 감전점",
+      "address": "부산광역시 사상구 새벽로 166 (감전동)",
+      "latitude": 35.15593055763173,
+      "longitude": 128.98342886298875,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 18,
+    "fields": {
+      "name": "오뚜기제과",
+      "address": "부산광역시 사상구 엄궁북로 43-1 (엄궁동)",
+      "latitude": 35.1282309043403,
+      "longitude": 128.975217606788,
+      "category": "제과점",
+      "contact": "051-312-1934",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 19,
+    "fields": {
+      "name": "베이커리(Bakery)모라점",
+      "address": "부산광역시 사상구 모라로 116 (모라동)",
+      "latitude": 35.1855516517699,
+      "longitude": 128.991365932501,
+      "category": "제과점",
+      "contact": "051-328-2861",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 20,
+    "fields": {
+      "name": "파리바게뜨 주례유엔아이점",
+      "address": "부산광역시 사상구 백양대로 372-11, 1층 (주례동, 상가)",
+      "latitude": 35.1534049276451,
+      "longitude": 129.01100417675,
+      "category": "제과점",
+      "contact": "051-335-2331",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 21,
+    "fields": {
+      "name": "케이엠에스베이크샵앤미니마트(KMS Bake Shop & Mini Mart)",
+      "address": "부산광역시 사상구 사상로238번길 8 (괘법동)",
+      "latitude": null,
+      "longitude": null,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 22,
+    "fields": {
+      "name": "베이커리(Bakery)",
+      "address": "부산광역시 사상구 광장로 7, 지하 1층 (괘법동, 홈플러스서부산점)",
+      "latitude": 37.4963731838914,
+      "longitude": 126.863082266053,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 23,
+    "fields": {
+      "name": "파리바게뜨(주례동일점)",
+      "address": "부산광역시 사상구 백양대로494번길 7 (주례동)",
+      "latitude": 35.15418774046023,
+      "longitude": 128.9981184931824,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 24,
+    "fields": {
+      "name": "파리바게뜨 부산사상점",
+      "address": "부산광역시 사상구 사상로 214 (괘법동)",
+      "latitude": 35.1642670415352,
+      "longitude": 128.983832143828,
+      "category": "제과점",
+      "contact": "051-313-1982",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 25,
+    "fields": {
+      "name": "파리바게뜨 학장점",
+      "address": "부산광역시 사상구 대동로 76 (학장동, 무학아파트 상가동 1층(탑플러스 내))",
+      "latitude": 35.137263478319746,
+      "longitude": 128.9770386206095,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 26,
+    "fields": {
+      "name": "뚜레쥬르 서부터미널점",
+      "address": "부산광역시 사상구 사상로 204 (괘법동)",
+      "latitude": 35.843352853111796,
+      "longitude": 128.56612918986718,
+      "category": "제과점",
+      "contact": "051-916-8000",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 27,
+    "fields": {
+      "name": "(주)신세계푸드 블랑제리 사상점",
+      "address": "부산광역시 사상구 광장로 17 (괘법동, 이마트 사상점)",
+      "latitude": null,
+      "longitude": null,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 28,
+    "fields": {
+      "name": "김충호과자점",
+      "address": "부산광역시 사상구 사상로250번길 1, 1층 (괘법동)",
+      "latitude": 35.1671445442922,
+      "longitude": 128.982453423258,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 29,
+    "fields": {
+      "name": "(주)신세계푸드 블랑제리 사상점2",
+      "address": "부산광역시 사상구 광장로 17, 1층 (괘법동, 사상 이마트)",
+      "latitude": null,
+      "longitude": null,
+      "category": "제과점",
+      "contact": "051-311-4290",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 30,
+    "fields": {
+      "name": "달콤한 상상",
+      "address": "부산광역시 사상구 사상로277번길 27, 1층 (덕포동)",
+      "latitude": 35.14991998288702,
+      "longitude": 129.00622893005493,
+      "category": "제과점",
+      "contact": "051-305-4110",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 31,
+    "fields": {
+      "name": "뚜레쥬르 부산 학장본점",
+      "address": "부산광역시 사상구 학감대로 111 (학장동)",
+      "latitude": 35.140696062906464,
+      "longitude": 128.98821652001305,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 32,
+    "fields": {
+      "name": "빵장수 야곱",
+      "address": "부산광역시 사상구 사상로 201, 1층 (괘법동)",
+      "latitude": 37.5215342135894,
+      "longitude": 126.737995844193,
+      "category": "제과점",
+      "contact": "051-282-3136",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 33,
+    "fields": {
+      "name": "뚜레쥬르 부산사상구청점",
+      "address": "부산광역시 사상구 학감대로 236, 1층 (감전동)",
+      "latitude": 35.151976099161075,
+      "longitude": 128.9903014337831,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 34,
+    "fields": {
+      "name": "스마일베이커리",
+      "address": "부산광역시 사상구 사상로 295, 1층 (덕포동)",
+      "latitude": 35.171193835778254,
+      "longitude": 128.98276465942732,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 35,
+    "fields": {
+      "name": "문브레드",
+      "address": "부산광역시 사상구 사상로 38, 1층 (주례동)",
+      "latitude": 37.55014325462263,
+      "longitude": 126.87282142459996,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 36,
+    "fields": {
+      "name": "슈슈베어",
+      "address": "부산광역시 사상구 가야대로 364, 1층 (주례동)",
+      "latitude": 37.5478559164619,
+      "longitude": 127.051954880781,
+      "category": "제과점",
+      "contact": "051-754-1554",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 37,
+    "fields": {
+      "name": "슈슈베어",
+      "address": "부산광역시 사상구 가야대로 364, 2층 (주례동)",
+      "latitude": 37.5478559164619,
+      "longitude": 127.051954880781,
+      "category": "제과점",
+      "contact": "051-754-1554",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 38,
+    "fields": {
+      "name": "베이커리(Bakery) 행사매대",
+      "address": "부산광역시 사상구 광장로 7, 홈플러스서부산점 지하1층 (괘법동)",
+      "latitude": 35.1709223005528,
+      "longitude": 129.133663675747,
+      "category": "제과점",
+      "contact": "051-319-9216",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 39,
+    "fields": {
+      "name": "알앤비(R&B)",
+      "address": "부산광역시 사상구 백양대로 930, 우성모라아파트 상가3동 105호 (모라동)",
+      "latitude": 37.21332989692412,
+      "longitude": 127.09319262184374,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 40,
+    "fields": {
+      "name": "파리바게뜨 부산덕포신익",
+      "address": "부산광역시 사상구 덕상로 16, 벽산신익타운 상가동 101호 (덕포동)",
+      "latitude": 35.17284251394509,
+      "longitude": 128.98933166360126,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 41,
+    "fields": {
+      "name": "하리다",
+      "address": "부산광역시 사상구 운산로 74-1, 1층 (괘법동)",
+      "latitude": 36.8269950507758,
+      "longitude": 127.13845298446,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 42,
+    "fields": {
+      "name": "케이크구나",
+      "address": "부산광역시 사상구 가야대로284번길 11, 2층 (주례동)",
+      "latitude": 35.1495394387308,
+      "longitude": 129.004175495003,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 43,
+    "fields": {
+      "name": "동백1970",
+      "address": "부산광역시 사상구 사상로 475-14, 1층 (모라동)",
+      "latitude": null,
+      "longitude": null,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 44,
+    "fields": {
+      "name": "쌀앓이",
+      "address": "부산광역시 사상구 모라로37번길 28, 1층 (모라동)",
+      "latitude": 35.1921704143381,
+      "longitude": 128.987548029424,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 45,
+    "fields": {
+      "name": "율가케이크",
+      "address": "부산광역시 사상구 새벽로 216, 3층 302호 (괘법동)",
+      "latitude": 35.1602072621863,
+      "longitude": 128.984326100048,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 46,
+    "fields": {
+      "name": "마블스퀘어",
+      "address": "부산광역시 사상구 사상로292번길 6, 1층 104호 (덕포동)",
+      "latitude": 35.1223554166043,
+      "longitude": 129.041744812396,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 47,
+    "fields": {
+      "name": "스탠다드",
+      "address": "부산광역시 사상구 사상로 312, 1층 (덕포동)",
+      "latitude": 37.541680943746,
+      "longitude": 127.058635647292,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 48,
+    "fields": {
+      "name": "해달당",
+      "address": "부산광역시 사상구 백양대로950번가길 39, 1층 (모라동)",
+      "latitude": null,
+      "longitude": null,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 49,
+    "fields": {
+      "name": "루리베이커리",
+      "address": "부산광역시 사상구 백양대로 955-9, 1층 (모라동)",
+      "latitude": 35.19160990502897,
+      "longitude": 128.991385364148,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 50,
+    "fields": {
+      "name": "베이커리팩토리 롯데슈퍼학장점",
+      "address": "부산광역시 사상구 대동로 94, 학장반도보라타운 상가동 1층 121호 (학장동)",
+      "latitude": null,
+      "longitude": null,
+      "category": "제과점",
+      "contact": null,
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  },
+  {
+    "model": "stores.store",
+    "pk": 51,
+    "fields": {
+      "name": "파리바게뜨 부산괘법점",
+      "address": "부산광역시 사상구 운산로 37, 1층 (덕포동)",
+      "latitude": 35.16851258934168,
+      "longitude": 128.98079764062916,
+      "category": "제과점",
+      "contact": "051-326-3456",
+      "description": null,
+      "created_at": null,
+      "business_hours": null,
+      "representative_tags": null,
+      "avg_rating": "0.00"
+    }
+  }
+]

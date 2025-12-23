@@ -8,7 +8,6 @@ import BakeryMap from '@/components/map/BakeryMap.vue';
 import BakeryInfoCard from '@/components/map/BakeryInfoCard.vue';
 import StoreReviewWrite from '@/components/map/StoreReviewWrite.vue';
 import { Search, MapPin, Star, Heart, Navigation, ThumbsUp, Home, Map as MapIcon, BookOpen, User, ChevronLeft, ChevronRight, RotateCw } from 'lucide-vue-next';
-import logoImage from '@/assets/images/logo.png'
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -125,16 +124,18 @@ const fetchBakeries = async (keyword = '', centerLat = null, centerLng = null) =
       const lng = rawLng ? parseFloat(String(rawLng).trim()) : null;
 
       return {
-        id: pk, 
+        id: pk,
         name: fields.name,
-        lat: lat, 
+        lat: lat,
         lng: lng,
         address: fields.address || '',
-        rating: parseFloat(fields.avg_rating) || 0.0, 
-        image: `https://source.unsplash.com/random/400x300/?bakery&sig=${pk}`,
-        tags: (fields.representative_tags && String(fields.representative_tags).trim() !== "") 
-              ? String(fields.representative_tags).split(',') 
+        rating: parseFloat(fields.avg_rating) || 0.0,
+        preview_image: fields.image || `https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600`,
+        tags: (fields.representative_tags && String(fields.representative_tags).trim() !== "")
+              ? String(fields.representative_tags).split(',')
               : ['맛있는빵집', '추천'],
+        business_hours: fields.business_hours || '09:00 ~ 20:00',
+        contact: fields.contact || '',
         // ✅ [수정] 메뉴 데이터 매핑
         // 백엔드에서 'products'로 보내준 데이터를 프론트엔드 'menu'로 연결
         menu: fields.products ? fields.products.map(p => ({
@@ -142,7 +143,7 @@ const fetchBakeries = async (keyword = '', centerLat = null, centerLng = null) =
             price: p.price,
             image_url: p.image_url // InfoCard는 item.image_url을 사용함
         })) : [],
-        distance: 0 
+        distance: 0
       };
     });
 
@@ -351,11 +352,7 @@ onMounted(() => {
       <!-- GNB -->
       <nav class="w-[72px] h-full bg-[#1D4E45] flex flex-col items-center py-6 z-50 shrink-0 shadow-lg text-white/70">
         <router-link :to="{ name: 'home' }" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-xl mb-10 cursor-pointer hover:bg-white/20 transition-colors text-white no-underline">
-        <img 
-          :src="logoImage" 
-          alt="Breadtopia Logo" 
-          class="w-10 h-10 object-contain transition-transform duration-500 group-hover:rotate-12"
-        />
+          🥐
         </router-link>
 
         <div class="flex flex-col gap-8 w-full">
@@ -438,7 +435,11 @@ onMounted(() => {
                  </div>
                  <div class="flex gap-4 items-center relative z-10">
                    <div class="w-16 h-16 rounded-full bg-white/10 border-2 border-white/20 overflow-hidden shrink-0">
-                     <img :src="currentHotBakery.image" class="w-full h-full object-cover" />
+                     <img
+                       :src="currentHotBakery.preview_image"
+                       @error="e => e.target.src = 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80'"
+                       class="w-full h-full object-cover"
+                     />
                    </div>
                    <div>
                      <h3 class="font-bold text-lg leading-tight mb-1">{{ currentHotBakery.name }}</h3>
@@ -469,7 +470,11 @@ onMounted(() => {
                     ]"
                   >
                     <div class="w-20 h-20 rounded-lg bg-gray-100 overflow-hidden shrink-0">
-                      <img :src="bakery.image" class="w-full h-full object-cover" />
+                      <img
+                        :src="bakery.preview_image"
+                        @error="e => e.target.src = 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80'"
+                        class="w-full h-full object-cover"
+                      />
                     </div>
                     <div class="flex-1 min-w-0 flex flex-col justify-between">
                       <div class="flex justify-between items-start">

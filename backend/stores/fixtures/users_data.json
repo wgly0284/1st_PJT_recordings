@@ -1,0 +1,1402 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "username": "user1",
+      "password": "pbkdf2_sha256$...",
+      "email": "user1@example.com",
+      "nickname": "빵냄새맡는 미식가 994",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+      "username": "user2",
+      "password": "pbkdf2_sha256$...",
+      "email": "user2@example.com",
+      "nickname": "당충전하는 단팥빵 485",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 3,
+    "fields": {
+      "username": "user3",
+      "password": "pbkdf2_sha256$...",
+      "email": "user3@example.com",
+      "nickname": "앙버터좋아하는 소금빵 768",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 4,
+    "fields": {
+      "username": "user4",
+      "password": "pbkdf2_sha256$...",
+      "email": "user4@example.com",
+      "nickname": "배고픈 케이크 971",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 5,
+    "fields": {
+      "username": "user5",
+      "password": "pbkdf2_sha256$...",
+      "email": "user5@example.com",
+      "nickname": "바삭한 크로와상 42",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 6,
+    "fields": {
+      "username": "user6",
+      "password": "pbkdf2_sha256$...",
+      "email": "user6@example.com",
+      "nickname": "빵지순례하는 바게트 471",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 7,
+    "fields": {
+      "username": "user7",
+      "password": "pbkdf2_sha256$...",
+      "email": "user7@example.com",
+      "nickname": "빵냄새맡는 마카롱 158",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 8,
+    "fields": {
+      "username": "user8",
+      "password": "pbkdf2_sha256$...",
+      "email": "user8@example.com",
+      "nickname": "다이어트실패한 곰돌이 179",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 9,
+    "fields": {
+      "username": "user9",
+      "password": "pbkdf2_sha256$...",
+      "email": "user9@example.com",
+      "nickname": "쫄깃한 밀가루요정 90",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 10,
+    "fields": {
+      "username": "user10",
+      "password": "pbkdf2_sha256$...",
+      "email": "user10@example.com",
+      "nickname": "바삭한 케이크 285",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 11,
+    "fields": {
+      "username": "user11",
+      "password": "pbkdf2_sha256$...",
+      "email": "user11@example.com",
+      "nickname": "탄수화물중독 케이크 184",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 12,
+    "fields": {
+      "username": "user12",
+      "password": "pbkdf2_sha256$...",
+      "email": "user12@example.com",
+      "nickname": "커피와함께 케이크 749",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 13,
+    "fields": {
+      "username": "user13",
+      "password": "pbkdf2_sha256$...",
+      "email": "user13@example.com",
+      "nickname": "우유에찍먹하는 베이글 85",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 14,
+    "fields": {
+      "username": "user14",
+      "password": "pbkdf2_sha256$...",
+      "email": "user14@example.com",
+      "nickname": "다이어트실패한 마카롱 127",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 15,
+    "fields": {
+      "username": "user15",
+      "password": "pbkdf2_sha256$...",
+      "email": "user15@example.com",
+      "nickname": "빵지순례하는 쩝쩝박사 950",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 16,
+    "fields": {
+      "username": "user16",
+      "password": "pbkdf2_sha256$...",
+      "email": "user16@example.com",
+      "nickname": "우유에찍먹하는 스콘 152",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 17,
+    "fields": {
+      "username": "user17",
+      "password": "pbkdf2_sha256$...",
+      "email": "user17@example.com",
+      "nickname": "바삭한 빵돌이 750",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 18,
+    "fields": {
+      "username": "user18",
+      "password": "pbkdf2_sha256$...",
+      "email": "user18@example.com",
+      "nickname": "입터진 미식가 732",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 19,
+    "fields": {
+      "username": "user19",
+      "password": "pbkdf2_sha256$...",
+      "email": "user19@example.com",
+      "nickname": "바삭한 미식가 305",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 20,
+    "fields": {
+      "username": "user20",
+      "password": "pbkdf2_sha256$...",
+      "email": "user20@example.com",
+      "nickname": "배고픈 빵돌이 931",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 21,
+    "fields": {
+      "username": "user21",
+      "password": "pbkdf2_sha256$...",
+      "email": "user21@example.com",
+      "nickname": "크림가득한 스콘 294",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 22,
+    "fields": {
+      "username": "user22",
+      "password": "pbkdf2_sha256$...",
+      "email": "user22@example.com",
+      "nickname": "달콤한 단팥빵 281",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 23,
+    "fields": {
+      "username": "user23",
+      "password": "pbkdf2_sha256$...",
+      "email": "user23@example.com",
+      "nickname": "다이어트실패한 토끼 125",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 24,
+    "fields": {
+      "username": "user24",
+      "password": "pbkdf2_sha256$...",
+      "email": "user24@example.com",
+      "nickname": "빵냄새맡는 스콘 454",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 25,
+    "fields": {
+      "username": "user25",
+      "password": "pbkdf2_sha256$...",
+      "email": "user25@example.com",
+      "nickname": "소화잘되는 빵돌이 831",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 26,
+    "fields": {
+      "username": "user26",
+      "password": "pbkdf2_sha256$...",
+      "email": "user26@example.com",
+      "nickname": "우유에찍먹하는 쩝쩝박사 22",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 27,
+    "fields": {
+      "username": "user27",
+      "password": "pbkdf2_sha256$...",
+      "email": "user27@example.com",
+      "nickname": "탄수화물중독 요정 822",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 28,
+    "fields": {
+      "username": "user28",
+      "password": "pbkdf2_sha256$...",
+      "email": "user28@example.com",
+      "nickname": "갓구운 빵순이 922",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 29,
+    "fields": {
+      "username": "user29",
+      "password": "pbkdf2_sha256$...",
+      "email": "user29@example.com",
+      "nickname": "갓구운 밀가루요정 998",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 30,
+    "fields": {
+      "username": "user30",
+      "password": "pbkdf2_sha256$...",
+      "email": "user30@example.com",
+      "nickname": "바삭한 미식가 556",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 31,
+    "fields": {
+      "username": "user31",
+      "password": "pbkdf2_sha256$...",
+      "email": "user31@example.com",
+      "nickname": "소화잘되는 제빵왕 67",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 32,
+    "fields": {
+      "username": "user32",
+      "password": "pbkdf2_sha256$...",
+      "email": "user32@example.com",
+      "nickname": "앙버터좋아하는 밀가루요정 320",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 33,
+    "fields": {
+      "username": "user33",
+      "password": "pbkdf2_sha256$...",
+      "email": "user33@example.com",
+      "nickname": "우유에찍먹하는 빵순이 977",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 34,
+    "fields": {
+      "username": "user34",
+      "password": "pbkdf2_sha256$...",
+      "email": "user34@example.com",
+      "nickname": "새벽에일어난 식빵맨 578",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 35,
+    "fields": {
+      "username": "user35",
+      "password": "pbkdf2_sha256$...",
+      "email": "user35@example.com",
+      "nickname": "당충전하는 케이크 146",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 36,
+    "fields": {
+      "username": "user36",
+      "password": "pbkdf2_sha256$...",
+      "email": "user36@example.com",
+      "nickname": "앙버터좋아하는 식빵맨 732",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 37,
+    "fields": {
+      "username": "user37",
+      "password": "pbkdf2_sha256$...",
+      "email": "user37@example.com",
+      "nickname": "행복한 쩝쩝박사 249",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 38,
+    "fields": {
+      "username": "user38",
+      "password": "pbkdf2_sha256$...",
+      "email": "user38@example.com",
+      "nickname": "크림가득한 케이크 395",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 39,
+    "fields": {
+      "username": "user39",
+      "password": "pbkdf2_sha256$...",
+      "email": "user39@example.com",
+      "nickname": "빵냄새맡는 단팥빵 771",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 40,
+    "fields": {
+      "username": "user40",
+      "password": "pbkdf2_sha256$...",
+      "email": "user40@example.com",
+      "nickname": "크림가득한 바게트 274",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 41,
+    "fields": {
+      "username": "user41",
+      "password": "pbkdf2_sha256$...",
+      "email": "user41@example.com",
+      "nickname": "커피와함께 빵순이 658",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 42,
+    "fields": {
+      "username": "user42",
+      "password": "pbkdf2_sha256$...",
+      "email": "user42@example.com",
+      "nickname": "행복한 식빵맨 512",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 43,
+    "fields": {
+      "username": "user43",
+      "password": "pbkdf2_sha256$...",
+      "email": "user43@example.com",
+      "nickname": "쫄깃한 쩝쩝박사 272",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 44,
+    "fields": {
+      "username": "user44",
+      "password": "pbkdf2_sha256$...",
+      "email": "user44@example.com",
+      "nickname": "줄서서기다린 탐험가 951",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 45,
+    "fields": {
+      "username": "user45",
+      "password": "pbkdf2_sha256$...",
+      "email": "user45@example.com",
+      "nickname": "크림가득한 마카롱 328",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 46,
+    "fields": {
+      "username": "user46",
+      "password": "pbkdf2_sha256$...",
+      "email": "user46@example.com",
+      "nickname": "갓구운 밀가루요정 719",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 47,
+    "fields": {
+      "username": "user47",
+      "password": "pbkdf2_sha256$...",
+      "email": "user47@example.com",
+      "nickname": "촉촉한 요정 564",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 48,
+    "fields": {
+      "username": "user48",
+      "password": "pbkdf2_sha256$...",
+      "email": "user48@example.com",
+      "nickname": "촉촉한 토끼 840",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 49,
+    "fields": {
+      "username": "user49",
+      "password": "pbkdf2_sha256$...",
+      "email": "user49@example.com",
+      "nickname": "새벽에일어난 빵순이 629",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 50,
+    "fields": {
+      "username": "user50",
+      "password": "pbkdf2_sha256$...",
+      "email": "user50@example.com",
+      "nickname": "배고픈 제빵왕 254",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 51,
+    "fields": {
+      "username": "user51",
+      "password": "pbkdf2_sha256$...",
+      "email": "user51@example.com",
+      "nickname": "달콤한 바게트 167",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 52,
+    "fields": {
+      "username": "user52",
+      "password": "pbkdf2_sha256$...",
+      "email": "user52@example.com",
+      "nickname": "빵냄새맡는 곰돌이 259",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 53,
+    "fields": {
+      "username": "user53",
+      "password": "pbkdf2_sha256$...",
+      "email": "user53@example.com",
+      "nickname": "갓구운 요정 960",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 54,
+    "fields": {
+      "username": "user54",
+      "password": "pbkdf2_sha256$...",
+      "email": "user54@example.com",
+      "nickname": "빵지순례하는 곰돌이 948",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 55,
+    "fields": {
+      "username": "user55",
+      "password": "pbkdf2_sha256$...",
+      "email": "user55@example.com",
+      "nickname": "입터진 스콘 704",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 56,
+    "fields": {
+      "username": "user56",
+      "password": "pbkdf2_sha256$...",
+      "email": "user56@example.com",
+      "nickname": "크림가득한 소금빵 376",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 57,
+    "fields": {
+      "username": "user57",
+      "password": "pbkdf2_sha256$...",
+      "email": "user57@example.com",
+      "nickname": "앙버터좋아하는 베이글 150",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 58,
+    "fields": {
+      "username": "user58",
+      "password": "pbkdf2_sha256$...",
+      "email": "user58@example.com",
+      "nickname": "소화잘되는 요정 867",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 59,
+    "fields": {
+      "username": "user59",
+      "password": "pbkdf2_sha256$...",
+      "email": "user59@example.com",
+      "nickname": "빵지순례하는 쩝쩝박사 776",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 60,
+    "fields": {
+      "username": "user60",
+      "password": "pbkdf2_sha256$...",
+      "email": "user60@example.com",
+      "nickname": "소화잘되는 미식가 703",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 61,
+    "fields": {
+      "username": "user61",
+      "password": "pbkdf2_sha256$...",
+      "email": "user61@example.com",
+      "nickname": "다이어트실패한 스콘 206",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 62,
+    "fields": {
+      "username": "user62",
+      "password": "pbkdf2_sha256$...",
+      "email": "user62@example.com",
+      "nickname": "다이어트실패한 소금빵 23",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 63,
+    "fields": {
+      "username": "user63",
+      "password": "pbkdf2_sha256$...",
+      "email": "user63@example.com",
+      "nickname": "바삭한 탐험가 332",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 64,
+    "fields": {
+      "username": "user64",
+      "password": "pbkdf2_sha256$...",
+      "email": "user64@example.com",
+      "nickname": "줄서서기다린 탐험가 198",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 65,
+    "fields": {
+      "username": "user65",
+      "password": "pbkdf2_sha256$...",
+      "email": "user65@example.com",
+      "nickname": "다이어트실패한 베이글 911",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 66,
+    "fields": {
+      "username": "user66",
+      "password": "pbkdf2_sha256$...",
+      "email": "user66@example.com",
+      "nickname": "갓구운 요정 396",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 67,
+    "fields": {
+      "username": "user67",
+      "password": "pbkdf2_sha256$...",
+      "email": "user67@example.com",
+      "nickname": "앙버터좋아하는 베이글 736",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 68,
+    "fields": {
+      "username": "user68",
+      "password": "pbkdf2_sha256$...",
+      "email": "user68@example.com",
+      "nickname": "바삭한 케이크 159",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 69,
+    "fields": {
+      "username": "user69",
+      "password": "pbkdf2_sha256$...",
+      "email": "user69@example.com",
+      "nickname": "갓구운 미식가 153",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 70,
+    "fields": {
+      "username": "user70",
+      "password": "pbkdf2_sha256$...",
+      "email": "user70@example.com",
+      "nickname": "배고픈 베이글 590",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 71,
+    "fields": {
+      "username": "user71",
+      "password": "pbkdf2_sha256$...",
+      "email": "user71@example.com",
+      "nickname": "우유에찍먹하는 소금빵 315",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 72,
+    "fields": {
+      "username": "user72",
+      "password": "pbkdf2_sha256$...",
+      "email": "user72@example.com",
+      "nickname": "촉촉한 케이크 543",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 73,
+    "fields": {
+      "username": "user73",
+      "password": "pbkdf2_sha256$...",
+      "email": "user73@example.com",
+      "nickname": "앙버터좋아하는 케이크 164",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 74,
+    "fields": {
+      "username": "user74",
+      "password": "pbkdf2_sha256$...",
+      "email": "user74@example.com",
+      "nickname": "행복한 탐험가 107",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 75,
+    "fields": {
+      "username": "user75",
+      "password": "pbkdf2_sha256$...",
+      "email": "user75@example.com",
+      "nickname": "달콤한 쩝쩝박사 826",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 76,
+    "fields": {
+      "username": "user76",
+      "password": "pbkdf2_sha256$...",
+      "email": "user76@example.com",
+      "nickname": "다이어트실패한 미식가 755",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 77,
+    "fields": {
+      "username": "user77",
+      "password": "pbkdf2_sha256$...",
+      "email": "user77@example.com",
+      "nickname": "소화잘되는 토끼 157",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 78,
+    "fields": {
+      "username": "user78",
+      "password": "pbkdf2_sha256$...",
+      "email": "user78@example.com",
+      "nickname": "당충전하는 토끼 994",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 79,
+    "fields": {
+      "username": "user79",
+      "password": "pbkdf2_sha256$...",
+      "email": "user79@example.com",
+      "nickname": "크림가득한 케이크 706",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 80,
+    "fields": {
+      "username": "user80",
+      "password": "pbkdf2_sha256$...",
+      "email": "user80@example.com",
+      "nickname": "촉촉한 미식가 687",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 81,
+    "fields": {
+      "username": "user81",
+      "password": "pbkdf2_sha256$...",
+      "email": "user81@example.com",
+      "nickname": "줄서서기다린 밀가루요정 602",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 82,
+    "fields": {
+      "username": "user82",
+      "password": "pbkdf2_sha256$...",
+      "email": "user82@example.com",
+      "nickname": "크림가득한 미식가 462",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 83,
+    "fields": {
+      "username": "user83",
+      "password": "pbkdf2_sha256$...",
+      "email": "user83@example.com",
+      "nickname": "배고픈 요정 415",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 84,
+    "fields": {
+      "username": "user84",
+      "password": "pbkdf2_sha256$...",
+      "email": "user84@example.com",
+      "nickname": "탄수화물중독 스콘 10",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 85,
+    "fields": {
+      "username": "user85",
+      "password": "pbkdf2_sha256$...",
+      "email": "user85@example.com",
+      "nickname": "입터진 소금빵 69",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 86,
+    "fields": {
+      "username": "user86",
+      "password": "pbkdf2_sha256$...",
+      "email": "user86@example.com",
+      "nickname": "달콤한 바게트 480",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 87,
+    "fields": {
+      "username": "user87",
+      "password": "pbkdf2_sha256$...",
+      "email": "user87@example.com",
+      "nickname": "배고픈 토끼 108",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 88,
+    "fields": {
+      "username": "user88",
+      "password": "pbkdf2_sha256$...",
+      "email": "user88@example.com",
+      "nickname": "우유에찍먹하는 케이크 749",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 89,
+    "fields": {
+      "username": "user89",
+      "password": "pbkdf2_sha256$...",
+      "email": "user89@example.com",
+      "nickname": "당충전하는 식빵맨 248",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 90,
+    "fields": {
+      "username": "user90",
+      "password": "pbkdf2_sha256$...",
+      "email": "user90@example.com",
+      "nickname": "앙버터좋아하는 스콘 198",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 91,
+    "fields": {
+      "username": "user91",
+      "password": "pbkdf2_sha256$...",
+      "email": "user91@example.com",
+      "nickname": "줄서서기다린 탐험가 143",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 92,
+    "fields": {
+      "username": "user92",
+      "password": "pbkdf2_sha256$...",
+      "email": "user92@example.com",
+      "nickname": "행복한 탐험가 407",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 93,
+    "fields": {
+      "username": "user93",
+      "password": "pbkdf2_sha256$...",
+      "email": "user93@example.com",
+      "nickname": "촉촉한 베이글 624",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 94,
+    "fields": {
+      "username": "user94",
+      "password": "pbkdf2_sha256$...",
+      "email": "user94@example.com",
+      "nickname": "당충전하는 밀가루요정 254",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 95,
+    "fields": {
+      "username": "user95",
+      "password": "pbkdf2_sha256$...",
+      "email": "user95@example.com",
+      "nickname": "소화잘되는 단팥빵 429",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 96,
+    "fields": {
+      "username": "user96",
+      "password": "pbkdf2_sha256$...",
+      "email": "user96@example.com",
+      "nickname": "갓구운 빵돌이 447",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 97,
+    "fields": {
+      "username": "user97",
+      "password": "pbkdf2_sha256$...",
+      "email": "user97@example.com",
+      "nickname": "행복한 탐험가 215",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 98,
+    "fields": {
+      "username": "user98",
+      "password": "pbkdf2_sha256$...",
+      "email": "user98@example.com",
+      "nickname": "새벽에일어난 케이크 330",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 99,
+    "fields": {
+      "username": "user99",
+      "password": "pbkdf2_sha256$...",
+      "email": "user99@example.com",
+      "nickname": "쫄깃한 탐험가 412",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 100,
+    "fields": {
+      "username": "user100",
+      "password": "pbkdf2_sha256$...",
+      "email": "user100@example.com",
+      "nickname": "갓구운 쩝쩝박사 684",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2025-12-23T16:56:57Z"
+    }
+  }
+]

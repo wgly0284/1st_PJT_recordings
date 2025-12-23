@@ -34,9 +34,7 @@ class Review(models.Model):
     )
 
     class Meta:
-        # 한 사용자는 가게 하나당 하나의 리뷰만 작성 가능
-        # (store가 null인 경우에는 여러 개 작성 가능)
-        unique_together = ('user', 'store')
+        # ✅ 중복 리뷰 작성 허용 (unique_together 제거)
         # 최신순으로 정렬
         ordering = ['-created_at']
 

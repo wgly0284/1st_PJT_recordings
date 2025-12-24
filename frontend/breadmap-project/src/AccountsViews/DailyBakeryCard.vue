@@ -24,8 +24,13 @@ const fetchDailyRecommendation = async () => {
     const res = await apiClient.get('/stores/daily-recommendation/')
     recommendation.value = res.data
   } catch (e) {
-    // 아직 백엔드가 없거나 추천 데이터가 없으면 조용히 실패 (화면에 안 그림)
-    console.log('추천 로드 대기 중...')
+    // 404 또는 다른 에러가 발생하면 조용히 실패 (화면에 안 그림)
+    if (e.response?.status === 404) {
+      console.log('ℹ️ daily-recommendation 엔드포인트가 아직 구현되지 않았습니다.')
+    } else {
+      console.log('ℹ️ AI 추천 로드 실패:', e.message)
+    }
+    recommendation.value = null
   } finally {
     isLoading.value = false
   }
@@ -90,8 +95,8 @@ onMounted(() => {
           {{ recommendation.description || '회원님의 빵 취향을 분석하여 AI가 선정한 오늘의 추천 빵집입니다. 따뜻한 빵 냄새와 함께 행복한 하루 보내세요!' }}
         </p>
 
-        <button 
-          @click="$router.push({ name: 'map', query: { store_id: recommendation.id } })" 
+        <button
+          @click="router.push({ name: 'detail', params: { id: recommendation.id } })"
           class="self-start px-8 py-3 bg-[#5D4037] text-white rounded-2xl font-bold hover:bg-[#4E342E] transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center gap-2 group/btn"
         >
           <span>보러 가기</span>

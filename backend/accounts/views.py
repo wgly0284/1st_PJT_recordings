@@ -88,6 +88,13 @@ class UserProfileView(APIView):
                 print(f"visited_stores 에러: {e}")
                 visited_stores = []
 
+            # 1-2. 📌 북마크한 빵집 목록
+            try:
+                bookmarked_stores = list(user.bookmarked_stores.all().values('id', 'name', 'location', 'image_url'))
+            except Exception as e:
+                print(f"bookmarked_stores 에러: {e}")
+                bookmarked_stores = []
+
             # 2. 🔮 취향 분석 데이터: 내가 쓴 리뷰들의 taste_tags 집계
             all_tags = []
             try:
@@ -178,11 +185,13 @@ class UserProfileView(APIView):
                 "follower_count": follower_count,
                 "following_count": following_count,
                 "visited_stores": list(visited_stores),
+                "bookmarked_stores": bookmarked_stores,
                 "taste_stats": sorted_taste,
                 "badges": badges,
                 "user_reviews": user_reviews,
                 "user_posts": user_posts,
                 "user_comments": user_comments,
+                "date_joined": user.date_joined.isoformat() if hasattr(user, 'date_joined') else None,
             }, status=status.HTTP_200_OK)
         except Exception as e:
             print(f"UserProfileView 전체 에러: {e}")
@@ -246,9 +255,11 @@ def followers_list(request):
     followers = request.user.followers.all()
     followers_data = [{
         'id': user.id,
+        'username': user.username,
         'nickname': user.nickname,
         'profile_image_url': user.profile_image_url,
         'level': user.level,
+        'level_title': user.level_title,
         'character_type': user.character_type,
     } for user in followers]
 
@@ -266,9 +277,11 @@ def following_list(request):
     following = request.user.follows.all()
     following_data = [{
         'id': user.id,
+        'username': user.username,
         'nickname': user.nickname,
         'profile_image_url': user.profile_image_url,
         'level': user.level,
+        'level_title': user.level_title,
         'character_type': user.character_type,
     } for user in following]
 

@@ -2,7 +2,7 @@
   <main class="flex-grow bg-gradient-to-b from-[#FFF9F0] to-[#E6F4D7] overflow-hidden">
     <!-- 1. Hero Section -->
     <section class="relative min-h-screen flex flex-col justify-center items-center pt-24 pb-24">
-      <!-- 수채화 배경 얼룩 (위치와 투명도 미세 조정) -->
+      <!-- 수채화 배경 얼룩 -->
       <div
         class="absolute top-0 right-0 w-[600px] h-[600px]
                bg-[#F3B37A]/15 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/4"
@@ -12,48 +12,53 @@
                bg-[#9AC89A]/15 rounded-full blur-3xl -z-10 -translate-x-1/3 translate-y-1/4"
       ></div>
 
-      <!-- 메인 컨텐츠 영역 (수직 정렬로 변경) -->
-      <div class="max-w-[1000px] mx-auto px-6 w-full flex flex-col items-center gap-8 relative z-10 text-center">
+      <!-- 메인 컨텐츠 영역 -->
+      <div class="w-full px-4 md:px-8 flex flex-col items-center gap-10 relative z-10 text-center">
         
-        <!-- 1. 이미지 (중앙 배치 & 배경과 자연스럽게) -->
-        <div class="relative w-full max-w-lg aspect-square sm:aspect-[4/3] flex items-center justify-center -mb-8 sm:-mb-12">
-          <!-- 뒤쪽 은은한 광채 효과 -->
-          <div class="absolute inset-10 bg-gradient-to-tr from-orange-100/60 to-yellow-100/60 rounded-full blur-[60px]"></div>
+        <!-- 2. 이미지 영역 (진열대) -->
+        <!-- 크기 축소: max-w-6xl 적용 / 녹아드는 효과 추가 -->
+        <div class="relative w-full max-w-6xl flex items-center justify-center -mb-8 sm:-mb-12 mt-4">
+          <!-- 뒤쪽 광채 효과 (은은하게 조정) -->
+          <div class="absolute inset-x-20 inset-y-24 bg-gradient-to-r from-orange-100/40 via-yellow-100/40 to-orange-100/40 rounded-full blur-[60px]"></div>
           
-          <!-- 메인 이미지 -->
+          <!-- 메인 이미지 (진열대) -->
+          <!-- 애니메이션 제거, 하단 마스킹 처리로 자연스럽게 합성 -->
           <img
-            :src="mainImage"
-            class="relative w-full h-full object-contain drop-shadow-lg hover:scale-105 transition-transform duration-700 z-10"
-            alt="Breadtopia Main"
+            :src="shelfImage"
+            class="relative w-full h-auto object-contain drop-shadow-md z-10 opacity-95"
+            style="-webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%); mask-image: linear-gradient(to bottom, black 60%, transparent 100%);"
+            alt="Breadtopia Shelf"
           />
 
-          <!-- 장식 스티커 (위치 재조정) -->
+          <!-- 장식 스티커 (애니메이션 제거, 정적 배치, 위치 미세 조정) -->
+          <!-- 오른쪽 상단 -->
           <div
-            class="absolute top-[10%] right-[5%] bg-white/90 px-4 py-2 rounded-2xl
-                   shadow-[0_4px_12px_rgba(0,0,0,0.05)] rotate-12 animate-pulse
+            class="absolute top-[10%] right-[10%] md:right-[15%] bg-white/90 px-5 py-3 rounded-2xl
+                   shadow-[0_4px_12px_rgba(0,0,0,0.05)]
                    flex items-center gap-2 z-20"
           >
-            <span class="text-2xl">🐶</span>
-            <span class="text-xs font-jua text-[#6B4A38] text-left">
+            <span class="text-3xl">🐶</span>
+            <span class="text-sm font-jua text-[#6B4A38] text-left leading-tight">
               바게트코기의<br />최애 빵집
             </span>
           </div>
 
+          <!-- 왼쪽 하단 -->
           <div
-            class="absolute bottom-[15%] left-[5%] bg-white/90 px-4 py-2 rounded-2xl
-                   shadow-[0_4px_12px_rgba(0,0,0,0.05)] -rotate-6
+            class="absolute bottom-[25%] left-[5%] md:left-[15%] bg-white/90 px-5 py-3 rounded-2xl
+                   shadow-[0_4px_12px_rgba(0,0,0,0.05)]
                    flex items-center gap-2 z-20"
           >
-            <span class="text-2xl">🐻</span>
-            <div class="text-xs font-jua text-[#6B4A38] text-left">
+            <span class="text-3xl">🐻</span>
+            <div class="text-sm font-jua text-[#6B4A38] text-left leading-tight">
               <p>곰 셰프 추천</p>
               <p class="text-[#C99768]">소금빵 맛집</p>
             </div>
           </div>
         </div>
 
-        <!-- 2. 텍스트 (이미지 아래로 이동) -->
-        <div class="space-y-6 flex flex-col items-center relative z-20">
+        <!-- 3. 텍스트 및 버튼 -->
+        <div class="space-y-6 flex flex-col items-center relative z-20 mt-[-2rem]">
           <div
             class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm border border-[#F3B37A]/30
                    px-5 py-2 rounded-full shadow-sm"
@@ -79,9 +84,8 @@
             class="text-lg md:text-xl text-[#8B6A55] font-jua leading-relaxed
                    max-w-lg opacity-90"
           >
-            바구니 속 강아지 빵처럼, 동글동글 귀여운 빵집들을
-            <br />
-            지도 위에서 하나씩 찾아보세요. 🐶🍞
+            진열대에 가득 찬 갓 구운 빵들처럼,<br />
+            동글동글 귀여운 빵집들을 지도 위에서 찾아보세요. 🐶🍞
           </p>
 
           <div class="flex flex-col sm:flex-row gap-4 pt-4 font-jua w-full justify-center">
@@ -109,7 +113,7 @@
         </div>
 
         <!-- 검색바 -->
-        <div class="w-full max-w-xl mt-8 relative z-30">
+        <div class="w-full max-w-xl mt-4 relative z-30">
           <div class="bg-white/90 backdrop-blur p-2 rounded-full shadow-[0_8px_24px_rgba(201,151,104,0.25)] flex items-center gap-3 border-4 border-[#FFF3DD]/80 hover:border-[#F3B37A]/50 transition-all duration-300">
             <div class="pl-5 text-[#C99768]">
               <Search class="w-6 h-6" />
@@ -151,34 +155,46 @@
       <div class="absolute top-10 right-10 w-64 h-64 bg-orange-100 rounded-full opacity-20 blur-3xl"></div>
       <div class="absolute bottom-10 left-10 w-72 h-72 bg-teal-100 rounded-full opacity-20 blur-3xl"></div>
 
-      <div class="max-w-6xl mx-auto px-6 relative z-10">
+      <div class="max-w-[1400px] mx-auto px-6 relative z-10">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-bold text-[#1D4E45] mb-3 font-jua">
             어디로 갈까요? 🗺️
           </h2>
-          <p class="text-gray-600">지역을 선택하면 근처 빵집을 추천해드려요</p>
+          <p class="text-gray-600 font-jua">지역을 선택하면 근처 빵집을 추천해드려요</p>
         </div>
 
         <!-- 지역 그리드 -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="grid grid-cols-4 md:grid-cols-8 gap-4">
           <button
             v-for="region in regions"
             :key="region.id"
             @click="goToRegion(region.id)"
-            class="group relative bg-gradient-to-br from-white to-orange-50 p-8 rounded-3xl border-2 border-orange-100 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-3 transition-all duration-300"
+            class="group relative p-6 hover:scale-110 hover:-translate-y-2 transition-all duration-300 active:scale-95"
           >
-            <!-- 발자국/빵 아이콘 -->
-            <div class="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">
-              {{ region.icon }}
+            <!-- 발바닥 SVG 배경 -->
+            <div class="absolute inset-0 overflow-visible">
+              <svg class="w-full h-full" viewBox="0 0 100 120" preserveAspectRatio="xMidYMid meet">
+                <ellipse cx="50" cy="70" rx="28" ry="24"
+                         class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300 drop-shadow-lg"/>
+                <ellipse cx="22" cy="35" rx="13" ry="16"
+                         class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300 drop-shadow-lg"/>
+                <ellipse cx="50" cy="28" rx="13" ry="17"
+                         class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300 drop-shadow-lg"/>
+                <ellipse cx="78" cy="35" rx="13" ry="16"
+                         class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300 drop-shadow-lg"/>
+                <ellipse cx="74" cy="58" rx="11" ry="14"
+                         class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300 drop-shadow-lg"/>
+              </svg>
             </div>
-            <h3 class="text-xl font-bold text-[#1D4E45] group-hover:text-orange-600 transition-colors font-jua">
-              {{ region.name }}
-            </h3>
-            <p class="text-sm text-gray-500 mt-1">{{ region.count }}개의 빵집</p>
 
-            <!-- 호버 화살표 -->
-            <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-              <ArrowRight class="w-5 h-5 text-orange-500" />
+            <!-- 콘텐츠 -->
+            <div class="relative z-10 pt-2">
+              <div class="text-4xl mb-1 transform group-hover:scale-125 transition-transform duration-300">
+                {{ region.icon }}
+              </div>
+              <h3 class="text-sm font-jua text-[#6B4A38] group-hover:text-orange-600 transition-colors">
+                {{ region.name }}
+              </h3>
             </div>
           </button>
         </div>
@@ -204,41 +220,44 @@
       <div class="max-w-[1200px] mx-auto px-6 relative z-10">
         <div class="text-center mb-16">
           <span
-            class="inline-flex items-center gap-1 text-[#C99768] tracking-widest text-sm
-                   bg-[#FFF3DD] px-4 py-1 rounded-full font-jua"
+            class="inline-flex items-center gap-2 text-[#C99768] tracking-wide text-base
+                   bg-[#FFF3DD] px-6 py-2 rounded-full font-jua shadow-md border-2 border-[#FFE8CC]"
           >
             <span>🍞</span>
             <span>Weekly Pick</span>
           </span>
 
-          <h2 class="text-3xl md:text-5xl font-jua text-[#6B4A38] mt-4">
+          <h2 class="text-4xl md:text-5xl font-jua text-[#6B4A38] mt-6 leading-relaxed">
             이번 주
-            <span class="text-[#C99768] underline decoration-wavy decoration-[#F3B37A]">
-              빵지순례 코스
+            <span class="text-[#C99768] relative inline-block">
+              <span class="relative z-10">빵지순례 코스</span>
+              <span class="absolute bottom-1 left-0 w-full h-3 bg-[#F3B37A]/30 -rotate-1"></span>
             </span>
             모음
           </h2>
-          <p class="mt-3 text-[#8B6A55] font-jua">
-            바구니에 쏙 담고 싶은 따뜻한 동네 빵집들을 모았어요. 🧺
+          <p class="mt-4 text-lg text-[#8B6A55] font-jua">
+            바구니에 쏙 담고 싶은 따뜻한 동네 빵집들을 모았어요 🧺
           </p>
         </div>
 
-        <BakeryGrid :bakeries="bakeries" @open-detail="openDetail" />
+        <BakeryGrid :bakeries="bakeries" @open-detail="openDetail" class="font-jua" />
 
         <div class="text-center mt-24">
           <button
-            class="inline-flex items-center gap-2 text-[#6B4A38] text-lg font-jua
-                   hover:text-[#C99768] transition-colors border-b-2 border-transparent
-                   hover:border-[#C99768] pb-1"
+            @click="$router.push('/map')"
+            class="group inline-flex items-center gap-3 px-8 py-3 bg-[#FFF3DD] border-2 border-[#F3B37A] rounded-3xl
+                   text-[#8B6A55] text-xl font-jua
+                   shadow-[0_4px_0_#F3B37A] hover:shadow-[0_2px_0_#F3B37A]
+                   hover:translate-y-[2px] transition-all duration-200"
           >
-            더 많은 빵집 보러가기
-            <ArrowRight class="w-5 h-5" />
+            <span>다른 빵집도 구경갈래요!</span>
+            <ArrowRight class="w-6 h-6 group-hover:translate-x-1 transition-transform text-[#C99768]" />
           </button>
         </div>
       </div>
     </section>
 
-    <!-- 3. Featured Section -->
+    <!-- 3. Featured Section (랜덤 마스코트 이미지 적용) -->
     <section class="py-32 bg-[#E6F4D7]/90 relative overflow-hidden">
       <div class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40">
         <div class="absolute top-10 left-10 w-32 h-12 bg-white/70 rounded-full blur-xl"></div>
@@ -247,7 +266,7 @@
 
       <div class="max-w-[1200px] mx-auto px-6 relative z-10">
         <div class="flex flex-col md:flex-row items-center gap-16">
-          <!-- 이미지 -->
+          <!-- 이미지 영역 -->
           <div class="md:w-1/2 w-full relative">
             <div
               class="relative z-10 transform hover:scale-105 transition-transform duration-500 cursor-pointer"
@@ -255,12 +274,14 @@
               <div
                 class="absolute -inset-4 bg-[#F3B37A]/26 rounded-[2.5rem] blur-2xl"
               ></div>
+              
+              <!-- 랜덤 이미지 바인딩 (:src="randomMascot") -->
               <img
-                src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?q=80&w=900&auto=format&fit=crop"
+                :src="randomMascot"
                 class="relative rounded-[2rem]
                        shadow-[0_20px_50px_-12px_rgba(201,151,104,0.35)]
                        border-8 border-[#FFF3DD] w-full object-cover h-[380px]"
-                alt="featured bakery"
+                alt="Random Mascot Character"
               />
 
               <div
@@ -270,7 +291,7 @@
               >
                 <span class="text-2xl">🐻</span>
                 <span class="text-base text-[#6B4A38] font-jua">
-                  이달의 추천 빵집이에요!
+                  같이 성장해봐요!
                 </span>
               </div>
             </div>
@@ -323,14 +344,22 @@ import DailyBakeryCard from '@/AccountsViews/DailyBakeryCard.vue'
 import { ArrowRight, ArrowDown, PawPrint, Search } from 'lucide-vue-next'
 import axios from 'axios'
 
-// Assets Import (확장자 .png 사용)
-import mainImage from '@/assets/images/메인화면.png'
+// Assets Import
+import shelfImage from '@/assets/images/진열대.png'
+
+// --- 랜덤 마스코트 이미지 로직 ---
+const mascotImagesGlob = import.meta.glob('@/assets/mascot/*.{png,jpg,jpeg,svg}', {
+  eager: true,
+  import: 'default'
+})
+
+const randomMascot = ref('')
 
 const router = useRouter()
 const searchQuery = ref('')
 const bakeries = ref([])
 
-// 지역 데이터 (부산광역시 기준)
+// 지역 데이터
 const regions = ref([
   { id: 'sasang', name: '사상구', searchKeyword: '사상', icon: '🥖', count: '200+' },
   { id: 'busanjin', name: '부산진구', searchKeyword: '부산진', icon: '🥐', count: '800+' },
@@ -342,7 +371,6 @@ const regions = ref([
   { id: 'nam', name: '남구', searchKeyword: '남구', icon: '🎂', count: '100+' }
 ])
 
-// 실제 데이터 로드 (Weekly Pick용)
 const fetchBakeries = async () => {
   try {
     const response = await axios.get('http://127.0.0.1:8000/stores/weekly-pick/')
@@ -362,7 +390,7 @@ const fetchBakeries = async () => {
 }
 
 const openDetail = bakery => {
-  router.push({ name: 'map', query: { store_id: bakery.id } })
+  router.push({ name: 'detail', params: { id: bakery.id } })
 }
 
 const handleSearch = () => {
@@ -384,6 +412,14 @@ const scrollToContent = () => {
 
 onMounted(() => {
   fetchBakeries()
+
+  const imagesArray = Object.values(mascotImagesGlob)
+  if (imagesArray.length > 0) {
+    const randomIndex = Math.floor(Math.random() * imagesArray.length)
+    randomMascot.value = imagesArray[randomIndex]
+  } else {
+    randomMascot.value = 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?q=80&w=900&auto=format&fit=crop'
+  }
 })
 </script>
 

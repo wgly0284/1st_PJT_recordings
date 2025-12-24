@@ -2,7 +2,7 @@ import os
 import json
 import traceback
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from dotenv import load_dotenv
 
 # .env 파일 로드 (manage.py가 있는 루트 경로에 .env가 있어야 함)
@@ -107,3 +107,48 @@ def generate_store_summary(store_name, reviews_list):
             "summary": "현재 AI 서버 연결에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.",
             "keywords": ["데이터분석", "오류발생"]
         }
+    
+def generate_chat_response(messages):
+    """
+    프론트엔드에서 받은 대화 목록(messages)을 그대로 AI에게 전달하고 응답을 받습니다.
+    messages 예시: [{'role': 'user', 'content': '안녕'}, {'role': 'assistant', 'content': '반가워요'}]
+    """
+    print(f"💬 [챗봇 요청] 메시지 개수: {len(messages)}")
+
+    # 1. API 키 검증
+    api_key = os.getenv("GMS_KEY")
+    if not api_key:
+        return "죄송합니다. 서버 설정 오류(API Key)로 인해 답변할 수 없습니다."
+
+    try:
+        # 2. LangChain ChatOpenAI 설정
+        chat = ChatOpenAI(
+            model="gpt-4o",
+            api_key=api_key,
+            base_url="https://gms.ssafy.io/gmsapi/api.openai.com/v1",
+            temperature=0.7  # 창의적인 답변을 위해 약간 높임
+        )
+
+        # 3. 메시지 변환 (JSON -> LangChain Message 객체)
+        langchain_messages = []
+        for msg in messages:
+            role = msg.get('role')
+            content = msg.get('content')
+            
+            if role == 'system':
+                langchain_messages.append(SystemMessage(content=content))
+            elif role == 'user':
+                langchain_messages.append(HumanMessage(content=content))
+            elif role == 'assistant':
+                langchain_messages.append(AIMessage(content=content))
+
+        # 4. AI 호출
+        response = chat.invoke(langchain_messages)
+        print(f"✅ [챗봇 응답] {response.content[:30]}...")
+        
+        return response.content
+
+    except Exception as e:
+        print(f"🚨 [챗봇 에러] {e}")
+        traceback.print_exc()
+        return "죄송합니다. 잠시 후 다시 시도해주세요. (AI 서버 오류)"

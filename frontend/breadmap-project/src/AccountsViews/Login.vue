@@ -4,7 +4,7 @@
       
       <!-- Image Section -->
       <div class="w-full md:w-1/2 flex items-center justify-center p-8 bg-cream-50">
-        <img src="@/assets/images/식빵.png" alt="A slice of toast" class="max-w-full h-auto object-contain" style="max-height: 400px;">
+        <img src="@/assets/images/메인화면.png" alt="A slice of toast" class="max-w-full h-auto object-contain" style="max-height: 400px;">
       </div>
 
       <!-- Form Section -->

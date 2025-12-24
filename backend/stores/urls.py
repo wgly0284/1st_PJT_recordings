@@ -1,25 +1,33 @@
 from django.urls import path
-from . import views
-from reviews.views import ReviewListCreateView 
-from .views import StoreAISummaryView
+from .views import (
+    StoreListView, 
+    StoreDetailView, 
+    MapStoreListView,
+    StoreAISummaryView,
+    BookmarkView,
+    UserBookmarkListView,
+    WeeklyPickView,
+    DailyRecommendationView,
+    BakeryChatBotView  # ✅ 챗봇 뷰 추가
+)
 
 urlpatterns = [
-    path('map/', views.MapStoreListView.as_view(), name='map_store_list'),
-    path('', views.StoreListView.as_view(), name='store_list'),
+    # 1. 가게 목록 및 상세
+    path('', StoreListView.as_view(), name='store-list'),
+    path('<int:pk>/', StoreDetailView.as_view(), name='store-detail'),
     
-    # 상세 페이지: /stores/1/
-    path('<int:pk>/', views.StoreDetailView.as_view(), name='store_detail'),
+    # 2. 지도용 목록
+    path('map/', MapStoreListView.as_view(), name='map-store-list'),
     
-    path('<int:store_pk>/bookmark/', views.BookmarkView.as_view(), name='bookmark'),
-
-    # 리뷰: /stores/1/reviews/
-    path('<int:store_pk>/reviews/', ReviewListCreateView.as_view(), name='review_list_create'),
-    path('bookmarks/', views.UserBookmarkListView.as_view(), name='my_bookmarks'),
+    # 3. 북마크 관련
+    path('<int:store_pk>/bookmark/', BookmarkView.as_view(), name='store-bookmark'),
+    path('bookmarks/', UserBookmarkListView.as_view(), name='user-bookmarks'),
     
-    path('weekly-pick/', views.WeeklyPickView.as_view(), name='weekly_pick'),
-
-    # [수정] stores/ 를 제거했습니다.
-    # 기존: path('stores/<int:pk>/ai-summary/', ...) -> 실제 URL: /stores/stores/1/ai-summary/ (404 원인)
-    # 변경: path('<int:pk>/ai-summary/', ...)       -> 실제 URL: /stores/1/ai-summary/ (정상)
+    # 4. 추천 및 AI 요약
+    path('weekly-pick/', WeeklyPickView.as_view(), name='weekly-pick'),
     path('<int:pk>/ai-summary/', StoreAISummaryView.as_view(), name='store-ai-summary'),
+    path('daily-recommendation/', DailyRecommendationView.as_view(), name='daily-recommendation'),
+
+    # 5. ✅ 챗봇 API
+    path('chatbot/', BakeryChatBotView.as_view(), name='bakery-chatbot'),
 ]

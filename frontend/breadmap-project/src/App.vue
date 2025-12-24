@@ -6,7 +6,7 @@
     <main class="flex-grow">
       <router-view />
     </main>
-    
+    <BakeryChatbot />
     <!-- ✅ 지도 화면에서는 보통 푸터도 안 보이게 설정합니다 (필요하면 v-if 제거하세요) -->
     <GlobalFooter v-if="!$route.meta.hideNavbar" />
   </div>
@@ -16,6 +16,8 @@
 import { RouterView } from 'vue-router'
 import GlobalHeader from '@/components/GlobalHeader.vue'
 import GlobalFooter from '@/components/GlobalFooter.vue'
+import BakeryChatbot from '@/components/common/BakeryChatbot.vue';
+
 </script>
 
 <style>

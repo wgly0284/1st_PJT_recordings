@@ -32,6 +32,14 @@ const isSubmittingReply = ref(false)
 const isDeletingPost = ref(false)
 const isDeletingComment = ref(null)
 
+// 작성자 프로필 이미지 처리
+const authorProfileImage = computed(() => {
+  const img = postData.value.author_profile_image
+  if (!img) return null
+  if (img.startsWith('http')) return img
+  return `http://127.0.0.1:8000${img}`
+})
+
 // ✅ 이미지 URL 처리 (상대 경로일 경우 백엔드 도메인 추가)
 const imageUrl = computed(() => {
   const img = postData.value.image // postData에서 이미지 확인
@@ -73,11 +81,11 @@ const fetchPostDetail = async () => {
 }
 
 const checkFollowStatus = async () => {
-  if (!authStore.isAuthenticated || !props.post.author_id) return
+  if (!authStore.isAuthenticated || !postData.value.author_id) return
   try {
     const response = await apiClient.get('/accounts/following/')
     const followingIds = response.data.following?.map(u => u.id) || []
-    isFollowed.value = followingIds.includes(props.post.author_id)
+    isFollowed.value = followingIds.includes(postData.value.author_id)
   } catch (error) {
     console.error('팔로우 상태 확인 실패:', error)
   }
@@ -156,12 +164,12 @@ const handleLike = async () => {
 
 const handleFollow = async () => {
   if (!authStore.isAuthenticated) { alert('로그인이 필요합니다.'); return }
-  if (isFollowing.value) return
+  if (isFollowing.value || !postData.value.author_id) return
   try {
     isFollowing.value = true
-    const response = await apiClient.post(`/accounts/follow/${props.post.author_id}/`)
+    const response = await apiClient.post(`/accounts/follow/${postData.value.author_id}/`)
     isFollowed.value = response.data.status === 'followed'
-  } catch (error) { console.error('팔로우 실패:', error) } finally { isFollowing.value = false }
+  } catch (error) { console.error('팔로우 실패:', error); alert('팔로우 처리 중 오류가 발생했습니다.') } finally { isFollowing.value = false }
 }
 
 const deletePost = async () => {
@@ -177,6 +185,17 @@ const deleteComment = async (id) => {
 }
 const deleteReply = async (id, parentId) => {
     deleteComment(id)
+}
+
+// 작성자 프로필 페이지로 이동
+const goToAuthorProfile = () => {
+  if (!postData.value.author_id) return
+  // 자신의 프로필이면 마이페이지로, 아니면 해당 유저 페이지로
+  if (authStore.user?.pk === postData.value.author_id) {
+    window.location.href = '/mypage'
+  } else {
+    window.location.href = `/user/${postData.value.author_id}`
+  }
 }
 
 // ✅ Watcher 수정: post 변경 시 데이터 초기화 및 상세 정보(이미지) Fetch
@@ -237,18 +256,39 @@ watch(() => props.post, (newPost) => {
       <h2 class="text-2xl lg:text-3xl font-bold mb-3 leading-tight font-serif tracking-wide">
         {{ postData.title }}
       </h2>
-      <div class="flex items-center justify-between relative z-10">
-        <p class="text-xs lg:text-sm opacity-80 flex items-center gap-2">
-          <span>📅 {{ postData.date }}</span>
-          <span>•</span>
-          <span>🧑‍🍳 {{ postData.user_nickname || '익명 빵순이' }}</span>
-        </p>
+      <div class="flex items-center justify-between relative z-10 gap-3">
+        <div class="flex items-center gap-3">
+          <!-- 작성자 프로필 이미지 -->
+          <div
+            @click="goToAuthorProfile"
+            class="cursor-pointer hover:opacity-80 transition-opacity"
+          >
+            <div v-if="authorProfileImage" class="w-10 h-10 rounded-full overflow-hidden border-2 border-white/30 shadow-md">
+              <img :src="authorProfileImage" alt="프로필" class="w-full h-full object-cover" />
+            </div>
+            <div v-else class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl border-2 border-white/30 shadow-md">
+              🧑‍🍳
+            </div>
+          </div>
+
+          <!-- 작성자 정보 -->
+          <div class="flex flex-col gap-1">
+            <span
+              @click="goToAuthorProfile"
+              class="text-sm lg:text-base font-bold cursor-pointer hover:underline"
+            >
+              {{ postData.user_nickname || '익명 빵순이' }}
+            </span>
+            <span class="text-xs opacity-70">📅 {{ postData.date }}</span>
+          </div>
+        </div>
+
         <button
           v-if="postData.author_id && authStore.user?.pk !== postData.author_id"
           @click="handleFollow"
           :disabled="isFollowing"
           :class="[
-            'px-4 py-1.5 rounded-full text-xs font-semibold transition-all shadow-sm',
+            'px-4 py-1.5 rounded-full text-xs font-semibold transition-all shadow-sm shrink-0',
             isFollowed
               ? 'bg-[#EFEBE9] text-[#5D4037] hover:bg-[#D7CCC8]'
               : 'bg-[#FFCC80] text-[#5D4037] hover:bg-[#FFA726] border border-[#FFB74D]',

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/Views/HomeView.vue'
 import DetailView from '@/Views/DetailView.vue'
 import MyPage from '@/Views/MyPage.vue'
+import UserProfile from '@/Views/UserProfile.vue'
 import SignUpView from '@/AccountsViews/SignUp.vue'
 import LoginView from '@/AccountsViews/Login.vue'
 import MyReviews from '@/components/MyPage/MyReviews.vue'
@@ -39,10 +40,15 @@ const routes = [
     name: 'detail',
     component: DetailView
   },
-  { 
-    path: '/mypage', 
-    name: 'mypage', 
-    component: MyPage 
+  {
+    path: '/mypage',
+    name: 'mypage',
+    component: MyPage
+  },
+  {
+    path: '/user/:userId',
+    name: 'userProfile',
+    component: UserProfile
   },
   {
     path: '/mypage/editprofile',

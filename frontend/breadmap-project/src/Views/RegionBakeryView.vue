@@ -19,7 +19,7 @@
 
       <!-- 빵집 카드 그리드 -->
       <div v-else-if="bakeries.length > 0" class="space-y-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <div
             v-for="bakery in paginatedBakeries"
             :key="bakery.id"
@@ -37,7 +37,7 @@
             <!-- 평점 뱃지 -->
             <div class="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-full flex items-center gap-1.5 shadow-lg">
               <Star class="w-5 h-5 fill-orange-400 text-orange-400" />
-              <span class="text-sm font-bold text-gray-800">{{ bakery.avg_rating ? bakery.avg_rating.toFixed(1) : 'N/A' }}</span>
+              <span class="text-sm font-bold text-gray-800">{{ bakery.avg_rating ? Number(bakery.avg_rating).toFixed(1) : 'N/A' }}</span>
             </div>
             <!-- 호버 오버레이 -->
             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
@@ -145,7 +145,7 @@ const isLoading = ref(false)
 
 // 페이지네이션 관련
 const currentPage = ref(1)
-const itemsPerPage = 10
+const itemsPerPage = 12 // 페이지당 12개 표시
 
 // 지역 정보 (부산광역시 기준)
 const regionData = {
@@ -213,16 +213,31 @@ const fetchBakeries = async () => {
   isLoading.value = true
   try {
     // 검색 키워드로 검색 (예: "사상", "북구" 등)
+    console.log(`🔍 검색 시작: 지역=${regionName.value}, 키워드="${searchKeyword.value}"`)
+
     const response = await axios.get('http://127.0.0.1:8000/stores/', {
       params: { search: searchKeyword.value }
     })
 
-    // 응답 데이터를 bakeries에 저장
-    bakeries.value = response.data
+    console.log('📦 API 응답 데이터:', response.data)
+    console.log('📊 응답 데이터 타입:', typeof response.data)
+    console.log('📋 응답 데이터 길이:', Array.isArray(response.data) ? response.data.length : 'Array가 아님')
 
-    console.log(`${regionName.value} 지역 빵집 ${bakeries.value.length}개 로드됨 (검색어: ${searchKeyword.value})`)
+    // 응답 데이터를 bakeries에 저장
+    if (Array.isArray(response.data)) {
+      bakeries.value = response.data
+      console.log(`✅ ${regionName.value} 지역 빵집 ${bakeries.value.length}개 로드 완료`)
+    } else if (response.data && typeof response.data === 'object') {
+      // 만약 data가 객체로 감싸져 있다면
+      bakeries.value = response.data.results || response.data.stores || []
+      console.log(`✅ ${regionName.value} 지역 빵집 ${bakeries.value.length}개 로드 완료 (중첩 객체)`)
+    } else {
+      console.warn('⚠️ 예상치 못한 응답 형식:', response.data)
+      bakeries.value = []
+    }
   } catch (error) {
-    console.error('빵집 목록 불러오기 실패:', error)
+    console.error('❌ 빵집 목록 불러오기 실패:', error)
+    console.error('에러 상세:', error.response?.data || error.message)
     bakeries.value = []
   } finally {
     isLoading.value = false
@@ -230,7 +245,7 @@ const fetchBakeries = async () => {
 }
 
 const goToBakery = (id) => {
-  router.push({ name: 'map', query: { store_id: id } })
+  router.push({ name: 'detail', params: { id } })
 }
 
 // 페이지 변경 시 스크롤을 맨 위로

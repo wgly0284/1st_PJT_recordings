@@ -106,8 +106,8 @@ const removeBookmark = async (storeId) => {
           <!-- 사진 영역 -->
           <div class="w-full aspect-square bg-gradient-to-br from-amber-50 to-orange-50 mb-3 overflow-hidden border border-gray-200 grayscale-[20%] group-hover:grayscale-0 transition-all">
             <img
-              v-if="store.image_url"
-              :src="store.image_url"
+              v-if="store.image || store.image_url"
+              :src="store.image || store.image_url"
               class="w-full h-full object-cover"
               @error="e => e.target.src = 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600'"
             >
@@ -125,7 +125,7 @@ const removeBookmark = async (storeId) => {
           <div class="text-center">
              <h4 class="font-hand text-lg font-bold text-[#3E2723] truncate px-1 group-hover:text-orange-600 transition-colors">{{ store.name }}</h4>
              <div class="flex items-center justify-center gap-1 text-[#8D6E63] text-xs font-hand mt-1">
-                <MapPin class="w-3 h-3" /> {{ store.location || '위치 정보 없음' }}
+                <MapPin class="w-3 h-3" /> {{ store.address || store.location || '위치 정보 없음' }}
              </div>
           </div>
 

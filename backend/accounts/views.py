@@ -92,10 +92,9 @@ class UserProfileView(APIView):
 
             # 1-2. 📌 북마크한 빵집 목록
             try:
-                # 프론트엔드에서 기대하는 필드명으로 매핑
-                for store in bookmarked_stores:
-                    store['location'] = store.pop('address', '')
-                    store['image_url'] = store.pop('preview_image', '')
+                from stores.serializers import StoreListSerializer
+                bookmarked_stores_qs = user.bookmarked_stores.all()
+                bookmarked_stores = StoreListSerializer(bookmarked_stores_qs, many=True, context={'request': request}).data
             except Exception as e:
                 print(f"bookmarked_stores 에러: {e}")
                 bookmarked_stores = []

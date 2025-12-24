@@ -94,9 +94,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ['email', 'level', 'exp', 'level_title', 'date_joined']
 
     def get_next_exp(self, obj):
-        if hasattr(obj, 'LEVEL_SYSTEM'):
-            return obj.LEVEL_SYSTEM.get(obj.level, {}).get('next_exp', 0)
-        return 0
+        from .models import User
+        return User.LEVEL_SYSTEM.get(obj.level, {}).get('next_exp', 100)
 
     def get_review_count(self, obj):
         return getattr(obj, 'reviews', []).count() if hasattr(obj, 'reviews') else 0
@@ -108,7 +107,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return []
 
     def get_bookmarked_stores(self, obj):
-        return []
+        from stores.serializers import StoreListSerializer
+        stores = obj.bookmarked_stores.all()
+        return StoreListSerializer(stores, many=True, context=self.context).data
 
     def get_taste_stats(self, obj):
         return {"크림빵": 5, "하드계열": 3}

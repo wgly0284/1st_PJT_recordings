@@ -53,9 +53,9 @@ Backend:
 
 Frontend:
 - Vue 3 (Composition API)
-- Tailwind CSS (귀여운 UI 구현)
+- Tailwind CSS (귀여운 UI 구현): 저희가 배웠던 bootstrap이 아니라 다른 css를 선택했습니다. 이유는 UI를 저희가 원하는 방향으로 커스텀하기에 훨씬 자유로워 테마에 맞는 프론트를 적절히 구현할 수 있었습니다.
 - Axios (비동기 통신)
-- Kakao Map API (지도 기능)
+- Kakao Map API (지도 기능):
 
 [ERD 설명]
 1. User 모델: 레벨, 경험치, 뱃지 관계

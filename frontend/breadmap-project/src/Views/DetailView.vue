@@ -3,19 +3,18 @@
     <div class="max-w-[1200px] mx-auto px-6 py-20">
 
       <!-- 뒤로 가기 버튼 -->
-      <button 
-        @click="$router.go(-1)" 
-        class="mb-10 group flex items-center gap-3 px-6 py-3 
-               bg-white/80 backdrop-blur-sm border-2 border-[#FFE8CC] rounded-full
-               shadow-[0_4px_12px_rgba(201,151,104,0.1)]
-               hover:border-[#F3B37A] hover:bg-white hover:shadow-[0_8px_20px_rgba(201,151,104,0.2)]
-               hover:-translate-y-1 transition-all duration-300"
+      <button
+        @click="$router.go(-1)"
+        class="mb-6 group inline-flex items-center gap-2 px-4 py-2
+               bg-white/80 backdrop-blur-sm border border-[#FFE8CC] rounded-full
+               shadow-sm hover:border-[#F3B37A] hover:bg-white hover:shadow-md
+               transition-all duration-300"
       >
-        <div class="w-10 h-10 rounded-full bg-[#FFF3DD] flex items-center justify-center group-hover:bg-[#F3B37A] transition-colors duration-300">
-          <PawPrint class="w-5 h-5 text-[#F3B37A] group-hover:text-white transition-colors duration-300" />
+        <div class="w-6 h-6 rounded-full bg-[#FFF3DD] flex items-center justify-center group-hover:bg-[#F3B37A] transition-colors duration-300">
+          <PawPrint class="w-3.5 h-3.5 text-[#F3B37A] group-hover:text-white transition-colors duration-300" />
         </div>
-        <span class="font-jua text-xl text-[#6B4A38] pt-1 group-hover:text-[#C99768] transition-colors">
-          목록으로 가기
+        <span class="font-jua text-sm text-[#6B4A38] group-hover:text-[#C99768] transition-colors">
+          뒤로가기
         </span>
       </button>
 
@@ -27,28 +26,53 @@
 
       <!-- 2. 데이터 로드 완료 시 (정상) -->
       <div v-else-if="selectedBakery" class="animate-fade-in space-y-12">
-        
-        <!-- [수정됨] 1. 상단 중앙 타이틀 영역 -->
-        <div class="text-center flex flex-col items-center">
-          <div class="inline-flex items-center gap-2 bg-[#FFF3DD] border-2 border-[#FFE8CC] px-5 py-2 rounded-full shadow-md mb-6">
-            <span class="text-2xl">🍞</span>
-            <span class="text-[#C99768] font-jua text-lg">동네 빵집</span>
-          </div>
-          <h2 class="text-5xl md:text-6xl font-jua text-[#6B4A38] leading-tight">
-            {{ selectedBakery.bakeryName }}
-          </h2>
-        </div>
 
-        <!-- [수정됨] 2. 대표 사진 영역 (높이 축소: h-96 -> h-72) -->
-        <div class="w-full h-72 rounded-[2.5rem] overflow-hidden shadow-2xl bg-white border-8 border-white relative z-0 group">
-          <img :src="selectedBakery.image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="베이커리 대표 사진">
-          <!-- 사진 위에 살짝 텍스트 오버레이 (선택사항) -->
-          <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+        <!-- 상단: 제목(왼쪽) + 사진(오른쪽) -->
+        <div class="grid lg:grid-cols-2 gap-8 items-center">
+
+          <!-- 왼쪽: 제목 영역 -->
+          <div class="space-y-6">
+            <div class="inline-flex items-center gap-2 bg-[#FFF3DD] border-2 border-[#FFE8CC] px-5 py-2 rounded-full shadow-md">
+              <span class="text-2xl">🍞</span>
+              <span class="text-[#C99768] font-jua text-lg">동네 빵집</span>
+            </div>
+            <h2 class="text-5xl md:text-6xl font-jua text-[#6B4A38] leading-tight">
+              {{ selectedBakery.bakeryName }}
+            </h2>
+
+            <!-- 평점 & 태그 -->
+            <div class="flex flex-wrap gap-3">
+              <span class="px-5 py-3 bg-white border-2 border-[#FFE8CC] rounded-full text-[#8B6A55] flex items-center gap-2 shadow-sm font-jua text-lg">
+                <Star class="w-5 h-5 text-orange-500 fill-current" /> {{ selectedBakery.rating }}
+              </span>
+              <span v-for="tag in selectedBakery.tags" :key="tag" class="px-5 py-3 bg-[#FFCCBC]/30 text-[#EF6C00] rounded-full font-jua border-2 border-[#FFE0B2] text-lg">
+                #{{ tag }}
+              </span>
+            </div>
+          </div>
+
+          <!-- 오른쪽: 대표 사진 -->
+          <div class="w-full h-80 rounded-[2.5rem] overflow-hidden shadow-2xl bg-gradient-to-br from-amber-50 to-orange-50 border-8 border-white relative z-0 group">
+            <img v-if="selectedBakery.image" :src="selectedBakery.image" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="베이커리 대표 사진">
+
+            <!-- 이미지 없을 때 -->
+            <div v-else class="w-full h-full flex flex-col items-center justify-center p-8 text-center">
+              <img
+                src="@/assets/images/logo.png"
+                alt="기본 로고"
+                class="w-24 h-24 object-contain opacity-30 mb-4"
+              />
+              <p class="text-sm font-bold text-gray-400 mb-2">이미지가 등록되지 않았어요</p>
+              <p class="text-xs text-gray-400">제보하기를 통해 이미지를 등록해주세요 📸</p>
+            </div>
+
+            <div v-if="selectedBakery.image" class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+          </div>
         </div>
 
         <!-- [수정됨] 3. 중간 정보 영역 (2단 컬럼: 왼쪽 정보 / 오른쪽 메뉴) -->
         <div class="grid lg:grid-cols-2 gap-12 items-start">
-          
+
           <!-- 왼쪽 컬럼: 매장 정보 & 설명 & AI 요약 -->
           <div class="space-y-8">
             <!-- 기본 정보 박스 -->
@@ -63,16 +87,6 @@
                     <p class="text-[#6B4A38] font-jua text-xl">{{ selectedBakery.location }}</p>
                   </div>
                 </div>
-              </div>
-
-              <!-- 평점 & 태그 -->
-              <div class="flex flex-wrap gap-3">
-                <span class="px-5 py-3 bg-white border-2 border-[#FFE8CC] rounded-full text-[#8B6A55] flex items-center gap-2 shadow-sm font-jua text-lg">
-                  <Star class="w-5 h-5 text-orange-500 fill-current" /> {{ selectedBakery.rating }}
-                </span>
-                <span v-for="tag in selectedBakery.tags" :key="tag" class="px-5 py-3 bg-[#FFCCBC]/30 text-[#EF6C00] rounded-full font-jua border-2 border-[#FFE0B2] text-lg">
-                  #{{ tag }}
-                </span>
               </div>
             </div>
 
@@ -116,27 +130,27 @@
 
           <!-- 오른쪽 컬럼: 메뉴 리스트 -->
           <div>
-            <div class="flex items-center gap-3 mb-6">
-              <h3 class="font-jua text-[#6B4A38] text-3xl">시그니처 메뉴</h3>
-              <span class="text-4xl">🍞</span>
+            <div class="flex items-center gap-2 mb-4">
+              <h3 class="font-jua text-[#6B4A38] text-2xl">시그니처 메뉴</h3>
+              <span class="text-2xl">🍞</span>
             </div>
-            <div v-if="selectedBakery.menu && selectedBakery.menu.length > 0" class="space-y-4">
-              <div v-for="menu in selectedBakery.menu" :key="menu.id" class="flex justify-between items-center p-6 rounded-3xl bg-white border-3 border-[#FFE8CC] hover:border-[#F3B37A] hover:shadow-xl transition-all cursor-pointer group">
-                <div class="flex items-center gap-6">
-                  <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FFF3DD] to-[#FFE8CC] flex items-center justify-center shrink-0 text-5xl group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-md">
+            <div v-if="selectedBakery.menu && selectedBakery.menu.length > 0" class="space-y-3">
+              <div v-for="menu in selectedBakery.menu" :key="menu.id" class="flex justify-between items-center p-4 rounded-2xl bg-white border-2 border-[#FFE8CC] hover:border-[#F3B37A] hover:shadow-lg transition-all cursor-pointer group">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FFF3DD] to-[#FFE8CC] flex items-center justify-center shrink-0 text-2xl group-hover:scale-110 transition-all duration-300 shadow-sm">
                     {{ getMenuIcon(menu.name) }}
                   </div>
                   <div>
-                    <h4 class="text-2xl font-jua text-[#6B4A38] mb-2">{{ menu.name }}</h4>
-                    <p class="text-lg text-[#C99768] font-jua">{{ menu.category || '베이커리' }}</p>
+                    <h4 class="text-lg font-jua text-[#6B4A38]">{{ menu.name }}</h4>
+                    <p class="text-xs text-[#C99768] font-jua">{{ menu.category || '베이커리' }}</p>
                   </div>
                 </div>
-                <span class="text-2xl font-jua text-[#C99768]">{{ Number(menu.price).toLocaleString() }}원</span>
+                <span class="text-base font-jua text-[#C99768] font-bold">{{ Number(menu.price).toLocaleString() }}원</span>
               </div>
             </div>
-            <div v-else class="text-[#C99768] py-16 text-center border-3 border-dashed border-[#FFE8CC] bg-white/50 rounded-3xl flex flex-col items-center justify-center gap-4">
-              <span class="text-6xl">🥐</span>
-              <span class="font-jua text-xl">등록된 메뉴 정보가 없습니다</span>
+            <div v-else class="text-[#C99768] py-12 text-center border-2 border-dashed border-[#FFE8CC] bg-white/50 rounded-2xl flex flex-col items-center justify-center gap-3">
+              <span class="text-4xl">🥐</span>
+              <span class="font-jua text-base">등록된 메뉴 정보가 없습니다</span>
             </div>
           </div>
 

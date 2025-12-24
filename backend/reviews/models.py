@@ -24,6 +24,10 @@ class Review(models.Model):
     # 예: "달달함,바삭함,촉촉함" (콤마로 구분하여 저장)
     taste_tags = models.CharField(max_length=200, blank=True, null=True)
 
+    # ✅ [추가] 먹은 메뉴 목록 (취향 분석용)
+    # 예: "소금빵,크루아상,바게트" (콤마로 구분하여 저장)
+    menu_items = models.CharField(max_length=300, blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     # '리뷰 좋아요' 관계

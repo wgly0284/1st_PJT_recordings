@@ -5,7 +5,11 @@
         <div class="space-y-4">
           <!-- 로고 및 타이틀 -->
           <div class="flex items-center gap-2 mb-2">
-            <span class="text-2xl">🥯</span>
+            <img
+              :src="logoImage"
+              alt="Breadtopia Logo"
+              class="w-10 h-10 object-contain transition-transform duration-500 group-hover:rotate-12"
+            />
             <h2 class="text-3xl font-bold text-[#6B4A38]">Breadtopia</h2>
           </div>
 
@@ -50,7 +54,7 @@
 </template>
 
 <script setup>
-// 로직이 필요하다면 여기에 추가
+import logoImage from '@/assets/images/logo.png'
 </script>
 
 <style scoped>

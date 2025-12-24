@@ -5,7 +5,7 @@
     <Transition name="chat">
       <div
         v-if="isOpen"
-        class="bg-white rounded-2xl shadow-2xl w-96 h-[600px] mb-4 flex flex-col overflow-hidden border-2 border-orange-100"
+        class="bg-white rounded-2xl shadow-2xl w-[450px] h-[600px] mb-4 flex flex-col overflow-hidden border-2 border-orange-100"
       >
         <!-- 헤더 -->
         <div class="bg-gradient-to-r from-[#F3B37A] to-[#C99768] p-4 flex items-center justify-between">
@@ -26,32 +26,106 @@
           </button>
         </div>
 
-        <!-- Step 1: 지역 선택 -->
-        <div v-if="step === 'location'" class="flex-1 flex flex-col justify-center p-6 space-y-4 bg-gradient-to-b from-[#FFF9F0] to-white">
+        <!-- Step 1: 시/도 선택 -->
+        <div v-if="step === 'city'" class="flex-1 flex flex-col justify-center p-6 space-y-4 bg-gradient-to-b from-[#FFF9F0] to-white">
           <div class="text-center space-y-2">
             <div class="w-16 h-16 bg-[#FFF3DD] rounded-full flex items-center justify-center mx-auto mb-3">
               <span class="text-3xl">📍</span>
             </div>
-            <h2 class="text-xl font-jua text-[#6B4A38]">어디에 계신가요?</h2>
-            <p class="text-sm text-[#8B6A55]">빵집을 찾고 싶은 지역을 선택해주세요</p>
+            <h2 class="text-xl font-jua text-[#6B4A38]">어느 시/도에 계신가요?</h2>
+            <p class="text-sm text-[#8B6A55]">빵집을 찾고 싶은 시/도를 선택해주세요</p>
           </div>
 
           <select
-            v-model="location"
+            v-model="selectedCity"
+            @change="onCityChange"
             class="w-full p-3 border-2 border-[#FFE8CC] rounded-xl text-base focus:ring-2 focus:ring-[#F3B37A] outline-none font-jua"
           >
-            <option value="" disabled>지역을 선택해주세요</option>
-            <option v-for="loc in LOCATIONS" :key="loc" :value="loc">{{ loc }}</option>
+            <option value="" disabled>시/도를 선택해주세요</option>
+            <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
           </select>
 
           <button
-            @click="location && (step = 'preference')"
-            :disabled="!location"
+            @click="selectedCity && (step = 'district')"
+            :disabled="!selectedCity"
             class="w-full py-3 rounded-xl font-jua text-white transition-all"
-            :class="location ? 'bg-[#F3B37A] hover:bg-[#C99768] shadow-md' : 'bg-gray-300 cursor-not-allowed'"
+            :class="selectedCity ? 'bg-[#F3B37A] hover:bg-[#C99768] shadow-md' : 'bg-gray-300 cursor-not-allowed'"
           >
             다음 단계
           </button>
+        </div>
+
+        <!-- Step 2: 구 선택 -->
+        <div v-if="step === 'district'" class="flex-1 flex flex-col justify-center p-6 space-y-4 bg-gradient-to-b from-[#FFF9F0] to-white">
+          <div class="text-center space-y-2">
+            <div class="w-16 h-16 bg-[#FFF3DD] rounded-full flex items-center justify-center mx-auto mb-3">
+              <span class="text-3xl">🏘️</span>
+            </div>
+            <h2 class="text-xl font-jua text-[#6B4A38]">어느 구에 계신가요?</h2>
+            <p class="text-sm text-[#8B6A55]">{{ selectedCity }}의 구를 선택해주세요</p>
+          </div>
+
+          <select
+            v-model="selectedDistrict"
+            @change="onDistrictChange"
+            class="w-full p-3 border-2 border-[#FFE8CC] rounded-xl text-base focus:ring-2 focus:ring-[#F3B37A] outline-none font-jua"
+          >
+            <option value="" disabled>구를 선택해주세요</option>
+            <option v-for="district in districts" :key="district" :value="district">{{ district }}</option>
+          </select>
+
+          <div class="flex gap-2">
+            <button
+              @click="step = 'city'"
+              class="w-1/3 py-3 rounded-xl font-jua bg-gray-200 hover:bg-gray-300 transition-all"
+            >
+              이전
+            </button>
+            <button
+              @click="selectedDistrict && (step = 'neighborhood')"
+              :disabled="!selectedDistrict"
+              class="w-2/3 py-3 rounded-xl font-jua text-white transition-all"
+              :class="selectedDistrict ? 'bg-[#F3B37A] hover:bg-[#C99768] shadow-md' : 'bg-gray-300 cursor-not-allowed'"
+            >
+              다음 단계
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: 동 선택 -->
+        <div v-if="step === 'neighborhood'" class="flex-1 flex flex-col justify-center p-6 space-y-4 bg-gradient-to-b from-[#FFF9F0] to-white">
+          <div class="text-center space-y-2">
+            <div class="w-16 h-16 bg-[#FFF3DD] rounded-full flex items-center justify-center mx-auto mb-3">
+              <span class="text-3xl">🏠</span>
+            </div>
+            <h2 class="text-xl font-jua text-[#6B4A38]">어느 동에 계신가요?</h2>
+            <p class="text-sm text-[#8B6A55]">{{ selectedCity }} {{ selectedDistrict }}의 동을 선택해주세요</p>
+          </div>
+
+          <select
+            v-model="selectedNeighborhood"
+            class="w-full p-3 border-2 border-[#FFE8CC] rounded-xl text-base focus:ring-2 focus:ring-[#F3B37A] outline-none font-jua"
+          >
+            <option value="" disabled>동을 선택해주세요</option>
+            <option v-for="neighborhood in neighborhoods" :key="neighborhood" :value="neighborhood">{{ neighborhood }}</option>
+          </select>
+
+          <div class="flex gap-2">
+            <button
+              @click="step = 'district'"
+              class="w-1/3 py-3 rounded-xl font-jua bg-gray-200 hover:bg-gray-300 transition-all"
+            >
+              이전
+            </button>
+            <button
+              @click="selectedNeighborhood && (step = 'preference')"
+              :disabled="!selectedNeighborhood"
+              class="w-2/3 py-3 rounded-xl font-jua text-white transition-all"
+              :class="selectedNeighborhood ? 'bg-[#F3B37A] hover:bg-[#C99768] shadow-md' : 'bg-gray-300 cursor-not-allowed'"
+            >
+              다음 단계
+            </button>
+          </div>
         </div>
 
         <!-- Step 2: 취향 선택 -->
@@ -179,12 +253,16 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, onMounted } from 'vue';
+import regionsData from '@/data/regions.json';
 
 // 상태 관리
 const isOpen = ref(false);
-const step = ref('location'); // location 부터 시작
-const location = ref('');
+const step = ref('city'); // city -> district -> neighborhood -> preference -> chat
+const location = ref(''); // 최종 선택된 전체 주소 (예: "서울특별시 강남구")
+const selectedCity = ref('');
+const selectedDistrict = ref('');
+const selectedNeighborhood = ref('');
 const preference = ref('');
 const messages = ref([]);
 const input = ref('');
@@ -192,14 +270,11 @@ const isLoading = ref(false);
 const hasNewMessage = ref(false);
 const messagesContainer = ref(null);
 
-// 상수 데이터
-const LOCATIONS = [
-  "서울 강남구", "서울 성수동", "서울 연남동", "서울 한남동",
-  "경기 분당", "경기 수원",
-  "부산 해운대", "부산 전포동",
-  "대구 동성로", "대전 성심당 인근", "광주 동명동",
-  "제주도"
-];
+// 지역 데이터 (JSON에서 로드)
+const regionData = regionsData.mapInfo;
+const cities = ref([]);
+const districts = ref([]);
+const neighborhoods = ref([]);
 
 const PREFERENCES = [
   { id: 'hard', label: '🥖 겉바속촉 하드계열 (바게트/깜빠뉴)' },
@@ -208,6 +283,53 @@ const PREFERENCES = [
   { id: 'vegan', label: '🥗 건강한 비건/쌀빵' },
   { id: 'date', label: '☕ 분위기 좋은 데이트 코스' },
 ];
+
+// 초기화 시 시/도 목록 로드
+onMounted(() => {
+  cities.value = regionData.map(region => region.name);
+});
+
+// 지역 선택 시 이벤트 핸들러
+const onCityChange = () => {
+  selectedDistrict.value = '';
+  selectedNeighborhood.value = '';
+  districts.value = [];
+  neighborhoods.value = [];
+
+  if (selectedCity.value) {
+    const selectedRegion = regionData.find(region => region.name === selectedCity.value);
+    if (selectedRegion) {
+      districts.value = selectedRegion.countries;
+    }
+  }
+};
+
+const onDistrictChange = async () => {
+  selectedNeighborhood.value = '';
+  neighborhoods.value = [];
+
+  // 동 목록은 백엔드 API에서 실제 빵집이 있는 곳만 가져오기
+  if (selectedCity.value && selectedDistrict.value) {
+    try {
+      // 시/도 이름을 간단하게 변환 (예: "서울특별시" -> "서울")
+      const cityShort = selectedCity.value.replace(/(특별시|광역시|도)$/, '');
+
+      const response = await fetch(
+        `http://localhost:8000/stores/regions/neighborhoods/?city=${encodeURIComponent(cityShort)}&district=${encodeURIComponent(selectedDistrict.value)}`
+      );
+      const data = await response.json();
+      neighborhoods.value = data;
+
+      // 동 데이터가 없으면 "동 정보 없음" 추가
+      if (neighborhoods.value.length === 0) {
+        neighborhoods.value = ['해당 지역'];
+      }
+    } catch (error) {
+      console.error('동 목록 조회 실패:', error);
+      neighborhoods.value = ['해당 지역'];
+    }
+  }
+};
 
 const scrollToBottom = async () => {
   await nextTick();
@@ -258,6 +380,10 @@ const callOpenAI = async (currentMessages) => {
 };
 
 const startChat = () => {
+  // 최종 주소 조합 (시/도 간단하게 변환)
+  const cityShort = selectedCity.value.replace(/(특별시|광역시|도)$/, '');
+  location.value = `${cityShort} ${selectedDistrict.value} ${selectedNeighborhood.value}`;
+
   if (!location.value || !preference.value) return;
 
   step.value = 'chat';
@@ -266,7 +392,7 @@ const startChat = () => {
     role: 'system',
     content: `당신은 20년 경력의 빵집 전문 큐레이터 '브레드 봇'입니다.
     사용자는 현재 '${location.value}' 지역에 있으며, '${preference.value}' 스타일의 빵집을 찾고 있습니다.
-    
+
     [지침]
     1. 항상 친절하고 전문적인 말투(해요체)를 사용하세요.
     2. 빵집 이름, 대표 메뉴, 그리고 추천 이유를 명확히 설명하세요.
@@ -294,7 +420,6 @@ const handleSendMessage = () => {
   const userMsg = { role: 'user', content: input.value };
   messages.value.push(userMsg);
 
-  const userInput = input.value;
   input.value = '';
 
   const apiMessages = [
@@ -322,9 +447,14 @@ const closeChat = () => {
 };
 
 const resetChat = () => {
-  step.value = 'location';
+  step.value = 'city';
   messages.value = [];
   location.value = '';
+  selectedCity.value = '';
+  selectedDistrict.value = '';
+  selectedNeighborhood.value = '';
+  districts.value = [];
+  neighborhoods.value = [];
   preference.value = '';
 };
 </script>

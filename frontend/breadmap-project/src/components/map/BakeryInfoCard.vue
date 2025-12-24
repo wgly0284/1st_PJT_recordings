@@ -81,14 +81,17 @@ const toggleBookmark = async () => {
     } else {
       isBookmarked.value = false
     }
+
+    // 북마크 상태 변경 이벤트 발생 (다른 컴포넌트에서 감지 가능)
+    window.dispatchEvent(new CustomEvent('bookmark-changed'))
   } catch (error) {
     console.error('북마크 실패:', error)
   }
 }
 
 // 가게 리뷰 조회 함수
-const fetchStoreReviews = async () => {
-  if (storeReviews.value.length > 0) return
+const fetchStoreReviews = async (forceRefresh = false) => {
+  if (storeReviews.value.length > 0 && !forceRefresh) return
   if (isReviewsLoading.value) return
   isReviewsLoading.value = true
 
@@ -139,6 +142,16 @@ const goToWriteReview = () => {
   emit('write-review', props.bakery.id)
 }
 
+// 외부에서 호출 가능한 리뷰 새로고침 함수
+const refreshReviews = () => {
+  fetchStoreReviews(true)
+}
+
+// 컴포넌트 외부에 노출
+defineExpose({
+  refreshReviews
+})
+
 onMounted(() => {
   checkBookmarkStatus()
 })
@@ -150,15 +163,27 @@ onMounted(() => {
   >
     <!-- 1. 헤더 (이미지 및 닫기 버튼) -->
     <div
-      class="relative w-full h-56 bg-gray-100 shrink-0 overflow-hidden"
+      class="relative w-full h-56 bg-gradient-to-br from-amber-50 to-orange-50 shrink-0 overflow-hidden"
     >
-      <!-- ✅ 백엔드 preview_image 사용 -->
+      <!-- 이미지가 있을 때 -->
       <img
+        v-if="bakery.preview_image"
         :src="bakery.preview_image"
         @error="handleImageError"
         class="w-full h-full object-cover transition-transform hover:scale-105 duration-700"
         alt="bakery image"
       />
+
+      <!-- 이미지가 없을 때 -->
+      <div v-else class="w-full h-full flex flex-col items-center justify-center p-6 text-center">
+        <img
+          src="@/assets/images/logo.png"
+          alt="기본 로고"
+          class="w-20 h-20 object-contain opacity-40 mb-3"
+        />
+        <p class="text-sm font-bold text-gray-400 mb-1">이미지가 등록되지 않았어요</p>
+        <p class="text-xs text-gray-400">제보하기를 통해 이미지를 등록해주세요 📸</p>
+      </div>
 
       <!-- 닫기 버튼 -->
       <button
@@ -376,6 +401,14 @@ onMounted(() => {
 
         <!-- 리뷰 탭 -->
         <div v-if="activeTab === 'review'">
+          <!-- 리뷰 작성 버튼 (맨 위) -->
+          <button
+            @click="goToWriteReview"
+            class="w-full mb-4 py-2.5 bg-teal-50 border border-teal-200 rounded-xl text-sm font-bold text-teal-700 hover:bg-teal-100 transition-colors"
+          >
+            + 이 가게 리뷰 남기기
+          </button>
+
           <!-- 리뷰 로딩 -->
           <div v-if="isReviewsLoading" class="text-center py-8">
             <div
@@ -468,14 +501,6 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-
-            <!-- 리뷰 작성 버튼 -->
-            <button
-              @click="goToWriteReview"
-              class="w-full mt-2 py-2.5 bg-teal-50 border border-teal-200 rounded-xl text-sm font-bold text-teal-700 hover:bg-teal-100 transition-colors"
-            >
-              + 이 가게 리뷰 남기기
-            </button>
           </div>
 
           <!-- 리뷰 없음 -->

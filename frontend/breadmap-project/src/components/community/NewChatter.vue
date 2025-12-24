@@ -11,7 +11,7 @@ const authStore = useAuthStore()
 const title = ref('')
 const content = ref('')
 const categoryLabel = '빵 주저리'
-const categoryValue = 'chatter' // 백엔드 전송용 코드
+const categoryValue = '빵 주저리' // 백엔드 전송용 값
 
 const imageFile = ref(null)
 const fileInputRef = ref(null)

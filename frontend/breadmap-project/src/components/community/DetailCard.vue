@@ -55,23 +55,25 @@ const fetchPostDetail = async () => {
   try {
     const res = await apiClient.get(`/community/${props.post.id}/`)
     const data = res.data
-    
-    // API 응답 데이터를 화면 포맷에 맞게 매핑하여 업데이트
+
+    console.log('post detail data:', data) // 🔍 확인용
+
     postData.value = {
-      ...postData.value, // 기존 데이터 유지
-      ...data,           // 새로운 데이터 덮어쓰기
-      image: data.image, // 이미지 필드 확실하게 업데이트
+      ...postData.value,
+      ...data,
+      image: data.image,
+      // 🔥 여기 중요: 백엔드에서 author는 pk(int)로 오니까 그대로 사용
       author_id: data.author, 
       user_nickname: data.author_nickname,
-      date: data.created_at?.slice(0, 10) || postData.value.date
+      date: data.created_at?.slice(0, 10) || postData.value.date,
     }
-    
-    // 좋아요 수 최신화
+
+    console.log('author_id set to:', postData.value.author_id) // 🔍 확인용
+
     if (data.like_count !== undefined) {
       localLikes.value = data.like_count
     }
-    
-    // 좋아요 여부 재확인
+
     if (authStore.isAuthenticated && data.like_users) {
       isLiked.value = data.like_users.includes(authStore.user?.pk)
     }
@@ -79,6 +81,7 @@ const fetchPostDetail = async () => {
     console.error('게시글 상세 로드 실패:', error)
   }
 }
+
 
 const checkFollowStatus = async () => {
   if (!authStore.isAuthenticated || !postData.value.author_id) return
@@ -189,8 +192,8 @@ const deleteReply = async (id, parentId) => {
 
 // 작성자 프로필 페이지로 이동
 const goToAuthorProfile = () => {
+  console.log('goToAuthorProfile author_id:', postData.value.author_id)
   if (!postData.value.author_id) return
-  // 자신의 프로필이면 마이페이지로, 아니면 해당 유저 페이지로
   if (authStore.user?.pk === postData.value.author_id) {
     window.location.href = '/mypage'
   } else {
@@ -199,20 +202,28 @@ const goToAuthorProfile = () => {
 }
 
 // ✅ Watcher 수정: post 변경 시 데이터 초기화 및 상세 정보(이미지) Fetch
-watch(() => props.post, (newPost) => {
-  if (newPost) {
-    postData.value = { ...newPost } // 일단 Prop 데이터로 초기화
-    localLikes.value = newPost.likes
-    
-    if (authStore.isAuthenticated && newPost.like_user_ids) {
-      isLiked.value = newPost.like_user_ids.includes(authStore.user?.pk)
+watch(
+  () => props.post,
+  (newPost) => {
+    if (newPost) {
+      postData.value = {
+        ...newPost,
+        // 목록 API에서 author가 안 들어오는 경우 대비용
+        author_id: newPost.author ?? postData.value.author_id,
+      }
+      localLikes.value = newPost.likes
+
+      if (authStore.isAuthenticated && newPost.like_user_ids) {
+        isLiked.value = newPost.like_user_ids.includes(authStore.user?.pk)
+      }
+
+      fetchPostDetail()
+      checkFollowStatus()
     }
-    
-    // 추가 정보(이미지 등)를 서버에서 받아옴
-    fetchPostDetail()
-    checkFollowStatus()
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
+
 </script>
 
 <template>

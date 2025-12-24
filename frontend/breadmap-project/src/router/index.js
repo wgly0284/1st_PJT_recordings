@@ -18,6 +18,7 @@ import MapPage from '@/Views/MapPage.vue'
 import SearchResultView from '@/Views/SearchResultView.vue'
 import RegionBakeryView from '@/Views/RegionBakeryView.vue'
 import { useAuthStore } from '@/stores/auth'
+import BreadRoulette from '@/Views/BreadRoulette.vue'
 
 const routes = [
   {
@@ -111,7 +112,13 @@ const routes = [
     component: MapPage,
     meta: { hideNavbar: true }
   },
+  {
+    path: '/roulette',
+    name: 'roulette',
+    component: BreadRoulette
+  },
 ]
+
 
 const router = createRouter({
   history: createWebHistory(),

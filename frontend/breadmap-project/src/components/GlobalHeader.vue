@@ -33,7 +33,10 @@
         >
           MAPS
         </router-link>
-
+        <router-link :to="{ name: 'roulette' }"
+        class="text-[#6B4A38] hover:text-[#F3B37A] transition-colors relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-0 after:h-0.5 after:bg-[#F3B37A] after:transition-all hover:after:w-full font-jua text-base">
+          ROULETTE
+        </router-link>
         <!-- Conditional Auth Links -->
         <template v-if="authStore.isAuthenticated">
           <router-link

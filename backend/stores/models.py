@@ -27,6 +27,10 @@ class Store(models.Model):
     bookmarking_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='bookmarked_stores', blank=True) # blank=True 추가 권장 (즐겨찾기 없는 경우)
     preview_image = models.URLField(blank=True, null=True)
 
+    # ✅ [추가] 대표 메뉴 목록 (리뷰 작성 시 선택지로 제공)
+    # 예: "소금빵,크루아상,바게트,식빵" (콤마로 구분하여 저장)
+    popular_menu_items = models.CharField(max_length=500, blank=True, null=True)
+
     def __str__(self):
         return self.name
 

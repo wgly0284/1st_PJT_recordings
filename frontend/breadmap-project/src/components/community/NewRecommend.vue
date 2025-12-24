@@ -57,45 +57,41 @@ const handleSubmit = async () => {
     return
   }
 
-  if (!storeId.value) { alert('추천할 빵집을 선택해주세요.'); return }
   if (!title.value || !content.value) { alert('제목과 내용을 입력해주세요.'); return }
-  
+
   try {
     isSubmitting.value = true
-    
+
     const formData = new FormData()
-    formData.append('store', storeId.value)
-    formData.append('rating', rating.value)
     formData.append('title', title.value)
     formData.append('content', content.value)
-    // 추천글은 태그로 구분하는 경우 'tags' 사용 (백엔드 확인 필요)
-    formData.append('tags', '빵집 추천') 
-    
+    formData.append('category', '빵집 추천')
+
     if (imageFile.value) {
       formData.append('image', imageFile.value)
     }
-    
-    // Review API 호출
-    await apiClient.post('/reviews/create/', formData, { 
-      headers: { 
-        'Authorization': `Token ${authStore.token}` 
-      } 
+
+    // Community API 호출
+    await apiClient.post('/community/create/', formData, {
+      headers: {
+        'Authorization': `Token ${authStore.token}`
+      }
     })
-    
+
     alert('추천글이 등록되었습니다! 🥯')
     router.push({ name: 'community' })
 
-  } catch (e) { 
+  } catch (e) {
     console.error('실패:', e)
     if (e.response?.status === 401) {
       alert('인증 정보가 유효하지 않습니다. 다시 로그인해주세요.')
     } else if (e.response?.status === 400) {
       alert('입력 정보를 확인해주세요.')
     } else {
-      alert('오류가 발생했습니다.') 
+      alert('오류가 발생했습니다.')
     }
-  } finally { 
-    isSubmitting.value = false 
+  } finally {
+    isSubmitting.value = false
   }
 }
 </script>

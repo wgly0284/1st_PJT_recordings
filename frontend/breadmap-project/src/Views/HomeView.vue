@@ -16,59 +16,19 @@
       <div class="w-full px-4 md:px-8 flex flex-col items-center gap-10 relative z-10 text-center">
         
         <!-- 2. 이미지 영역 (진열대) -->
-        <!-- 크기 축소: max-w-6xl 적용 / 녹아드는 효과 추가 -->
         <div class="relative w-full max-w-6xl flex items-center justify-center -mb-8 sm:-mb-12 mt-4">
-          <!-- 뒤쪽 광채 효과 (은은하게 조정) -->
           <div class="absolute inset-x-20 inset-y-24 bg-gradient-to-r from-orange-100/40 via-yellow-100/40 to-orange-100/40 rounded-full blur-[60px]"></div>
           
-          <!-- 메인 이미지 (진열대) -->
-          <!-- 애니메이션 제거, 하단 마스킹 처리로 자연스럽게 합성 -->
           <img
             :src="shelfImage"
             class="relative w-full h-auto object-contain drop-shadow-md z-10 opacity-95"
             style="-webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%); mask-image: linear-gradient(to bottom, black 60%, transparent 100%);"
             alt="Breadtopia Shelf"
           />
-
-          <!-- 장식 스티커 (애니메이션 제거, 정적 배치, 위치 미세 조정) -->
-          <!-- 오른쪽 상단 -->
-          <div
-            class="absolute top-[10%] right-[10%] md:right-[15%] bg-white/90 px-5 py-3 rounded-2xl
-                   shadow-[0_4px_12px_rgba(0,0,0,0.05)]
-                   flex items-center gap-2 z-20"
-          >
-            <span class="text-3xl">🐶</span>
-            <span class="text-sm font-jua text-[#6B4A38] text-left leading-tight">
-              바게트코기의<br />최애 빵집
-            </span>
-          </div>
-
-          <!-- 왼쪽 하단 -->
-          <div
-            class="absolute bottom-[25%] left-[5%] md:left-[15%] bg-white/90 px-5 py-3 rounded-2xl
-                   shadow-[0_4px_12px_rgba(0,0,0,0.05)]
-                   flex items-center gap-2 z-20"
-          >
-            <span class="text-3xl">🐻</span>
-            <div class="text-sm font-jua text-[#6B4A38] text-left leading-tight">
-              <p>곰 셰프 추천</p>
-              <p class="text-[#C99768]">소금빵 맛집</p>
-            </div>
-          </div>
         </div>
 
         <!-- 3. 텍스트 및 버튼 -->
         <div class="space-y-6 flex flex-col items-center relative z-20 mt-[-2rem]">
-          <div
-            class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm border border-[#F3B37A]/30
-                   px-5 py-2 rounded-full shadow-sm"
-          >
-            <span class="text-xl">🥐</span>
-            <span class="text-sm font-bold text-[#C99768] tracking-wide font-jua">
-              포근한 빵 바구니, Breadtopia
-            </span>
-          </div>
-
           <h1 class="text-5xl md:text-7xl font-jua text-[#6B4A38] leading-tight drop-shadow-sm">
             친구들과
             <span class="inline-block text-[#C99768] relative px-2">
@@ -80,10 +40,7 @@
             <br class="hidden md:block" /> 떠나기
           </h1>
 
-          <p
-            class="text-lg md:text-xl text-[#8B6A55] font-jua leading-relaxed
-                   max-w-lg opacity-90"
-          >
+          <p class="text-lg md:text-xl text-[#8B6A55] font-jua leading-relaxed max-w-lg opacity-90">
             진열대에 가득 찬 갓 구운 빵들처럼,<br />
             동글동글 귀여운 빵집들을 지도 위에서 찾아보세요. 🐶🍞
           </p>
@@ -164,35 +121,35 @@
         </div>
 
         <!-- 지역 그리드 -->
-        <div class="grid grid-cols-4 md:grid-cols-8 gap-4">
+        <div class="grid grid-cols-4 md:grid-cols-8 gap-6 md:gap-8">
           <button
             v-for="region in regions"
             :key="region.id"
             @click="goToRegion(region.id)"
-            class="group relative p-6 hover:scale-110 hover:-translate-y-2 transition-all duration-300 active:scale-95"
+            class="group relative flex flex-col items-center justify-center w-full aspect-square hover:scale-110 hover:-translate-y-2 transition-all duration-300 active:scale-95"
           >
-            <!-- 발바닥 SVG 배경 -->
-            <div class="absolute inset-0 overflow-visible">
-              <svg class="w-full h-full" viewBox="0 0 100 120" preserveAspectRatio="xMidYMid meet">
-                <ellipse cx="50" cy="70" rx="28" ry="24"
-                         class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300 drop-shadow-lg"/>
-                <ellipse cx="22" cy="35" rx="13" ry="16"
-                         class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300 drop-shadow-lg"/>
-                <ellipse cx="50" cy="28" rx="13" ry="17"
-                         class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300 drop-shadow-lg"/>
-                <ellipse cx="78" cy="35" rx="13" ry="16"
-                         class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300 drop-shadow-lg"/>
-                <ellipse cx="74" cy="58" rx="11" ry="14"
-                         class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300 drop-shadow-lg"/>
+            <!-- 큼직하고 단순한 곰돌이 발바닥 SVG 배경 -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[130%] z-0">
+              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-sm">
+                <!-- 메인 패드 -->
+                <circle cx="100" cy="115" r="55" 
+                        class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300" />
+                <!-- 발가락들 -->
+                <circle cx="45" cy="70" r="22" 
+                        class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300" />
+                <circle cx="100" cy="45" r="22" 
+                        class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300" />
+                <circle cx="155" cy="70" r="22" 
+                        class="fill-[#FFF3DD] group-hover:fill-[#FFE8CC] transition-colors duration-300" />
               </svg>
             </div>
 
             <!-- 콘텐츠 -->
-            <div class="relative z-10 pt-2">
-              <div class="text-4xl mb-1 transform group-hover:scale-125 transition-transform duration-300">
+            <div class="relative z-10 flex flex-col items-center pt-6">
+              <div class="text-4xl md:text-5xl mb-1 transform group-hover:scale-125 transition-transform duration-300 drop-shadow-sm filter">
                 {{ region.icon }}
               </div>
-              <h3 class="text-sm font-jua text-[#6B4A38] group-hover:text-orange-600 transition-colors">
+              <h3 class="text-sm md:text-base font-jua text-[#6B4A38] font-bold bg-white/40 px-3 py-0.5 rounded-full backdrop-blur-[2px] group-hover:text-orange-600 transition-colors">
                 {{ region.name }}
               </h3>
             </div>
@@ -257,79 +214,103 @@
       </div>
     </section>
 
-    <!-- 3. Featured Section (랜덤 마스코트 이미지 적용) -->
-    <section class="py-32 bg-[#E6F4D7]/90 relative overflow-hidden">
-      <div class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40">
-        <div class="absolute top-10 left-10 w-32 h-12 bg-white/70 rounded-full blur-xl"></div>
-        <div class="absolute top-24 right-16 w-40 h-16 bg-white/70 rounded-full blur-xl"></div>
-      </div>
+    <!-- [수정됨] 4. Featured Section (나만의 빵 캐릭터) -->
+    <!-- 디자인 컨셉: 폴라로이드 사진관 + 도감 수집 느낌 -->
+    <section class="py-32 relative overflow-hidden">
+      <!-- 배경: 부드러운 그라데이션과 패턴 -->
+      <div class="absolute inset-0 bg-gradient-to-br from-[#FFF3DD] to-[#F9F7F2] z-0"></div>
+      <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] z-0"></div>
 
-      <div class="max-w-[1200px] mx-auto px-6 relative z-10">
-        <div class="flex flex-col md:flex-row items-center gap-16">
-          <!-- 이미지 영역 -->
-          <div class="md:w-1/2 w-full relative">
-            <div
-              class="relative z-10 transform hover:scale-105 transition-transform duration-500 cursor-pointer"
-            >
-              <div
-                class="absolute -inset-4 bg-[#F3B37A]/26 rounded-[2.5rem] blur-2xl"
-              ></div>
-              
-              <!-- 랜덤 이미지 바인딩 (:src="randomMascot") -->
-              <img
-                :src="randomMascot"
-                class="relative rounded-[2rem]
-                       shadow-[0_20px_50px_-12px_rgba(201,151,104,0.35)]
-                       border-8 border-[#FFF3DD] w-full object-cover h-[380px]"
-                alt="Random Mascot Character"
-              />
+      <!-- 장식용 부유물 (떠다니는 느낌) -->
+      <div class="absolute top-10 left-10 text-4xl animate-bounce-slow opacity-60">🥨</div>
+      <div class="absolute bottom-20 right-10 text-4xl animate-bounce-slow opacity-60 delay-700">🥯</div>
+      <div class="absolute top-1/3 right-20 w-32 h-32 bg-[#F3B37A]/10 rounded-full blur-2xl"></div>
 
-              <div
-                class="absolute -top-6 -right-4 bg-white/95 px-4 py-3 rounded-2xl rounded-bl-none
-                       shadow-[0_10px_20px_rgba(0,0,0,0.06)]
-                       flex items-center gap-2"
-              >
-                <span class="text-2xl">🐻</span>
-                <span class="text-base text-[#6B4A38] font-jua">
-                  같이 성장해봐요!
-                </span>
+      <div class="max-w-[1100px] mx-auto px-6 relative z-10">
+        <div class="flex flex-col md:flex-row items-center gap-12 md:gap-20">
+          
+          <!-- 왼쪽: 캐릭터 카드 (폴라로이드 스타일) -->
+          <div class="md:w-1/2 w-full flex justify-center">
+            <div class="relative group cursor-pointer perspective-1000">
+              <!-- 카드 본체 -->
+              <div class="relative bg-white p-4 pb-16 rounded shadow-[0_15px_30px_rgba(0,0,0,0.1)] transform transition-transform duration-500 hover:rotate-2 hover:scale-105 border border-gray-100 w-[320px] sm:w-[380px]">
+                
+                <!-- 상단 테이프 장식 -->
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-[#F3B37A]/40 rotate-1 backdrop-blur-sm shadow-sm z-20"></div>
+
+                <!-- 이미지 프레임 -->
+                <div class="aspect-square w-full bg-[#FFF9F0] rounded-inner overflow-hidden border-2 border-[#EAEaea] relative">
+                  <!-- 캐릭터 이미지 -->
+                  <img
+                    :src="randomMascot"
+                    class="w-full h-full object-contain p-6 hover:scale-110 transition-transform duration-500"
+                    alt="My Bread Character"
+                  />
+                  <!-- 레벨 뱃지 -->
+                </div>
+
+                <!-- 하단 텍스트 (손글씨 느낌) -->
+                <div class="absolute bottom-4 left-0 w-full text-center">
+                  <p class="font-jua text-2xl text-[#6B4A38] mb-1">나의 빵 친구</p>
+                  <p class="font-jua text-sm text-[#C99768]">총 9종류를 모아보세요!</p>
+                </div>
+
+                <!-- 스탬프 장식 (우측 하단) -->
+                <div class="absolute bottom-4 right-4 w-12 h-12 border-2 border-[#EF6C00] rounded-full flex items-center justify-center opacity-20 -rotate-12">
+                  <span class="text-[10px] font-bold text-[#EF6C00] uppercase">Collection</span>
+                </div>
               </div>
+
+              <!-- 뒷배경 장식 카드 (겹쳐진 느낌) -->
+              <div class="absolute top-2 -right-4 w-full h-full bg-white rounded shadow-sm -z-10 rotate-6 border border-gray-100"></div>
             </div>
           </div>
 
-          <!-- 텍스트 -->
-          <div class="md:w-1/2 w-full space-y-6 text-center md:text-left">
-            <span
-              class="inline-block px-4 py-1 bg-[#FFF3DD]/80 text-[#8B6A55]
-                     rounded-full text-sm font-jua border border-[#C99768]/30"
-            >
-              Level Up Challenge
+          <!-- 오른쪽: 텍스트 설명 -->
+          <div class="md:w-1/2 w-full text-center md:text-left space-y-6">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 bg-[#1D4E45]/10 text-[#1D4E45] rounded-full text-sm font-bold tracking-wide">
+              <span>🧬</span> 빵지순례 성장 시스템
             </span>
 
             <h2 class="text-4xl md:text-5xl font-jua text-[#6B4A38] leading-tight">
-              빵을 먹을수록
-              <br />
-              나만의 빵 캐릭터도 성장해요
+              빵 하나 먹을 때마다<br>
+              <span class="text-[#EF6C00] inline-block mt-2 transform -rotate-1 bg-[#FFF3DD] px-2">경험치 +1 UP!</span>
             </h2>
 
-            <p class="text-[#8B6A55] text-xl leading-relaxed font-jua opacity-90">
-              첫 방문은 작고 귀여운 <strong>모닝빵</strong>이지만,
-              <br />
-              여러 빵집을 기록하다 보면
-              <strong>든든한 식빵 히어로</strong>가 되어 있어요. 🍞
+            <p class="text-[#8B6A55] text-lg leading-relaxed font-jua opacity-90">
+              처음엔 작고 소중한 <strong>밀가루 반죽</strong>이지만,<br>
+              리뷰를 남기고 빵지순례를 다닐수록<br>
+              멋진 <strong>식빵 히어로</strong>로 성장한답니다.
             </p>
 
-            <button
-              class="px-8 py-4 bg-[#C99768] text-white text-xl rounded-3xl
-                     font-jua hover:bg-[#A6744C] transition-all
-                     shadow-[0_10px_22px_rgba(201,151,104,0.5)]
-                     hover:shadow-[0_6px_16px_rgba(201,151,104,0.35)]
-                     w-full md:w-auto flex items-center justify-center gap-2 mx-auto md:mx-0"
-            >
-              내 캐릭터 확인하러 가기
-              <ArrowRight class="w-5 h-5" />
-            </button>
+            <!-- 경험치 바 예시 -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-[#FFE8CC] max-w-md mx-auto md:mx-0">
+              <div class="flex justify-between text-sm font-bold text-[#6B4A38] mb-1">
+                <span>현재 레벨</span>
+                <span>다음 레벨까지 30xp</span>
+              </div>
+              <div class="w-full h-3 bg-[#F0F0F0] rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-[#F3B37A] to-[#EF6C00] w-[70%] rounded-full relative">
+                  <div class="absolute right-0 top-0 h-full w-2 bg-white/30 animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-4">
+              <button
+                class="px-8 py-4 bg-[#6B4A38] text-white text-xl rounded-2xl
+                       font-jua hover:bg-[#5A3E2F] transition-all
+                       shadow-[0_8px_20px_rgba(107,74,56,0.3)]
+                       hover:shadow-[0_4px_10px_rgba(107,74,56,0.2)]
+                       hover:-translate-y-1
+                       w-full md:w-auto flex items-center justify-center gap-2 mx-auto md:mx-0"
+              >
+                <span>내 캐릭터 도감 보기</span>
+                <ArrowRight class="w-5 h-5" />
+              </button>
+            </div>
           </div>
+
         </div>
       </div>
     </section>
@@ -347,8 +328,9 @@ import axios from 'axios'
 // Assets Import
 import shelfImage from '@/assets/images/진열대.png'
 
-// --- 랜덤 마스코트 이미지 로직 ---
-const mascotImagesGlob = import.meta.glob('@/assets/mascot/*.{png,jpg,jpeg,svg}', {
+// --- [수정됨] 마스코트 이미지 로드 로직 (mascots 폴더의 png 파일) ---
+// assets/mascots 폴더 내의 모든 png 파일을 불러옵니다.
+const mascotImagesGlob = import.meta.glob('@/assets/mascot/*.png', {
   eager: true,
   import: 'default'
 })
@@ -413,12 +395,14 @@ const scrollToContent = () => {
 onMounted(() => {
   fetchBakeries()
 
+  // [수정됨] 랜덤 마스코트 이미지 선택 로직
   const imagesArray = Object.values(mascotImagesGlob)
   if (imagesArray.length > 0) {
     const randomIndex = Math.floor(Math.random() * imagesArray.length)
     randomMascot.value = imagesArray[randomIndex]
   } else {
-    randomMascot.value = 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?q=80&w=900&auto=format&fit=crop'
+    // 이미지가 없을 경우 기본 이미지
+    randomMascot.value = 'https://cdn-icons-png.flaticon.com/512/3014/3014275.png' 
   }
 })
 </script>
@@ -428,5 +412,19 @@ onMounted(() => {
 
 .font-jua {
   font-family: 'Jua', sans-serif;
+}
+
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-bounce-slow {
+  animation: bounceSlow 3s infinite ease-in-out;
+}
+
+/* 3D 효과를 위한 Perspective */
+.perspective-1000 {
+  perspective: 1000px;
 }
 </style>

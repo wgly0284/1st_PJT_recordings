@@ -5,10 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 
-from .models import Post, PostComment
+from .models import Post, PostComment 
 from .serializers import PostSerializer, PostCommentSerializer
-
-
+from accounts.serializers import UserSerializer
 class CommunityPostListView(generics.ListAPIView):
     """
     커뮤니티 게시글 목록을 조회합니다.
@@ -164,3 +163,34 @@ def my_posts(request):
     posts = Post.objects.filter(author=request.user).order_by('-created_at')
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def following_list(request):
+    try:
+        # 흔한 에러 패턴들 방지
+        if not hasattr(request.user, 'profile'):
+            return Response({"following": []}, status=200)
+        
+        following_users = request.user.profile.following.all()
+        serializer = UserSerializer(following_users, many=True)
+        return Response({"following": serializer.data})
+    except Exception as e:
+        print(f"Following list error: {e}")  # DEBUG용
+        return Response({"following": []}, status=200)
+
+
+
+# community/views.py 맨 아래에 추가
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .models import Post  # 실제 모델명으로 변경
+from .serializers import PostSerializer  # 실제 시리얼라이저로 변경
+
+class PostDetailView(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    lookup_field = 'pk'
+    permission_classes = [IsAuthenticatedOrReadOnly]

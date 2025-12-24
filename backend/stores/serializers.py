@@ -27,7 +27,8 @@ class StoreSerializer(serializers.ModelSerializer):
             'avg_rating',
             'products',
             'is_bookmarked',
-            "preview_image", 
+            "preview_image",
+            'popular_menu_items',
         )
 
     def get_is_bookmarked(self, obj):

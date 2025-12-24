@@ -9,6 +9,9 @@ import BakeryInfoCard from '@/components/map/BakeryInfoCard.vue';
 import StoreReviewWrite from '@/components/map/StoreReviewWrite.vue';
 import { Search, MapPin, Star, Heart, Navigation, ThumbsUp, Home, Map as MapIcon, BookOpen, User, ChevronLeft, ChevronRight, RotateCw } from 'lucide-vue-next';
 
+// 로고 이미지 import (경로에 맞게 수정됨)
+import logoImg from '@/assets/images/logo.png';
+
 const router = useRouter();
 const authStore = useAuthStore();
 
@@ -43,6 +46,7 @@ const characterImages = {
 const showReviewWrite = ref(false);
 const reviewStoreId = ref(null);
 const reviewStoreName = ref('');
+const bakeryInfoCardRef = ref(null);
 
 // 키워드 필터
 const selectedMood = ref(null);
@@ -331,7 +335,10 @@ const openReviewWrite = (storeId) => {
 // 리뷰 작성 완료 후
 const handleReviewCreated = () => {
   showReviewWrite.value = false;
-  // 리뷰 목록 새로고침 (BakeryInfoCard에서 자동으로 처리됨)
+  // 리뷰 목록 새로고침
+  if (bakeryInfoCardRef.value) {
+    bakeryInfoCardRef.value.refreshReviews();
+  }
 };
 
 // 스크롤 이벤트 핸들러 - 더 많은 데이터 로드
@@ -378,8 +385,9 @@ onMounted(() => {
       
       <!-- GNB -->
       <nav class="w-[72px] h-full bg-[#1D4E45] flex flex-col items-center py-6 z-50 shrink-0 shadow-lg text-white/70">
-        <router-link :to="{ name: 'home' }" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-xl mb-10 cursor-pointer hover:bg-white/20 transition-colors text-white no-underline">
-          🥐
+        <!-- 🟢 [수정됨] 홈 링크: 이모티콘 대신 로고 이미지 사용 -->
+        <router-link :to="{ name: 'home' }" class="w-12 h-12 mb-10 cursor-pointer hover:opacity-80 transition-opacity no-underline">
+           <img :src="logoImg" alt="Home Logo" class="w-full h-full object-contain" />
         </router-link>
 
         <div class="flex flex-col gap-8 w-full">
@@ -411,6 +419,7 @@ onMounted(() => {
         <!-- 🟢 선택된 빵집이 있으면 InfoCard 표시 -->
         <div v-if="selectedBakery" class="h-full flex flex-col">
           <BakeryInfoCard
+            ref="bakeryInfoCardRef"
             :bakery="selectedBakery"
             @close="closeInfoCard"
             @view-detail="goToDetail"
@@ -457,30 +466,30 @@ onMounted(() => {
               </div>
 
               <div v-if="currentHotBakery" class="bg-gradient-to-br from-[#1D4E45] to-[#12352E] rounded-2xl p-5 text-white shadow-lg relative overflow-hidden group cursor-pointer mb-6" @click="handleListClick(currentHotBakery)">
-                 <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-                 <div class="flex justify-between items-start mb-3 relative z-10">
-                   <span class="px-2 py-1 bg-white/20 backdrop-blur rounded text-[10px] font-bold tracking-wider flex items-center gap-1">
-                     <ThumbsUp class="w-3 h-3" /> 오늘의 추천
-                   </span>
-                   <button class="text-white/70 hover:text-white"><Heart class="w-4 h-4" /></button>
-                 </div>
-                 <div class="flex gap-4 items-center relative z-10">
-                   <div class="w-16 h-16 rounded-full bg-white/10 border-2 border-white/20 overflow-hidden shrink-0">
-                     <img
-                       :src="currentHotBakery.preview_image"
-                       @error="e => e.target.src = 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80'"
-                       class="w-full h-full object-cover"
-                     />
-                   </div>
-                   <div>
-                     <h3 class="font-bold text-lg leading-tight mb-1">{{ currentHotBakery.name }}</h3>
-                     <p class="text-xs text-white/70 truncate w-40">{{ currentHotBakery.address }}</p>
-                     <div class="flex gap-2 mt-2 text-xs">
-                       <span class="text-orange-300 font-bold">★ {{ currentHotBakery.rating }}</span>
-                       <span class="text-white/50">#{{ currentHotBakery.tags[0] }}</span>
-                     </div>
-                   </div>
-                 </div>
+                  <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                  <div class="flex justify-between items-start mb-3 relative z-10">
+                    <span class="px-2 py-1 bg-white/20 backdrop-blur rounded text-[10px] font-bold tracking-wider flex items-center gap-1">
+                      <ThumbsUp class="w-3 h-3" /> 오늘의 추천
+                    </span>
+                    <button class="text-white/70 hover:text-white"><Heart class="w-4 h-4" /></button>
+                  </div>
+                  <div class="flex gap-4 items-center relative z-10">
+                    <div class="w-16 h-16 rounded-full bg-white/10 border-2 border-white/20 overflow-hidden shrink-0">
+                      <img
+                        :src="currentHotBakery.preview_image"
+                        @error="e => e.target.src = 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80'"
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h3 class="font-bold text-lg leading-tight mb-1">{{ currentHotBakery.name }}</h3>
+                      <p class="text-xs text-white/70 truncate w-40">{{ currentHotBakery.address }}</p>
+                      <div class="flex gap-2 mt-2 text-xs">
+                        <span class="text-orange-300 font-bold">★ {{ currentHotBakery.rating }}</span>
+                        <span class="text-white/50">#{{ currentHotBakery.tags[0] }}</span>
+                      </div>
+                    </div>
+                  </div>
               </div>
 
               <div>

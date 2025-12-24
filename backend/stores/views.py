@@ -101,42 +101,53 @@ class StoreAISummaryView(APIView):
 # 8. 사용자 맞춤 일일 추천 API
 class DailyRecommendationView(APIView):
     """
-    사용자의 취향 키워드를 기반으로 매일 빵집을 추천합니다.
+    사용자의 취향 키워드(bread_preferences)를 기반으로 매일 빵집을 추천합니다.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
-        user_keywords = user.preference_keywords.all()
 
-        # 1) 키워드가 없는 경우: 랜덤 추천
-        if not user_keywords.exists():
+        # 1) bread_preferences에서 키워드 추출 (쉼표로 구분된 문자열 파싱)
+        bread_prefs = user.bread_preferences.strip() if user.bread_preferences else ""
+
+        # 2) 키워드가 없는 경우: 랜덤 추천
+        if not bread_prefs:
             recommended_store = Store.objects.order_by('?').first()
             if not recommended_store:
                 return Response({"error": "No stores available"}, status=status.HTTP_404_NOT_FOUND)
-            serializer = StoreSerializer(recommended_store)
+            serializer = StoreSerializer(recommended_store, context={'request': request})
             return Response({**serializer.data, 'reason': '신규 회원 추천', 'matched_keywords': []})
 
-        # 2) 키워드 매칭 로직
+        # 3) 쉼표로 구분된 키워드들을 리스트로 변환
+        keyword_names = [kw.strip() for kw in bread_prefs.split(',') if kw.strip()]
+
+        if not keyword_names:
+            recommended_store = Store.objects.order_by('?').first()
+            serializer = StoreSerializer(recommended_store, context={'request': request})
+            return Response({**serializer.data, 'reason': '새로운 발견', 'matched_keywords': []})
+
+        # 4) 키워드 매칭 로직
         from .models import Product  # Circular import 방지
-        keyword_names = [kw.name for kw in user_keywords]
         matching_products = Product.objects.filter(keywords__name__in=keyword_names).distinct()
 
         if not matching_products.exists():
             recommended_store = Store.objects.order_by('?').first()
-            serializer = StoreSerializer(recommended_store)
+            serializer = StoreSerializer(recommended_store, context={'request': request})
             return Response({**serializer.data, 'reason': '새로운 발견', 'matched_keywords': []})
 
+        # 5) 매칭된 상품이 있는 빵집들 중 랜덤 선택
         store_ids = matching_products.values_list('store_id', flat=True).distinct()
         stores = Store.objects.filter(id__in=store_ids)
         recommended_store = stores.order_by('?').first()
 
+        # 6) 매칭된 키워드 추출
         matched_keywords = list(set(
             matching_products.filter(store=recommended_store)
             .values_list('keywords__name', flat=True)
         ) & set(keyword_names))
 
-        serializer = StoreSerializer(recommended_store)
+        serializer = StoreSerializer(recommended_store, context={'request': request})
         return Response({
             **serializer.data,
             'reason': '취향 저격',
@@ -149,11 +160,11 @@ class BakeryChatBotView(APIView):
     빵집 추천 챗봇과 대화합니다.
     POST /stores/chatbot/
     """
-    permission_classes = [AllowAny] 
+    permission_classes = [AllowAny]
 
     def post(self, request):
         messages = request.data.get('messages', [])
-        
+
         if not messages:
             return Response({"error": "메시지 내역이 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -161,3 +172,80 @@ class BakeryChatBotView(APIView):
         bot_reply = generate_chat_response(messages)
 
         return Response({"role": "assistant", "content": bot_reply}, status=status.HTTP_200_OK)
+
+# 10. 시/도 목록 조회 API
+class RegionCityListView(APIView):
+    """
+    가게 주소에서 시/도 목록을 추출하여 반환합니다.
+    GET /stores/regions/cities/
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        # address 필드에서 시/도 추출 (첫 번째 공백 또는 첫 단어)
+        addresses = Store.objects.values_list('address', flat=True)
+        cities = set()
+
+        for addr in addresses:
+            if addr:
+                # "서울 강남구 ..."에서 "서울" 추출
+                parts = addr.split()
+                if parts:
+                    city = parts[0]
+                    cities.add(city)
+
+        return Response(sorted(list(cities)), status=status.HTTP_200_OK)
+
+# 11. 구 목록 조회 API
+class RegionDistrictListView(APIView):
+    """
+    선택된 시/도에 해당하는 구 목록을 반환합니다.
+    GET /stores/regions/districts/?city=서울
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        city = request.query_params.get('city', '')
+
+        if not city:
+            return Response({"error": "city 파라미터가 필요합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+        addresses = Store.objects.filter(address__startswith=city).values_list('address', flat=True)
+        districts = set()
+
+        for addr in addresses:
+            parts = addr.split()
+            if len(parts) >= 2:
+                district = parts[1]
+                districts.add(district)
+
+        return Response(sorted(list(districts)), status=status.HTTP_200_OK)
+
+# 12. 동 목록 조회 API
+class RegionNeighborhoodListView(APIView):
+    """
+    선택된 시/도와 구에 해당하는 동 목록을 반환합니다.
+    GET /stores/regions/neighborhoods/?city=서울&district=강남구
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        city = request.query_params.get('city', '')
+        district = request.query_params.get('district', '')
+
+        if not city or not district:
+            return Response({"error": "city와 district 파라미터가 필요합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+        addresses = Store.objects.filter(
+            address__startswith=f"{city} {district}"
+        ).values_list('address', flat=True)
+
+        neighborhoods = set()
+
+        for addr in addresses:
+            parts = addr.split()
+            if len(parts) >= 3:
+                neighborhood = parts[2]
+                neighborhoods.add(neighborhood)
+
+        return Response(sorted(list(neighborhoods)), status=status.HTTP_200_OK)

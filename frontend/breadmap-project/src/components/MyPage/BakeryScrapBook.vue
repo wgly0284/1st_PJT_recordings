@@ -104,14 +104,21 @@ const removeBookmark = async (storeId) => {
           </button>
 
           <!-- 사진 영역 -->
-          <div class="w-full aspect-square bg-gray-100 mb-3 overflow-hidden border border-gray-100 grayscale-[20%] group-hover:grayscale-0 transition-all">
-            <img 
-              v-if="store.image_url" 
-              :src="store.image_url" 
+          <div class="w-full aspect-square bg-gradient-to-br from-amber-50 to-orange-50 mb-3 overflow-hidden border border-gray-200 grayscale-[20%] group-hover:grayscale-0 transition-all">
+            <img
+              v-if="store.image_url"
+              :src="store.image_url"
               class="w-full h-full object-cover"
               @error="e => e.target.src = 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600'"
             >
-            <div v-else class="w-full h-full flex items-center justify-center text-4xl bg-[#F5F5F5] text-gray-300">🥖</div>
+            <div v-else class="w-full h-full flex flex-col items-center justify-center p-3 text-center">
+              <img
+                src="@/assets/images/logo.png"
+                alt="기본 로고"
+                class="w-12 h-12 object-contain opacity-30 mb-2"
+              />
+              <p class="text-[10px] text-gray-400 leading-tight">이미지 없음<br/>제보 요청📸</p>
+            </div>
           </div>
 
           <!-- 텍스트 (손글씨 느낌) -->

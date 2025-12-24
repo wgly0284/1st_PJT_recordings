@@ -11,6 +11,8 @@ from django.core.files.storage import default_storage
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from stores.models import Store # Store 모델 필요 (스탬프용)
+from django.shortcuts import get_object_or_404
+
 
 User = get_user_model()
 
@@ -90,29 +92,32 @@ class UserProfileView(APIView):
 
             # 1-2. 📌 북마크한 빵집 목록
             try:
-                bookmarked_stores = list(user.bookmarked_stores.all().values('id', 'name', 'location', 'image_url'))
+                # 프론트엔드에서 기대하는 필드명으로 매핑
+                for store in bookmarked_stores:
+                    store['location'] = store.pop('address', '')
+                    store['image_url'] = store.pop('preview_image', '')
             except Exception as e:
                 print(f"bookmarked_stores 에러: {e}")
                 bookmarked_stores = []
 
-            # 2. 🔮 취향 분석 데이터: 내가 쓴 리뷰들의 taste_tags 집계
-            all_tags = []
+            # 2. 🔮 취향 분석 데이터: 내가 쓴 리뷰들의 menu_items 집계
+            all_menus = []
             try:
                 for review in user.review_set.all():
-                    if review.taste_tags:
-                        # 콤마로 구분된 태그들을 분리해서 리스트에 추가
-                        tags = [t.strip() for t in review.taste_tags.split(',') if t.strip()]
-                        all_tags.extend(tags)
+                    if review.menu_items:
+                        # 콤마로 구분된 메뉴들을 분리해서 리스트에 추가
+                        menus = [m.strip() for m in review.menu_items.split(',') if m.strip()]
+                        all_menus.extend(menus)
             except Exception as e:
-                print(f"taste_tags 에러: {e}")
+                print(f"menu_items 에러: {e}")
 
-            # 태그 빈도수 계산
+            # 메뉴 빈도수 계산
             from collections import Counter
-            taste_counts = Counter(all_tags)
-            # 예: {'달달함': 5, '바삭함': 2}
+            menu_counts = Counter(all_menus)
+            # 예: {'소금빵': 12, '크루아상': 8}
 
-            # 많이 나온 순서대로 정렬 (상위 5개 정도만 보내줘도 됨)
-            sorted_taste = dict(sorted(taste_counts.items(), key=lambda item: item[1], reverse=True)[:5])
+            # 많이 먹은 순서대로 정렬 (상위 10개)
+            sorted_menus = dict(sorted(menu_counts.items(), key=lambda item: item[1], reverse=True)[:10])
 
             # 3. 커뮤니티 게시글 및 댓글 수 집계
             try:
@@ -186,7 +191,7 @@ class UserProfileView(APIView):
                 "following_count": following_count,
                 "visited_stores": list(visited_stores),
                 "bookmarked_stores": bookmarked_stores,
-                "taste_stats": sorted_taste,
+                "taste_stats": sorted_menus,
                 "badges": badges,
                 "user_reviews": user_reviews,
                 "user_posts": user_posts,
@@ -256,11 +261,11 @@ def followers_list(request):
     followers_data = [{
         'id': user.id,
         'username': user.username,
-        'nickname': user.nickname,
-        'profile_image_url': user.profile_image_url,
-        'level': user.level,
-        'level_title': user.level_title,
-        'character_type': user.character_type,
+        'nickname': getattr(user, 'nickname', user.username),  # ✅ 안전하게
+        'profile_image_url': getattr(user, 'profile_image_url', None),  # ✅ 안전하게
+        'level': getattr(user, 'level', 1),  # ✅ 안전하게
+        'level_title': getattr(user, 'level_title', '아기빵쥐'),  # ✅ 안전하게
+        'character_type': getattr(user, 'character_type', 'hamster'),  # ✅ 안전하게
     } for user in followers]
 
     return Response({
@@ -278,14 +283,26 @@ def following_list(request):
     following_data = [{
         'id': user.id,
         'username': user.username,
-        'nickname': user.nickname,
-        'profile_image_url': user.profile_image_url,
-        'level': user.level,
-        'level_title': user.level_title,
-        'character_type': user.character_type,
+        'nickname': getattr(user, 'nickname', user.username),  # ✅ 안전하게
+        'profile_image_url': getattr(user, 'profile_image_url', None),  # ✅ 안전하게
+        'level': getattr(user, 'level', 1),  # ✅ 안전하게
+        'level_title': getattr(user, 'level_title', '아기빵쥐'),  # ✅ 안전하게
+        'character_type': getattr(user, 'character_type', 'hamster'),  # ✅ 안전하게
     } for user in following]
 
     return Response({
         'count': len(following_data),
         'following': following_data
     }, status=status.HTTP_200_OK)
+
+
+
+# accounts/views.py
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_detail_by_id(request, user_id):
+    print('user_detail_by_id 호출됨, user_id =', user_id)
+    user = get_object_or_404(User, id=user_id)
+    print('조회된 user pk =', user.pk, 'nickname =', user.nickname)
+    serializer = UserSerializer(user)
+    return Response(serializer.data)

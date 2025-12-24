@@ -4,7 +4,15 @@
       "Bash(python manage.py makemigrations:*)",
       "Bash(python manage.py migrate:*)",
       "Bash(grep:*)",
-      "Bash(python manage.py runserver:*)"
+      "Bash(python manage.py runserver:*)",
+      "Bash(python manage.py show_urls:*)",
+      "Bash(python -c:*)",
+      "Bash(timeout 5 bash -c \"until curl -s http://127.0.0.1:8000/admin/ > /dev/null 2>&1; do sleep 0.5; done\")",
+      "Bash(curl:*)",
+      "Bash(python manage.py shell:*)",
+      "Bash(python:*)",
+      "Bash(dir /s /b *.png)",
+      "Bash(findstr:*)"
     ]
   }
 }

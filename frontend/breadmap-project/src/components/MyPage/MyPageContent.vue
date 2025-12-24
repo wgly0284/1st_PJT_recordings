@@ -1,8 +1,8 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
-import { Star, Award, Settings, Receipt, BookOpen, Bookmark, Map } from 'lucide-vue-next'; 
+import { Award, Settings, Receipt, BookOpen, Bookmark } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
 // 👇 컴포넌트 import
 import BreadPassport from './BreadPassport.vue';
@@ -16,7 +16,7 @@ const isLoading = ref(true);
 const userInfo = ref(null);
 const router = useRouter();
 
-// 탭 상태 관리 ('passport', 'taste', 'badge', 'scrap')
+// 탭 상태 관리
 const activeTab = ref('passport');
 
 const showFollowModal = ref(false);
@@ -62,46 +62,19 @@ const fetchUserProfile = async () => {
 
     const data = response.data;
 
-    let bookmarkedStores = data.bookmarked_stores || [];
-    // 👇 테스트용 데이터
-    if (bookmarkedStores.length === 0) {
-        bookmarkedStores = [
-            { id: 1, name: '성심당', location: '대전 중구', image_url: 'https://img.hankyung.com/photo/202305/01.33385564.1.jpg' },
-            { id: 2, name: '런던베이글뮤지엄', location: '서울 종로구', image_url: 'https://i.pinimg.com/736x/87/42/e0/8742e052495764d7c713809268798cc1.jpg' },
-            { id: 3, name: '이성당', location: '전북 군산', image_url: '' },
-        ];
-    }
-
-    let badges = data.badges || [];
-    // 👇 테스트용 데이터
-    if (badges.length === 0) {
-        badges = [
-            { name: '첫 리뷰', icon: '📝', description: '설레는 첫 리뷰 작성' },
-            { name: '소금빵 러버', icon: '🥐', description: '소금빵 리뷰 5개 달성' },
-            { name: '얼리버드', icon: '☀️', description: '오전 9시 이전 방문' },
-            { name: '빵지순례자', icon: '🏃', description: '5개 지역 빵집 방문' }
-        ];
-    }
-
+    // ✨ 수정됨: 더미 데이터 로직 제거하고 실제 데이터만 할당
+    const bookmarkedStores = data.bookmarked_stores || [];
+    const badges = data.badges || [];
+    const tasteStats = data.taste_stats || {};
+    
+    // 방문 데이터 가공
     const visitedStores = (data.visited_stores || []).map(store => ({
       id: store.id,
       name: store.name,
       category: store.category || '빵집',
       location: store.location || '',
-      date: new Date().toISOString().split('T')[0]
+      date: store.visited_date || new Date().toISOString().split('T')[0] // 실제 방문 날짜가 있다면 사용
     }));
-
-    // 👇 취향 분석 더미 데이터 수정 (빵집 메뉴 위주)
-    // 실제로는 백엔드에서 방문한 빵집의 카테고리나 태그를 집계해서 보내줘야 합니다.
-    let tasteStats = data.taste_stats || {};
-    if (Object.keys(tasteStats).length === 0) {
-        tasteStats = {
-            '소금빵': 12,
-            '베이글': 8,
-            '잠봉뵈르': 5,
-            '크루아상': 3
-        };
-    }
 
     userInfo.value = {
       nickname: data.nickname || data.username,
@@ -156,44 +129,30 @@ const openFollowModal = async (type) => {
 
   try {
     const token = authStore.token;
-    if (!token) {
-      console.error('토큰이 없습니다');
-      return;
-    }
+    if (!token) return;
 
+    let response;
     if (type === 'followers') {
-      // 팔로워 목록 가져오기
-      const response = await axios.get('http://127.0.0.1:8000/accounts/followers/', {
+      response = await axios.get('http://127.0.0.1:8000/accounts/followers/', {
         headers: { Authorization: `Token ${token}` }
       });
-      console.log('팔로워 응답:', response.data);
       followList.value = response.data.followers || [];
-      console.log('팔로워 목록:', followList.value);
     } else if (type === 'following') {
-      // 팔로잉 목록 가져오기
-      const response = await axios.get('http://127.0.0.1:8000/accounts/following/', {
+      response = await axios.get('http://127.0.0.1:8000/accounts/following/', {
         headers: { Authorization: `Token ${token}` }
       });
-      console.log('팔로잉 응답:', response.data);
       followList.value = response.data.following || [];
-      console.log('팔로잉 목록:', followList.value);
     } else if (type === 'reviews') {
-      // 리뷰 목록 가져오기
-      const response = await axios.get('http://127.0.0.1:8000/reviews/my/', {
+      response = await axios.get('http://127.0.0.1:8000/reviews/my/', {
         headers: { Authorization: `Token ${token}` }
       });
-      console.log('리뷰 응답:', response.data);
       followList.value = response.data;
-      console.log('리뷰 목록:', followList.value);
     } else if (type === 'posts') {
-      // 포스트 목록 가져오기 - UserProfileView에서 이미 가져온 데이터 사용
-      console.log('포스트 목록 (userInfo에서):', userInfo.value?.user_posts);
+      // API가 따로 없다면 userInfo에 있는 데이터 사용
       followList.value = userInfo.value?.user_posts || [];
-      console.log('포스트 목록:', followList.value);
     }
   } catch (error) {
     console.error(`${type} 데이터 로드 실패:`, error);
-    console.error('에러 상세:', error.response?.data || error.message);
     followList.value = [];
   }
 };
@@ -214,8 +173,20 @@ const receiptEdgeStyle = {
     left: '0'
 };
 
+// 북마크 변경 이벤트 리스너
+const handleBookmarkChanged = () => {
+  // 북마크만 다시 조회
+  fetchUserProfile();
+};
+
 onMounted(() => {
   fetchUserProfile();
+  // 북마크 변경 이벤트 감지
+  window.addEventListener('bookmark-changed', handleBookmarkChanged);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('bookmark-changed', handleBookmarkChanged);
 });
 </script>
 
@@ -231,10 +202,10 @@ onMounted(() => {
     <!-- 데이터 로드 완료 -->
     <div v-else-if="userInfo">
       
-      <!-- 1. 프로필 헤더 (✨ NEW Design: 따뜻한 연두색 Ver.) -->
+      <!-- 1. 프로필 헤더 -->
       <div class="relative pt-12 pb-20 px-6 rounded-b-[50px] shadow-xl overflow-hidden z-10 bg-gradient-to-b from-[#F1F8E9] to-[#DCEDC8]">
         
-        <!-- ☁️ 몽글몽글 배경 효과 (Blobs - 연두빛) -->
+        <!-- 배경 효과 -->
         <div class="absolute top-[-20%] left-[-10%] w-72 h-72 bg-lime-200/40 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
         <div class="absolute top-[-20%] right-[-10%] w-72 h-72 bg-green-200/40 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
         <div class="absolute bottom-[-20%] left-[20%] w-72 h-72 bg-yellow-100/60 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
@@ -247,7 +218,6 @@ onMounted(() => {
             <div class="w-36 h-36 bg-white rounded-full border-[6px] border-white shadow-xl flex items-center justify-center overflow-hidden relative z-10">
               <img :src="getProfileImage" :class="userInfo.profile_image_url ? 'w-full h-full object-cover' : 'w-24 h-24 object-contain drop-shadow-lg'" @error="handleImageError">
             </div>
-            <!-- 레벨 뱃지 (연두색 포인트) -->
             <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#8BC34A] text-white font-bold px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap z-20 flex items-center gap-1 text-sm font-serif border border-white/50">
               <span class="text-xs opacity-90">Lv.{{ userInfo.level }}</span>
               <span>{{ currentLevelInfo.name }}</span>
@@ -261,7 +231,7 @@ onMounted(() => {
               <span class="text-2xl animate-bounce">{{ currentLevelInfo.icon }}</span>
             </div>
 
-            <!-- 경험치 바 (라임 & 그린 그라데이션) -->
+            <!-- 경험치 바 -->
             <div class="relative mb-2 group max-w-md mx-auto md:mx-0">
               <div class="w-full bg-white/60 h-5 rounded-full overflow-hidden backdrop-blur-sm border border-white/40 shadow-inner">
                 <div class="bg-gradient-to-r from-[#DCE775] to-[#8BC34A] h-full rounded-full transition-all duration-1000 relative bg-[length:200%_100%] animate-[shimmer_2s_infinite]" 
@@ -277,7 +247,7 @@ onMounted(() => {
               "{{ currentLevelInfo.name }}" 단계입니다. 맛있는 빵을 찾아 떠나보세요! 🚀
             </p>
 
-            <!-- 스탯 요약 (글라스모피즘 스타일) -->
+            <!-- 스탯 요약 -->
             <div class="flex justify-center md:justify-start gap-4 p-3 bg-white/40 rounded-2xl backdrop-blur-md border border-white/50 shadow-sm inline-flex flex-wrap">
               <div @click="openFollowModal('followers')" class="text-center cursor-pointer hover:text-[#558B2F] transition-colors px-2">
                 <p class="text-lg font-bold text-[#4E342E]">{{ userInfo.follower_count }}</p>
@@ -307,7 +277,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- 2️⃣ 탭 메뉴 (색상 변경: 따뜻한 그린 톤) -->
+      <!-- 2. 탭 메뉴 -->
       <div class="max-w-5xl mx-auto px-4 -mt-10 relative z-20">
         <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg border border-white/60 p-1.5 flex justify-between md:justify-start gap-2 overflow-x-auto hide-scrollbar">
           
@@ -337,7 +307,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- 메인 컨텐츠 영역 (탭 전환) -->
+      <!-- 메인 컨텐츠 영역 -->
       <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-20">
         <Transition name="fade" mode="out-in">
           
@@ -366,22 +336,22 @@ onMounted(() => {
                   </div>
                   <div v-if="Object.keys(userInfo.taste_stats).length > 0" class="space-y-4 mb-8">
                     <div class="flex justify-between text-xs text-gray-500 uppercase tracking-wider border-b border-gray-200 pb-2">
-                      <span>Menu</span>
-                      <span>Qty</span>
+                      <span>Bread Menu</span>
+                      <span>Times</span>
                     </div>
-                    <div v-for="(count, tag) in userInfo.taste_stats" :key="tag" class="flex justify-between items-end group">
-                      <span class="font-bold text-lg text-gray-800 group-hover:text-[#8BC34A] transition-colors">{{ tag }}</span>
+                    <div v-for="(count, menu) in userInfo.taste_stats" :key="menu" class="flex justify-between items-end group">
+                      <span class="font-bold text-lg text-gray-800 group-hover:text-[#8BC34A] transition-colors">{{ menu }}</span>
                       <span class="text-gray-300 border-b-2 border-dotted border-gray-200 flex-1 mx-3 mb-1"></span>
-                      <span class="font-bold text-lg">{{ count }}</span>
+                      <span class="font-bold text-lg">{{ count }}x</span>
                     </div>
                   </div>
                   <div v-else class="py-12 text-center text-gray-400">
-                    <p>No purchase history yet.</p>
-                    <p class="text-xs mt-2">Eat more bread! 🥖</p>
+                    <p>아직 먹은 빵이 없어요 🥺</p>
+                    <p class="text-xs mt-2">리뷰를 작성하면 취향 분석이 표시됩니다!</p>
                   </div>
                   <div class="border-t-2 border-dashed border-gray-300 pt-6 text-center">
                     <div v-if="Object.keys(userInfo.taste_stats).length > 0" class="mb-6 relative inline-block">
-                        <p class="text-[10px] text-gray-500 mb-2 uppercase tracking-widest">Your Top Pick</p>
+                        <p class="text-[10px] text-gray-500 mb-2 uppercase tracking-widest">🏆 Most Loved</p>
                         <p class="text-3xl font-black text-red-500 border-[3px] border-red-500 px-6 py-2 rounded-lg transform -rotate-3 opacity-80" style="font-family: 'Gaegu', cursive;">
                           {{ Object.keys(userInfo.taste_stats).reduce((a, b) => userInfo.taste_stats[a] > userInfo.taste_stats[b] ? a : b) }}
                         </p>
@@ -417,7 +387,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- 팔로우/리뷰/포스트 모달 (기존 코드 유지) -->
+    <!-- 모달 -->
     <Transition name="modal">
       <div v-if="showFollowModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" @click.self="closeFollowModal">
         <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
@@ -430,7 +400,6 @@ onMounted(() => {
             <button @click="closeFollowModal" class="text-white/80 hover:text-white transition-colors">✕</button>
           </div>
           <div class="p-6 overflow-y-auto">
-            <!-- 팔로워/팔로잉 목록 -->
             <div v-if="followModalType === 'followers' || followModalType === 'following'">
               <div v-if="followList.length === 0" class="text-center text-gray-400 py-8">
                 <p class="text-4xl mb-4">🥐</p>
@@ -449,15 +418,15 @@ onMounted(() => {
                     <p class="font-bold text-gray-800">{{ user.nickname || user.username }}</p>
                     <p class="text-xs text-gray-500">Lv.{{ user.level || 1 }} {{ user.level_title || '아기빵쥐' }}</p>
                   </div>
-                  <button class="px-4 py-2 bg-[#8BC34A] text-white rounded-full text-sm font-bold hover:bg-[#7CB342] transition-colors">
+                    <button
+                    class="px-4 py-2 bg-[#8BC34A] text-white rounded-full text-sm font-bold hover:bg-[#7CB342] transition-colors"
+                    @click="router.push({ name: 'userProfile', params: { userId: user.id } })"> 
                     프로필 보기
                   </button>
                 </div>
               </div>
             </div>
-            <!-- 리뷰 목록 -->
             <MyReviewsSection v-else-if="followModalType === 'reviews'" :reviews="followList" />
-            <!-- 포스트 목록 -->
             <MyPostsSection v-else-if="followModalType === 'posts'" :posts="followList" />
           </div>
         </div>
@@ -475,7 +444,6 @@ h2, .font-serif { font-family: 'Gaegu', cursive; }
   100% { transform: translateX(100%); }
 }
 
-/* 몽글몽글 구름 효과 애니메이션 */
 @keyframes blob {
   0% { transform: translate(0px, 0px) scale(1); }
   33% { transform: translate(30px, -50px) scale(1.1); }
@@ -492,17 +460,14 @@ h2, .font-serif { font-family: 'Gaegu', cursive; }
   animation-delay: 4s;
 }
 
-/* 탭 전환 애니메이션 */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
-
 .fade-enter-from {
   opacity: 0;
   transform: translateY(10px);
 }
-
 .fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);

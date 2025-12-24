@@ -38,6 +38,44 @@
           </div>
         </div>
 
+        <!-- 먹은 메뉴 선택 -->
+        <div>
+          <label class="block text-sm font-bold text-gray-800 mb-3">먹은 메뉴를 선택해주세요</label>
+          <div class="flex flex-wrap gap-2 mb-3">
+            <button
+              v-for="menu in popularMenus"
+              :key="menu"
+              @click="toggleMenu(menu)"
+              class="px-4 py-2 rounded-full text-sm font-bold transition-all border-2"
+              :class="
+                selectedMenus.includes(menu)
+                  ? 'bg-amber-500 text-white border-amber-500'
+                  : 'bg-white text-gray-700 border-gray-300 hover:border-amber-300'
+              "
+            >
+              {{ menu }}
+            </button>
+          </div>
+          <!-- 직접 입력 -->
+          <div class="flex gap-2">
+            <input
+              v-model="customMenu"
+              @keyup.enter="addCustomMenu"
+              placeholder="직접 입력 (엔터로 추가)"
+              class="flex-1 px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none text-sm"
+            />
+            <button
+              @click="addCustomMenu"
+              class="px-4 py-2 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition-colors"
+            >
+              추가
+            </button>
+          </div>
+          <div v-if="selectedMenus.length > 0" class="mt-2 text-xs text-gray-500">
+            선택한 메뉴: {{ selectedMenus.join(', ') }}
+          </div>
+        </div>
+
         <!-- 이런 점이 좋았어요 (키워드 선택) -->
         <div>
           <label class="block text-sm font-bold text-gray-800 mb-3">이런 점이 좋았어요</label>
@@ -108,7 +146,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { X, Star, Camera } from 'lucide-vue-next'
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
@@ -128,6 +166,9 @@ const content = ref('')
 const imageFile = ref(null)
 const imagePreview = ref(null)
 const selectedKeywords = ref([])
+const selectedMenus = ref([])
+const customMenu = ref('')
+const popularMenus = ref([])
 
 // 키워드 옵션 (네이버 지도 스타일)
 const tasteTags = [
@@ -141,6 +182,32 @@ const tasteTags = [
   '특별해요'
 ]
 
+// 가게 정보 불러오기 (대표 메뉴 포함)
+const fetchStoreInfo = async () => {
+  try {
+    const response = await axios.get(`http://127.0.0.1:8000/stores/${props.storeId}/`)
+    const store = response.data
+
+    // popular_menu_items가 있으면 파싱
+    if (store.popular_menu_items) {
+      popularMenus.value = store.popular_menu_items.split(',').map(item => item.trim()).filter(item => item)
+    }
+
+    // 기본 메뉴가 없으면 일반적인 빵 메뉴 제공
+    if (popularMenus.value.length === 0) {
+      popularMenus.value = ['소금빵', '크루아상', '바게트', '식빵', '단팥빵', '카스테라']
+    }
+  } catch (error) {
+    console.error('가게 정보 로드 실패:', error)
+    // 실패 시 기본 메뉴
+    popularMenus.value = ['소금빵', '크루아상', '바게트', '식빵', '단팥빵', '카스테라']
+  }
+}
+
+onMounted(() => {
+  fetchStoreInfo()
+})
+
 // 유효성 검사
 const isValid = computed(() => {
   return content.value.trim().length >= 10
@@ -153,6 +220,25 @@ const toggleKeyword = (keyword) => {
     selectedKeywords.value.splice(index, 1)
   } else {
     selectedKeywords.value.push(keyword)
+  }
+}
+
+// 메뉴 토글
+const toggleMenu = (menu) => {
+  const index = selectedMenus.value.indexOf(menu)
+  if (index > -1) {
+    selectedMenus.value.splice(index, 1)
+  } else {
+    selectedMenus.value.push(menu)
+  }
+}
+
+// 커스텀 메뉴 추가
+const addCustomMenu = () => {
+  const menu = customMenu.value.trim()
+  if (menu && !selectedMenus.value.includes(menu)) {
+    selectedMenus.value.push(menu)
+    customMenu.value = ''
   }
 }
 
@@ -184,6 +270,7 @@ const submitReview = async () => {
     formData.append('rating', rating.value)
     formData.append('content', content.value)
     formData.append('taste_tags', selectedKeywords.value.join(','))
+    formData.append('menu_items', selectedMenus.value.join(','))
 
     if (imageFile.value) {
       formData.append('image', imageFile.value)

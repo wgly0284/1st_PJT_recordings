@@ -49,6 +49,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             'photo_urls',
             'tags',
             'taste_tags',
+            'menu_items',
             'created_at',
             'like_users',
             'comments_count',

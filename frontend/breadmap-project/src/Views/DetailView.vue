@@ -4,7 +4,7 @@
 
       <!-- 뒤로 가기 버튼 -->
       <button
-        @click="$router.go(-1)"
+        @click="router.go(-1)"
         class="mb-6 group inline-flex items-center gap-2 px-4 py-2
                bg-white/80 backdrop-blur-sm border border-[#FFE8CC] rounded-full
                shadow-sm hover:border-[#F3B37A] hover:bg-white hover:shadow-md
@@ -36,9 +36,24 @@
               <span class="text-2xl">🍞</span>
               <span class="text-[#C99768] font-jua text-lg">동네 빵집</span>
             </div>
-            <h2 class="text-5xl md:text-6xl font-jua text-[#6B4A38] leading-tight">
-              {{ selectedBakery.bakeryName }}
-            </h2>
+            <div class="flex items-start justify-between gap-4">
+              <h2 class="text-5xl md:text-6xl font-jua text-[#6B4A38] leading-tight flex-1">
+                {{ selectedBakery.bakeryName }}
+              </h2>
+              <!-- 북마크 버튼 -->
+              <button
+                @click="toggleBookmark"
+                class="w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-lg border-2 shrink-0 hover:scale-110"
+                :class="isBookmarked
+                  ? 'bg-red-500 border-red-400 hover:bg-red-600'
+                  : 'bg-white border-[#FFE8CC] hover:border-red-300'"
+              >
+                <Heart
+                  class="w-7 h-7 transition-all"
+                  :class="isBookmarked ? 'fill-white text-white' : 'text-[#C99768]'"
+                />
+              </button>
+            </div>
 
             <!-- 평점 & 태그 -->
             <div class="flex flex-wrap gap-3">
@@ -181,7 +196,7 @@
         </div>
         <h3 class="text-3xl font-jua text-[#6B4A38] mb-4">정보를 찾을 수 없어요</h3>
         <p class="text-[#C99768] font-jua text-xl mb-10">요청하신 빵집 정보가 삭제되었거나 존재하지 않습니다</p>
-        <button @click="$router.push('/')" class="px-10 py-5 bg-gradient-to-r from-[#C99768] to-[#F3B37A] text-white rounded-3xl font-jua text-xl hover:shadow-xl hover:-translate-y-1 transition-all shadow-lg">
+        <button @click="router.push('/')" class="px-10 py-5 bg-gradient-to-r from-[#C99768] to-[#F3B37A] text-white rounded-3xl font-jua text-xl hover:shadow-xl hover:-translate-y-1 transition-all shadow-lg">
           홈으로 돌아가기 🏠
         </button>
       </div>
@@ -192,16 +207,20 @@
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
-import { PawPrint, MapPin, Star, Sparkles, ArrowRight } from 'lucide-vue-next';
+import { PawPrint, MapPin, Star, Sparkles, ArrowRight, Heart } from 'lucide-vue-next';
+import { useAuthStore } from '@/stores/auth';
 
 const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
 const selectedBakery = ref(null);
 const isLoading = ref(true);
 const isError = ref(false);
 const isMapLoaded = ref(false); // 지도 로드 상태
 const aiSummary = ref(null);
+const isBookmarked = ref(false);
 
 // 환경 변수에서 키 가져오기
 const KAKAO_API_KEY = import.meta.env.VITE_KAKAO_MAP_API_KEY;
@@ -392,8 +411,68 @@ const getMenuIcon = (menuName) => {
   return '🥐';
 };
 
+// 북마크 토글 함수
+const toggleBookmark = async () => {
+  if (!authStore.isAuthenticated) {
+    alert('로그인이 필요합니다.');
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      `http://127.0.0.1:8000/stores/${route.params.id}/bookmark/`,
+      {},
+      { headers: { Authorization: `Token ${authStore.token}` } }
+    );
+
+    if (response.data.status === 'bookmark added') {
+      isBookmarked.value = true;
+    } else {
+      isBookmarked.value = false;
+    }
+  } catch (error) {
+    console.error('북마크 실패:', error);
+    alert('북마크 저장에 실패했습니다.');
+  }
+};
+
+// 북마크 상태 확인
+const checkBookmarkStatus = async () => {
+  if (!authStore.isAuthenticated) {
+    console.log('로그인되지 않음 - 북마크 상태 확인 스킵');
+    return;
+  }
+
+  try {
+    console.log('북마크 상태 확인 중...', {
+      url: 'http://127.0.0.1:8000/stores/bookmarks/',
+      token: authStore.token ? '토큰 있음' : '토큰 없음'
+    });
+
+    const response = await axios.get(
+      'http://127.0.0.1:8000/stores/bookmarks/',
+      {
+        headers: { Authorization: `Token ${authStore.token}` },
+      }
+    );
+
+    console.log('북마크 목록 응답:', response.data);
+    const bookmarkedIds = response.data.map((store) => store.id);
+    isBookmarked.value = bookmarkedIds.includes(parseInt(route.params.id));
+    console.log('현재 가게 북마크 상태:', isBookmarked.value);
+  } catch (error) {
+    console.error('북마크 상태 확인 실패:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url
+    });
+  }
+};
+
 onMounted(() => {
   fetchBakeryDetail();
+  checkBookmarkStatus();
 });
 </script>
 

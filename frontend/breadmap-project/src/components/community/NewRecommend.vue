@@ -59,6 +59,12 @@ const handleSubmit = async () => {
 
   if (!title.value || !content.value) { alert('제목과 내용을 입력해주세요.'); return }
 
+  // ✅ 빵집 추천 글에는 가게 선택이 필수
+  if (!storeId.value) {
+    alert('추천할 빵집을 선택해주세요!')
+    return
+  }
+
   try {
     isSubmitting.value = true
 
@@ -66,6 +72,7 @@ const handleSubmit = async () => {
     formData.append('title', title.value)
     formData.append('content', content.value)
     formData.append('category', '빵집 추천')
+    formData.append('store', storeId.value)  // ✅ [추가] store ID 전송
 
     if (imageFile.value) {
       formData.append('image', imageFile.value)

@@ -20,20 +20,38 @@ const categoryLabel = '빵집 추천'
 const imageFile = ref(null)
 const fileInputRef = ref(null)
 const isSubmitting = ref(false)
+const isLoadingStores = ref(false)
 
-onMounted(async () => {
-  try { 
-    const res = await apiClient.get('/stores/')
-    stores.value = res.data 
-  } catch (e) { 
-    console.error('가게 목록 로드 실패:', e) 
+// ✅ [최적화] 백엔드 검색 API 사용 - 검색어 2글자 이상일 때만 호출
+const searchStores = async () => {
+  const q = storeQuery.value.trim()
+  if (!q || q.length < 2) {
+    stores.value = []
+    return
   }
-})
+
+  try {
+    isLoadingStores.value = true
+    // ✅ 초고속 검색 엔드포인트 사용 (이름, 주소만 조회)
+    const res = await apiClient.get(`/stores/quick-search/?search=${encodeURIComponent(q)}`)
+    stores.value = res.data.slice(0, 30) // 최대 30개까지만 표시
+  } catch (e) {
+    console.error('가게 검색 실패:', e)
+    stores.value = []
+  } finally {
+    isLoadingStores.value = false
+  }
+}
+
+// ✅ debounce를 위한 타이머
+let searchTimer = null
+const handleStoreQueryInput = () => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(searchStores, 300)
+}
 
 const filteredStores = computed(() => {
-  const q = storeQuery.value.trim().toLowerCase()
-  if (!q) return stores.value.slice(0, 20)
-  return stores.value.filter((s) => `${s.name} ${s.address || ''}`.toLowerCase().includes(q)).slice(0, 20)
+  return stores.value
 })
 
 const handleImageChange = (e) => {
@@ -130,11 +148,17 @@ const handleSubmit = async () => {
             <span class="text-sm font-bold text-[#5D4037]">가게 선택 <span class="text-[#FF7043]">*</span></span>
             <input
               v-model="storeQuery"
+              @input="handleStoreQueryInput"
               type="text"
               class="w-full border border-[#D7CCC8] rounded-xl px-4 py-3 text-sm bg-[#FAFAFA] focus:outline-none focus:ring-2 focus:ring-[#8D6E63] placeholder-[#BCAAA4]"
-              placeholder="가게 이름을 검색해보세요..."
+              placeholder="가게 이름을 2글자 이상 입력하세요..."
             />
-            <div v-if="storeQuery && filteredStores.length" class="absolute z-20 w-full max-h-48 overflow-y-auto border border-[#D7CCC8] rounded-xl bg-white shadow-lg mt-1 custom-scroll">
+            <!-- 로딩 상태 -->
+            <div v-if="isLoadingStores" class="absolute z-20 w-full border border-[#D7CCC8] rounded-xl bg-white shadow-lg mt-1 px-4 py-3 text-sm text-[#8D6E63]">
+              🔍 검색 중...
+            </div>
+            <!-- 검색 결과 -->
+            <div v-else-if="storeQuery && filteredStores.length" class="absolute z-20 w-full max-h-48 overflow-y-auto border border-[#D7CCC8] rounded-xl bg-white shadow-lg mt-1 custom-scroll">
               <button
                 v-for="store in filteredStores"
                 :key="store.id"
@@ -145,6 +169,10 @@ const handleSubmit = async () => {
                 <span class="font-bold text-[#4E342E]">{{ store.name }}</span>
                 <span class="text-xs text-[#8D6E63]">{{ store.address }}</span>
               </button>
+            </div>
+            <!-- 검색 결과 없음 -->
+            <div v-else-if="storeQuery.length >= 2 && !isLoadingStores && !filteredStores.length" class="absolute z-20 w-full border border-[#D7CCC8] rounded-xl bg-white shadow-lg mt-1 px-4 py-3 text-sm text-[#8D6E63]">
+              검색 결과가 없습니다 😢
             </div>
             <p v-if="storeId" class="text-xs text-[#5D4037] font-bold mt-1 flex items-center gap-1">
               ✅ 가게가 선택되었습니다.

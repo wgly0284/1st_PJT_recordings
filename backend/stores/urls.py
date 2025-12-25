@@ -11,13 +11,15 @@ from .views import (
     BakeryChatBotView,
     RegionCityListView,
     RegionDistrictListView,
-    RegionNeighborhoodListView
+    RegionNeighborhoodListView,
+    StoreQuickSearchView  # ✅ [추가]
 )
 from reviews.views import ReviewListCreateView
 
 urlpatterns = [
     # 1. 가게 목록 및 상세
     path('', StoreListView.as_view(), name='store-list'),
+    path('quick-search/', StoreQuickSearchView.as_view(), name='store-quick-search'),  # ✅ [추가] 빠른 검색
     path('<int:pk>/', StoreDetailView.as_view(), name='store-detail'),
 
     # 2. 지도용 목록

@@ -97,3 +97,9 @@ class MapStoreSerializer(serializers.ModelSerializer):
             'business_hours',
             'contact',
         )
+
+# ✅ [추가] 빠른 검색용 초경량 Serializer (이름, 주소만)
+class StoreSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Store
+        fields = ['id', 'name', 'address']

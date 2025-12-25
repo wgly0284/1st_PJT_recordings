@@ -5,7 +5,8 @@
       "Bash(python manage.py runserver:*)",
       "Bash(python manage.py shell:*)",
       "Bash(python manage.py makemigrations:*)",
-      "Bash(python manage.py migrate:*)"
+      "Bash(python manage.py migrate:*)",
+      "Bash(grep:*)"
     ]
   }
 }

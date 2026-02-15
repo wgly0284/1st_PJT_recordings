@@ -9,7 +9,7 @@ from .models import Store
 from reviews.models import Review
 
 # 시리얼라이저 임포트
-from .serializers import StoreListSerializer, StoreSerializer, MapStoreSerializer
+from .serializers import StoreListSerializer, StoreSerializer, MapStoreSerializer, StoreSearchSerializer
 
 # ✅ utils에서 함수 2개 모두 임포트
 from .utils import generate_store_summary, generate_chat_response
@@ -31,6 +31,20 @@ class StoreListView(generics.ListAPIView):
     serializer_class = StoreListSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'address', 'category', 'representative_tags', 'products__name', 'products__keywords__name']
+
+# 2-1. ✅ [추가] 초고속 빵집 검색 API (이름, 주소만)
+class StoreQuickSearchView(generics.ListAPIView):
+    """
+    빵집 이름/주소만 빠르게 검색합니다. (?search=키워드)
+    커뮤니티 빵집 추천 글 작성용
+    """
+    serializer_class = StoreSearchSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', 'address']  # 이름과 주소만 검색
+
+    def get_queryset(self):
+        # only()로 필요한 필드만 select
+        return Store.objects.only('id', 'name', 'address')
 
 # 3. 가게 상세 조회 API
 class StoreDetailView(generics.RetrieveAPIView):
